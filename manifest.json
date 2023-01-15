@@ -10,5 +10,12 @@
         "16": "icon.png",
         "48": "icon.png",
         "128": "icon.png"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://powerschool.zis.ch/public/"],
+            "js": ["inject.js"]
+        }
+    ],
+    "host_permissions": ["<all_urls>"]
 }
