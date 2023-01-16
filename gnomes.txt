@@ -1,5 +1,5 @@
 Level 1; 
-Name Here;
+Gnomium Gnomelius Gnome;
 The common garden gnome… at least it has character.;
 
 Level 2;
@@ -51,12 +51,12 @@ Name Here;
 This gnome has a beeeeeeeeeeeeeeeeeeg brain.;
 
 Level 14;
-Name Here;
-DESC HERE;
+His Royalty the Gnome;
+He is the king of all gnomes. He decides what is and isn’t a gnome.;
 
 Level 15;
 Giga-Gnome;
-DESC HERE;
+This gnome is an absolute chad. It is the pinnacle of alpha-gnomes.;
 
 Level 16;
 PNOME;
