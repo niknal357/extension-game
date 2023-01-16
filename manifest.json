@@ -13,7 +13,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://powerschool.zis.ch/public/"],
+            "matches": ["*://powerschool.zis.ch/public/*"],
             "js": ["inject.js"]
         }
     ],
