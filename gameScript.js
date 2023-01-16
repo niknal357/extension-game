@@ -13,6 +13,20 @@ grass_blades = []
 
 var fn = 'simplex';
 
+hole_img = document.createElement("img")
+hole_img.src = "gnomes/Hole.png"
+
+hole_front_img = document.createElement("img")
+hole_front_img.src = "gnomes/Hole Front.png"
+
+gnome_imgs = [];
+for (i = 1; i <= 16; i++) {
+    gnome_imgs.push(document.createElement("img"))
+    gnome_imgs[i-1].src = "gnomes/Level " + i + ".png"
+}
+
+hole_size = 100
+
 function draw() {
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
@@ -47,5 +61,13 @@ function draw() {
         ctx.lineWidth = 2;
         ctx.strokeStyle = GRASS_BLADE;
         ctx.stroke();
+    }
+    x_spacing = canvas_width*0.235
+    y_spacing = canvas_height*0.235
+    vertical_offset = canvas_height*-0.045
+    for (x = -1; x < 2; x++) {
+        for (y = -1; y < 2; y++) {
+            ctx.drawImage(hole_img, x_spacing*x + canvas_width/2 - hole_size/2, y_spacing*y + canvas_height/2 - hole_size/2 + vertical_offset, hole_size, hole_size)
+        }
     }
 }
