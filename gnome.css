@@ -38,6 +38,7 @@ h3{
 } */
 
 #gnome-dex{
+    z-index: 9999;
     width: 400px;
     height: 530px;
     background: white;
@@ -111,7 +112,7 @@ h3{
 }
 .button{
     position: absolute;
-    z-index: 999;
+    z-index: 99999;
     width: 50px;
     height: 50px;
     background-size: cover;
