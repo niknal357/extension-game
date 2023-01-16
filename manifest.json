@@ -15,7 +15,14 @@
         {
             "matches": ["*://powerschool.zis.ch/public/*"],
             "js": ["inject.js"]
+        },
+        {
+            "matches": ["<all_urls>"],
+            "js": ["toggleIcon.js"]
         }
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "host_permissions": ["<all_urls>"]
 }
