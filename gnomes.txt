@@ -55,9 +55,9 @@ Name Here;
 DESC HERE;
 
 Level 15;
-Name Here;
+Giga-Gnome;
 DESC HERE;
 
 Level 16;
-Name Here;
-DESC HERE;
+PNOME;
+Paul as a gnome. The name is a combination of paul's first name and the word gnome, just fyi incase you couldn't figure it out.;
