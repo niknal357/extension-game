@@ -1,11 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "Platformer Game",
+    "name": "Gnome Game",
     "version": "1.0.0",
     "action": {
         "default_popup": "index.html"
     },
-    "description": "A gnome merging game made by Paul Lundberg",
+    "description": "A gnome game made by Paul Lundberg",
     "icons": {
         "16": "icon.png",
         "48": "icon.png",
