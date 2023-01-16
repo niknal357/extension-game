@@ -1,4 +1,4 @@
-setTimeout(ready, 2000);
+setTimeout(ready, 1000);
 
 // document.addEventListener('DOMContentLoaded', function() {
 //         ready();
@@ -7,11 +7,11 @@ setTimeout(ready, 2000);
 // );
 
 function ready() { 
-    let gnomeButton = document.getElementById('gnome-dex')
+    let gnomeButton = document.getElementById('gnome-dex-button')
 
-        gnomeButton.addEventListener('click',
-            function(){
-                document.getElementById('gnome-dex').classList.toggle('gnome-dex-hidden')
-            }
-        );
+    gnomeButton.addEventListener('click',
+        function(){
+            document.getElementById('gnome-dex').classList.toggle('gnome-dex-hidden')
+        }
+    );
 }
