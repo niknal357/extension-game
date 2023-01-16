@@ -11,6 +11,7 @@ const checker = setInterval(() => {
 
 grass_blades = []
 
+var fn = 'simplex';
 
 function draw() {
     mainCanvas = document.getElementById("mainCanvas");
@@ -24,11 +25,14 @@ function draw() {
     canvas_width = mainCanvas.clientWidth;
     canvas_height = mainCanvas.clientHeight;
     if (grass_blades.length == 0) {
-        for (i = 0; i < 700; i++) {
+        var noisefn = fn === 'simplex' ? noise.simplex2 : noise.perlin2;
+        for (i = 0; i < 1000; i++) {
+            let x = Math.random() * canvas_width;
+            let y = Math.random() * canvas_height;
             grass_blades.push({
-                x: Math.random() * canvas_width,
-                y: Math.random() * canvas_height,
-                offset: Math.random() * Math.PI * 2,
+                x: x,
+                y: y,
+                offset: noisefn(x/100, y/100)*Math.PI+Math.PI
             })
         }
     }
@@ -38,7 +42,7 @@ function draw() {
     for (i = 0; i < grass_blades.length; i++) {
         ctx.beginPath();
         ctx.moveTo(grass_blades[i].x, grass_blades[i].y)
-        rotation = Math.sin(Date.now()*0.001+grass_blades[i].offset)*0.3-Math.PI/2
+        rotation = Math.sin(Date.now()*0.001+grass_blades[i].offset)*0.5-Math.PI/2
         ctx.lineTo(grass_blades[i].x + Math.cos(rotation) * 20, grass_blades[i].y + Math.sin(rotation) * 20);
         ctx.lineWidth = 2;
         ctx.strokeStyle = GRASS_BLADE;
