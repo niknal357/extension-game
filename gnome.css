@@ -1,3 +1,23 @@
+:root{
+    color: black;
+    font-family: 'Patrick Hand', cursive;
+}
+h1{
+    font-family: 'Patrick Hand', cursive;
+    font-size: 2rem;
+    margin-top: 0.35rem;
+    margin-bottom: 0.35rem;
+}
+h2{
+    margin-top: 0.5rem;
+    margin-bottom: 0.15rem;
+    font-family: 'Patrick Hand', cursive;
+}
+h3{
+    margin-top: 0.15rem;
+    font-family: 'Patrick Hand', cursive;
+}
+
 #gnome-dex-button{
     background-color: black;
     border-radius: 25px;
@@ -39,9 +59,32 @@
     -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     -moz-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: scroll;
+    gap: 5px;
+    padding-bottom: 15px;
 }
 .gnome-dex-hidden{
     width: 50px !important;
     height: 50px !important;
     transition: all 0.5s ease-in;
+}
+
+.gnome{
+    width: 350px;
+    border: 2px solid black;
+    border-radius: 15px;
+    height: auto;
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 10px;
+}
+.gnome-image{
+    width: 100%;
+}
+.gnome-description{
+    margin-right: 10px;
 }
