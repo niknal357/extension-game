@@ -1,12 +1,10 @@
-setTimeout(){
+setTimeout(ready, 2000);
 
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-        ready();
+// document.addEventListener('DOMContentLoaded', function() {
+//         ready();
       
-    }
-);
+//     }
+// );
 
 function ready() { 
     let gnomeButton = document.getElementById('gnome-dex')
