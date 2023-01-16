@@ -11,7 +11,8 @@ function ready() {
 
     gnomeButton.addEventListener('click',
         function(){
-            document.getElementById('gnome-dex').classList.toggle('gnome-dex-hidden')
+            document.getElementById('gnome-dex').classList.toggle('gnome-dex-hidden');
+            document.getElementById('gnome-dex-button').classList.toggle('gnome-dex-button-toggled');
         }
     );
 }
