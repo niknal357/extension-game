@@ -41,3 +41,5 @@ function valueUpdate(user, pass) {
         window.close()
     }
 }
+
+// init()
