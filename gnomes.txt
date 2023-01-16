@@ -1,0 +1,63 @@
+Level 1; 
+Name Here;
+The common garden gnome… at least it has character.;
+
+Level 2;
+Name Here;
+A happy gnome with far too much innocence. He holds a unique sky-blue hat.;
+
+Level 3;
+Name Here;
+This gnome has fewer movement capabilities, though its nose can sniff out all enemies.;
+
+Level 4;
+Name Here;
+This gnome has so much energy that it started melting… and it has a pig nose?;
+
+Level 5;
+Name Here;
+This gnome wears green clothes to show his high status. What a snob.;
+
+Level 6;
+Name Here;
+This gnome has a high level of deformity, and has been given the nickname of the “Tooth Gnome”.;
+
+Level 7;
+Name Here;
+This gnome has unimaginable greed and has degraded to an animal.;
+
+Level 8;
+Name Here;
+Hey, how was your trip to Gnomia? Did you visit the Pyramid of Gnome?;
+
+Level 9;
+Name Here;
+This gnome grew bored of doing nothing so it decided to plant some flowers.;
+
+Level 10;
+Name Here;
+This gnome has built all its strength in its right arm by making swords, but its left arm has become incredibly flimsy.;
+
+Level 11;
+Name Here;
+This gnome mines diamonds as a side hustle and was able to afford this stylish red shirt.;
+
+Level 12;
+Name Here;
+This wizard gnome can cast any spell using its magical flower wand. It seems it’s lost its marbles though.;
+
+Level 13;
+Name Here;
+This gnome has a beeeeeeeeeeeeeeeeeeg brain.;
+
+Level 14;
+Name Here;
+DESC HERE;
+
+Level 15;
+Name Here;
+DESC HERE;
+
+Level 16;
+Name Here;
+DESC HERE;
