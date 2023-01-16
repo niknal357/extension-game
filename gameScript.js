@@ -19,11 +19,54 @@ hole_img.src = "gnomes/Hole.png"
 hole_front_img = document.createElement("img")
 hole_front_img.src = "gnomes/Hole Front.png"
 
+
 gnome_imgs = [];
 for (i = 1; i <= 16; i++) {
     gnome_imgs.push(document.createElement("img"))
     gnome_imgs[i-1].src = "gnomes/Level " + i + ".png"
 }
+console.log(gnome_imgs)
+
+class DataStorage {
+    constructor() {
+        this.data = {}
+    }
+
+    set(key, value) {
+        this.data[key] = value
+    }
+
+    get(key) {
+        return this.data[key]
+    }
+}
+
+fetch("save.json")
+.then((response) => response.json())
+.then((json) => {
+    data = new DataStorage()
+    data.set("gnomes", json.gnomes)
+    simulation_time = json.logoffTime
+    simulation_time = Date.now()
+})
+
+function run_tick(){
+    let gnomes = data.get("gnomes")
+    for (i = 0; i < gnomes.length; i++) {
+        let gnome = gnomes[i]
+        let vx = Math.cos(gnome.heading)*0.5
+        let vy = Math.sin(gnome.heading)*0.5
+        gnome.x += vx
+        gnome.y += vy
+    }
+}
+
+setInterval(() => {
+    while(Date.now() - simulation_time > 8) {
+        run_tick()
+        simulation_time += 8
+    }
+}, 16)
 
 hole_size = 100
 
@@ -38,6 +81,7 @@ function draw() {
 
     canvas_width = mainCanvas.clientWidth;
     canvas_height = mainCanvas.clientHeight;
+
     if (grass_blades.length == 0) {
         var noisefn = fn === 'simplex' ? noise.simplex2 : noise.perlin2;
         for (i = 0; i < 1000; i++) {
@@ -69,5 +113,13 @@ function draw() {
         for (y = -1; y < 2; y++) {
             ctx.drawImage(hole_img, x_spacing*x + canvas_width/2 - hole_size/2, y_spacing*y + canvas_height/2 - hole_size/2 + vertical_offset, hole_size, hole_size)
         }
+    }
+    let gnomes = data.get("gnomes")
+    for (i = 0; i < gnomes.length; i++){
+        let gnome = gnomes[i]
+        t = Date.now()*0.01+i*999999999999;
+        u_d = -Math.abs(Math.sin(t))*15
+        l_r = Math.cos(t)*(1-Math.abs(Math.cos(gnome.heading)))*8
+        ctx.drawImage(gnome_imgs[gnome.num-1], gnome.x+l_r, gnome.y+u_d, 100, 100)
     }
 }
