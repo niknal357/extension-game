@@ -22,24 +22,11 @@ h3{
     background-color: black;
     top: 10px;
     right: 10px;
+    width: 50px;
+    height: 50px;
     background-image: url('icon2.png');
     transition: all 0.5s ease-out, background-color 0s;
     border-radius: 25px;
-}
-#shovel-button{
-    top: 10px;
-    left: 10px;
-    background-image: url('./gnomes/Shovel.png');
-}
-.button{
-    position: absolute;
-    z-index: 999;
-    width: 50px;
-    height: 50px;
-    background-size: cover;
-    padding: 0;
-    border: none;
-    background-color: transparent;
 }
 .gnome-dex-button-toggled{
     border-radius: 25px 0 25px 25px !important;
@@ -90,9 +77,54 @@ h3{
     grid-template-columns: 100px 1fr;
     gap: 10px;
 }
+.gnome-description{
+    margin-right: 10px;
+}
 .gnome-image{
     width: 100%;
 }
-.gnome-description{
-    margin-right: 10px;
+.coin-image{
+    width: 30px;
+    height: 30px;
+    margin: auto;
+}
+#coin-counter{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 150px;
+    height: 40px;
+    border-radius: 15px;
+    background-color: white;
+    font-size: 1.5rem;
+    font-family: 'Patrick Hand', cursive;
+    color: black;
+    display: grid;
+    grid-template-columns: 35px 1fr;
+
+    -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
+    -moz-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
+    box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
+}
+#shovel-button{
+    top: 10px;
+    left: 165px;
+    background-image: url('./gnomes/Shovel.png');
+}
+.button{
+    position: absolute;
+    z-index: 999;
+    width: 40px;
+    height: 40px;
+    background-size: cover;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+}
+#coin-count{
+    margin: auto;
+    text-align: left;
+    width: 85%;
+    line-height: 0;
+    margin-left: 5%;
 }
