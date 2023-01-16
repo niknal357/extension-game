@@ -38,5 +38,3 @@ function valueUpdate(user, pass) {
         })
     })
 }
-
-// init()
