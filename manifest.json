@@ -5,7 +5,7 @@
     "action": {
         "default_popup": "index.html"
     },
-    "description": "A platformer game",
+    "description": "A gnome merging game made by Paul Lundberg",
     "icons": {
         "16": "icon.png",
         "48": "icon.png",
@@ -13,7 +13,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://powerschool.zis.ch/public/"],
+            "matches": ["*://powerschool.zis.ch/public/*"],
             "js": ["inject.js"]
         }
     ],
