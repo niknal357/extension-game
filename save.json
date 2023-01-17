@@ -9,6 +9,7 @@
             "x": 45,
             "y": 291,
             "heading": 4.03171057211,
+            "waddleOffset": 0.36651914291,
             "customData": {}
         },
         {
@@ -16,6 +17,7 @@
             "x": 391,
             "y": 81,
             "heading": 1.0471975512,
+            "waddleOffset": 1.76278254451,
             "customData": {}
         }
     ],

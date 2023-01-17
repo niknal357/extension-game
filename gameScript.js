@@ -69,6 +69,7 @@ setInterval(() => {
 }, 16)
 
 hole_size = 100
+gnome_size = 100
 
 function draw() {
     mainCanvas = document.getElementById("mainCanvas");
@@ -117,9 +118,10 @@ function draw() {
     let gnomes = data.get("gnomes")
     for (i = 0; i < gnomes.length; i++){
         let gnome = gnomes[i]
-        t = Date.now()*0.01+i*999999999999;
+        t = Date.now()*0.01+gnome.waddleOffset;
         u_d = -Math.abs(Math.sin(t))*15
         l_r = Math.cos(t)*(1-Math.abs(Math.cos(gnome.heading)))*8
-        ctx.drawImage(gnome_imgs[gnome.num-1], gnome.x+l_r, gnome.y+u_d, 100, 100)
+        g = 1+Math.min(0, Math.abs(Math.sin(t))-0.5)*0.25
+        ctx.drawImage(gnome_imgs[gnome.num-1], gnome.x+l_r, gnome.y+u_d-gnome_size*g, gnome_size, gnome_size*g)
     }
 }
