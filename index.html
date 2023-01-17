@@ -11,14 +11,42 @@
 </head>
 <body style="width: 750px; height: 550px; margin: 0; padding: 0; border: 0;">
 
-    <div id = 'coin-counter'>
+    <div id = 'coin-counter' class="border">
         <img id = 'coin-image' class = 'coin-image' src = './gnomes/Coin.png'>
-        <h1 id = 'coin-count'>0</h1>
+        <h1 id = 'coin-count'>123981238918312890</h1>
     </div>
-    <button id = 'shovel-button' class = 'button'></button>
-    <button id = 'gnome-dex-button' class = 'button'></button>
+
+    <section id = 'toolbar'>
+        <button id = 'toolbar-button-1' class = 'button button1'>
+            <div class='button-icon' style='background-image: url("./gnomes/Shovel.png");'></div>
+            <div id = 'keybind'>1</div>
+        </button>
+        <button id = 'toolbar-button-2' class = 'button button2'>
+            <div class='button-icon' style='background-image: url("./gnomes/");'></div>
+            <div id = 'keybind'>2</div>
+        </button>
+        <button id = 'toolbar-button-3' class = 'button button2'>
+            <div class='button-icon' style='background-image: url("./gnomes/");'></div>
+            <div id = 'keybind'>3</div>
+        </button>
+        <button id = 'toolbar-button-3' class = 'button button1'>
+            <div class='button-icon' style='background-image: url("./gnomes/");'></div>
+            <div id = 'keybind'>4</div>
+        </button>
+        <button id = 'toolbar-button-5' class = 'button button1'>
+            <div class='button-icon' style='background-image: url("./gnomes/Inventory.png");'></div>
+            <div id = 'keybind'>5</div>
+        </button>
+    </section>
+
+    <section id = 'inventory' class="inventory-hidden border">
+
+    </section>
+
+
+    <button id = 'gnome-dex-button' class = 'button border'></button>
     
-    <section id = 'gnome-dex' class="gnome-dex-hidden">
+    <section id = 'gnome-dex' class="gnome-dex-hidden border">
         <h1 id = 'gd-title'>GNOME-DEX</h1>
     </section>
 

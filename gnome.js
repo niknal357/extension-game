@@ -12,6 +12,12 @@ function ready() {
             .classList.toggle("gnome-dex-button-toggled");
     });
 
+    let inventoryButton = document.getElementById("toolbar-button-5");
+    inventoryButton.addEventListener("click", function () {
+        document.getElementById('inventory').classList.toggle('inventory-hidden');
+        inventoryButton.getElementsByClassName('button-icon')[0].classList.toggle('inventory-icon-toggled');
+    });
+
     fetch("gnomes.txt")
         .then((response) => response.text())
         .then((text) => generateGnomeDex(text));

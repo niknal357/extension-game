@@ -2,6 +2,9 @@
     color: black;
     font-family: 'Patrick Hand', cursive;
 }
+body{
+    cursor: url('./gnomes/Shovel.png'), auto;
+}
 h1{
     font-family: 'Patrick Hand', cursive;
     font-size: 2rem;
@@ -25,6 +28,15 @@ h3{
     background-image: url('icon2.png');
     transition: all 0.5s ease-out, background-color 0s;
     border-radius: 25px;
+    cursor: pointer;
+
+    position: absolute;
+    z-index: 99999;
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    padding: 0;
+    border: none;
 }
 .gnome-dex-button-toggled{
     border-radius: 25px 0 25px 25px !important;
@@ -33,9 +45,6 @@ h3{
 #gnome-dex-button:hover{
     background-color: rgb(68, 68, 68);
 }
-/* #gnome-dex-button:focus{
-    background-color: gray;
-} */
 
 #gnome-dex{
     z-index: 9999;
@@ -49,10 +58,6 @@ h3{
     transition: all 0.5s ease-out;
     box-sizing: border-box;
 
-    /* border: 2px solid black; */
-    -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
-    -moz-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
-    box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -91,8 +96,9 @@ h3{
     position: absolute;
     top: 10px;
     left: 10px;
-    width: 150px;
+    min-width: 150px;
     height: 40px;
+    padding-right: 8px;
     border-radius: 15px;
     background-color: white;
     font-size: 1.5rem;
@@ -101,17 +107,42 @@ h3{
     display: grid;
     grid-template-columns: 35px 1fr;
 
+}
+.border{
     -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     -moz-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
 }
-#shovel-button{
+
+#coin-count{
+    margin: auto;
+    text-align: left;
+    line-height: 0;
+}
+#toolbar{
+    position: fixed;
     bottom: 10px;
     left: 10px;
-    background-image: url('./gnomes/Shovel.png');
+    height: 50px;
+    width: auto;
+}
+#inventory{
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    height: 50px;
+    width: 400px;
+    background-color: white;
+    border-radius: 25px;
+    transition: 0.5s all ease-out;
+}
+.inventory-hidden{
+    width: 0px !important;
+    height: 0px !important;
+    transition: 0.5s all ease-in;
 }
 .button{
-    position: absolute;
+    position: relative;
     z-index: 99999;
     width: 50px;
     height: 50px;
@@ -119,11 +150,36 @@ h3{
     padding: 0;
     border: none;
     background-color: transparent;
+    cursor: pointer;
 }
-#coin-count{
-    margin: auto;
-    text-align: left;
-    width: 85%;
-    line-height: 0;
-    margin-left: 5%;
+.button-icon{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.button1{
+    background-image: url('./gnomes/Button1.png');
+}
+.button2{
+    background-image: url('./gnomes/Button2.png');
+}   
+#keybind{
+    position: absolute;
+    bottom: -2px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 5px;
+    border: 2px solid black;
+    background-color: white;
+    font-family: 'Patrick Hand', cursive;
+    line-height: 15px;
+}
+.inventory-icon-toggled{
+    background-image: url('./gnomes/Inventory2.png') !important;
 }
