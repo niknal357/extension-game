@@ -24,5 +24,6 @@
             "extension_ids": []
         }
     ],
+    "permissions": ["storage"],
     "host_permissions": ["<all_urls>"]
 }
