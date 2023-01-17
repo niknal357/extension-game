@@ -1,7 +1,7 @@
 {
     "gnomesCollectedInCurrentRun": 29,
     "coinsInCurrentRun": 0,
-    "highestGnomeFound": 1,
+    "highestGnomeDiscovered": 5,
     "logoffTime": 1673908787000,
     "gnomes": [
         {
@@ -34,6 +34,23 @@
                 "num": 8,
                 "customData": {}
             }
+        }
+    ],
+    "inventory": [
+        {
+            "name": "Seed 1",
+            "amount": 1,
+            "discovered": true
+        },
+        {
+            "name": "Seed 2",
+            "amount": 148,
+            "discovered": true
+        },
+        {
+            "name": "Seed 3",
+            "amount": 0,
+            "discovered": false
         }
     ],
 

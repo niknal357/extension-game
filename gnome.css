@@ -136,12 +136,12 @@ h3{
     width: 400px;
     background-color: white;
     border-radius: 25px;
-    transition: 0.5s all ease-out;
+    transition: 0.2s all ease-out;
 }
 .inventory-hidden{
     width: 0px !important;
-    height: 0px !important;
-    transition: 0.5s all ease-in;
+    height: 50px !important;
+    transition: 0.2s all ease-in;
 }
 .button{
     position: relative;
@@ -184,4 +184,7 @@ h3{
 }
 .inventory-icon-toggled{
     background-image: url('./gnomes/Inventory2.png') !important;
+}
+.undiscovered{
+    filter: brightness(0) !important;
 }
