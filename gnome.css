@@ -10,6 +10,8 @@ h1{
     font-size: 2rem;
     margin-top: 0.35rem;
     margin-bottom: 0.35rem;
+    width: 250px;
+    text-align: center;
 }
 h2{
     margin-top: 0.5rem;
