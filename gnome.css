@@ -69,6 +69,7 @@ h3{
     padding-bottom: 15px;
 }
 .gnome-dex-hidden{
+    overflow: hidden !important;
     width: 50px !important;
     height: 50px !important;
     transition: all 0.5s ease-in;

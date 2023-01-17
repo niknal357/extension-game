@@ -29,10 +29,10 @@ function generateGnomeDex(data) {
     console.log(data);
 
     let lines = data.split(";");
-    let linesPerGnomeEntry = 3;
+    const linesPerGnomeEntry = 3;
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
-    let highestGnomeDiscovered = 5;  //TODO: this should pull from save.json file
+    let highestGnomeDiscovered = 3;  //TODO: this should pull from save.json file
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -55,7 +55,7 @@ function generateGnomeDex(data) {
         gnomeDescription.classList.add("gnome-description");
         gnomeDescription.innerHTML = lines[i * linesPerGnomeEntry + 2];
 
-        if(highestGnomeDiscovered < i){
+        if(highestGnomeDiscovered <= i){
             gnomeImage.classList.add("undiscovered");
             gnomeName.innerHTML = "???";
             gnomeDescription.innerHTML = "???";
