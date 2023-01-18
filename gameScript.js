@@ -14,6 +14,13 @@ hole_size = 100;
 gnome_size = 100;
 wind = 0;
 
+function resetProgress() {
+    for (let i = 0; i < data.datapoints.length; i++) {
+        data.set(data.datapoints[i], data.defaults[i]);
+    }
+    data.save();
+}
+
 function ready() {
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
