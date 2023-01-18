@@ -155,6 +155,17 @@ h3{
     background-color: transparent;
     cursor: pointer;
 }
+.toolbar_button:after{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    z-index: -1;
+}
+
 .button-icon{
     position: absolute;
     top: 0;
@@ -164,14 +175,15 @@ h3{
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    rotate: unset !important;
 }
-.button1{
+.button1:after{
     background-image: url('./gnomes/Button1.png');
 }
-.button2{
+.button2:after{
     background-image: url('./gnomes/Button2.png');
 }   
-#keybind{
+.keybind{
     position: absolute;
     bottom: -2px;
     right: -5px;
@@ -182,6 +194,7 @@ h3{
     background-color: white;
     font-family: 'Patrick Hand', cursive;
     line-height: 15px;
+    rotate: unset !important;
 }
 .inventory-icon-toggled{
     background-image: url('./gnomes/Inventory2.png') !important;

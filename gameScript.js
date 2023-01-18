@@ -30,6 +30,17 @@ function ready() {
 }
 
 function generateUI() {
+    let buttons = document.getElementsByClassName("toolbar_button");
+    for (let i = 0; i < buttons.length; i++) {
+        rot_value = Math.random() * 360;
+        let css =
+            ".toolbar_button_" + i + "::after {rotate: " + rot_value + "deg;}";
+        let style = document.createElement("style");
+        style.innerHTML = css;
+        document.getElementsByTagName("head")[0].appendChild(style);
+        buttons[i].classList.add("toolbar_button_" + i);
+    }
+
     let gnomeButton = document.getElementById("gnome-dex-button");
 
     gnomeButton.addEventListener("click", function () {
