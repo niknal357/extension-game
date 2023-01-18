@@ -161,27 +161,6 @@ for (i = 1; i <= 16; i++) {
 }
 console.log(gnome_imgs);
 
-var to_store = [];
-
-setInterval(() => {
-    let clearing = to_store.length;
-    console.log(to_store);
-    if (clearing == 0) {
-        return;
-    }
-    let datar = to_store.pop();
-    console.log(datar);
-    let key = datar["key"];
-    let data = datar["data"];
-    console.log(key, data);
-    console.log(JSON.stringify(data));
-    let val = {};
-    val[key] = JSON.stringify(data);
-    chrome.storage.sync.set(val, () => {
-        console.log("Stored " + JSON.stringify(data) + " in " + key);
-    });
-}, 100);
-
 class DataStorage {
     constructor() {
         this.data = {};
@@ -214,12 +193,15 @@ class DataStorage {
 
     save() {
         this.lastSave = Date.now();
-        var dat = this;
-        for (i = 0; i < dat.datapoints.length; i++) {
-            let key = dat.datapoints[i];
-            console.log(key, dat.get(key));
-            to_store.push({ key: key, data: dat.get(key) });
+        let val = {};
+        for (let i = 0; i < data.datapoints.length; i++) {
+            val[data.datapoints[i]] = JSON.stringify(
+                data.data[data.datapoints[i]]
+            );
         }
+        chrome.storage.sync.set(val, () => {
+            console.log("Stored");
+        });
     }
 
     load() {
@@ -239,7 +221,6 @@ class DataStorage {
                 }
                 // dat.set(key, defau[i]);
             }
-            simulation_time = dat.get("logoffTime");
             dat.loaded = true;
         });
     }
@@ -259,8 +240,6 @@ setTimeout(() => {
 }, 200);
 
 var resetting = false;
-
-var simulation_time = 0;
 
 // fetch("save.json")
 //     .then((response) => response.json())
@@ -287,10 +266,9 @@ setTimeout(() => {
         if (!data.loaded) {
             return;
         }
-        if (Date.now() - simulation_time > 8) {
+        if (Date.now() - data.get("logoffTime") > 8) {
             run_tick();
-            simulation_time += 8;
-            data.set("logoffTime", simulation_time);
+            data.set("logoffTime", data.get("logoffTime") + 8);
             // console.log(Date.now()-simulation_time)
         }
     }, 3);
@@ -299,7 +277,7 @@ setTimeout(() => {
 function draw() {
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
-    console.log(wind);
+    // console.log(wind);
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
     //draw the background
