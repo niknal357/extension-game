@@ -25,6 +25,8 @@ function ready() {
     generateHoles();
     console.log(holePositions);
     
+    
+
     generateUI();
     
 }
@@ -52,30 +54,40 @@ function generateUI() {
         .then((text) => generateGnomeDex(text));
 }
 
-function generateHoles(numHoleRows = 3, numHoleCols = 3, x_spacing = 140, y_spacing = 20) {
+function generateHoles(numHoleRows = 3, numHoleCols = 1, x_spacing = 140, y_spacing = 20) {
     // the above set defaults if no value is passed
+    let newHoles = []
 
-    let widthOfHoles = numHoleCols * (x_spacing + hole_size);
-    let heightOfHoles = numHoleRows * (y_spacing + hole_size);
-    let top_left_x = (canvas_width - widthOfHoles) / 2;
-    let top_left_y = (canvas_height - heightOfHoles) / 2;
+    let holeBoundingBoxWidth = numHoleCols * hole_size + (numHoleCols - 1) * x_spacing;
+    let holeBoundingBoxHeight = numHoleRows * hole_size + (numHoleRows - 1) * y_spacing;
+    let top_left_x = (canvas_width - holeBoundingBoxWidth) / 2;
+    let top_left_y = (canvas_height - holeBoundingBoxHeight) / 2;
+
+    console.log(numHoleRows + '  ' + numHoleCols + '  ' + x_spacing + '  ' + y_spacing);
+    console.log(canvas_width + '  ' + canvas_height);
+    console.log(top_left_x + '  ' + top_left_y);
+    console.log('width: ' + holeBoundingBoxWidth + '  ' + 'height: ' + holeBoundingBoxHeight);
 
     let vertical_offset = canvas_height * -0.045;
-    for (x = 0; x < numHoleCols; x++) {
-        for (y = 0; y < numHoleCols; y++) {
-            holePositions.push({
-                'xPos': top_left_x + x * (x_spacing + hole_size) + x_spacing/2,
-                'yPos': top_left_y + y * (y_spacing + hole_size) + vertical_offset + y_spacing/2,
-                'x': x,
-                'y': y,
+    for (let row = 0; row < numHoleRows; row++) {
+        for (let column = 0; column < numHoleCols; column++) {
+            newHoles.push({
+                'xPos': top_left_x + row * (x_spacing + hole_size),
+                'yPos': top_left_y + column * (y_spacing + hole_size) + vertical_offset,
+                'x': row,
+                'y': column,
             });
         }
-    }}
+    }
+    console.log(newHoles);
+    holePositions = newHoles;
+
+    // setTimeout(generateHoles, 5000, Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100));
+}
 
 function generateGnomeDex(data) {
     // get rid of new lines in data
     data = data.replace(/(\r\n|\n|\r)/gm, "");
-    console.log(data);
 
     let lines = data.split(";");
     const linesPerGnomeEntry = 3;
@@ -200,7 +212,6 @@ function draw() {
 
     // wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
-    console.log(wind);
     //draw the background
     GRASS = "#82d479";
     GRASS_BLADE_1 = "#519645";
@@ -265,10 +276,6 @@ function draw() {
 
     for(let hole = 0; hole < holePositions.length; hole++){
         // call ctx.drawImage() for each position, and pass in the value for the keys 'xPox', 'yPos', 'width', and 'height'
-
-        console.log(holePositions[hole]);
-        console.log(holePositions[hole].xPos);
-        console.log(holePositions[hole].yPos);
         ctx.drawImage(
             hole_img,
             holePositions[hole].xPos,
@@ -276,17 +283,6 @@ function draw() {
             hole_size,
             hole_size
             );
-
-        // ctx.drawImage(
-        //     hole_img,
-        //     holePositions[hole].x,
-        //     y_spacing * y +
-        //         canvas_height / 2 -
-        //         hole_size / 2 +
-        //         vertical_offset,
-        //     hole_size,
-        //     hole_size
-        // );
     }
 
     let gnomes = data.get("gnomes");
