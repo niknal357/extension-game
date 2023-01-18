@@ -69,10 +69,6 @@ function generateHoles(
     let total_height = numHoleRows * hole_size + (numHoleRows - 1) * y_spacing;
     let left_offset = (canvas_width - total_width) / 2;
     let top_offset = (canvas_height - total_height) / 2 - canvas_height * 0.045;
-    console.log(total_width);
-    console.log(total_height);
-    console.log(left_offset);
-    console.log(top_offset);
 
     for (let row = 0; row < numHoleRows; row++) {
         for (let column = 0; column < numHoleCols; column++) {
