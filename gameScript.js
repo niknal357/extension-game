@@ -141,7 +141,7 @@ const checker = setInterval(() => {
         ready();
         console.log("starting");
         setInterval(draw, 1000 / 60);
-        
+
         clearInterval(checker);
     }
 }, 10);
@@ -169,7 +169,7 @@ var to_store = [];
 
 setInterval(() => {
     let clearing = to_store.length;
-    console.log(to_store)
+    console.log(to_store);
     if (clearing == 0) {
         return;
     }
@@ -177,21 +177,28 @@ setInterval(() => {
     console.log(datar);
     let key = datar["key"];
     let data = datar["data"];
-    console.log(key, data)
-    console.log(JSON.stringify(data))
-    let val = {}
+    console.log(key, data);
+    console.log(JSON.stringify(data));
+    let val = {};
     val[key] = JSON.stringify(data);
     chrome.storage.sync.set(val, () => {
-        console.log("Stored "+JSON.stringify(data)+ " in "+key)
-    })
+        console.log("Stored " + JSON.stringify(data) + " in " + key);
+    });
 }, 100);
 
 class DataStorage {
     constructor() {
         this.data = {};
-        this.lastSave = Date.now()+1000000000;
-        this.datapoints = ["gnomes", "holes", "inventory", "logoffTime", "inventory"];
+        this.lastSave = Date.now() + 1000000000;
+        this.datapoints = [
+            "logoffTime",
+            "gnomes",
+            "holes",
+            "inventory",
+            "inventory",
+        ];
         this.defaults = [
+            Date.now(),
             [
                 {
                     x: 60,
@@ -199,13 +206,12 @@ class DataStorage {
                     heading: 1,
                     num: 1,
                     waddleOffset: 4,
-                    customData: {}
-                }
+                    customData: {},
+                },
             ],
             [],
             [],
             [],
-            Date.now()
         ];
         this.loaded = false;
     }
@@ -219,34 +225,34 @@ class DataStorage {
 
     save() {
         this.lastSave = Date.now();
-        var dat = this
+        var dat = this;
         for (i = 0; i < dat.datapoints.length; i++) {
             let key = dat.datapoints[i];
-            console.log(key, dat.get(key))
-            to_store.push({"key": key, "data": dat.get(key)})
+            console.log(key, dat.get(key));
+            to_store.push({ key: key, data: dat.get(key) });
         }
     }
 
     load() {
-        var dp = this.datapoints
-        var defau = this.defaults
-        var dat = this
-        chrome.storage.sync.get(this.datapoints, function(items){
+        var dp = this.datapoints;
+        var defau = this.defaults;
+        var dat = this;
+        chrome.storage.sync.get(this.datapoints, function (items) {
             for (i = 0; i < dp.length; i++) {
                 let key = dp[i];
-                console.log(key)
+                console.log(key);
                 if (key in items) {
-                    console.log('taking from storage')
+                    console.log("taking from storage");
                     dat.set(key, JSON.parse(items[key]));
                 } else {
-                    console.log('taking from default')
+                    console.log("taking from default");
                     dat.set(key, defau[i]);
                 }
                 // dat.set(key, defau[i]);
             }
             simulation_time = dat.get("logoffTime");
             dat.loaded = true;
-        })
+        });
     }
 
     get(key) {
@@ -255,19 +261,17 @@ class DataStorage {
 }
 
 var data = new DataStorage();
-console.log(data.datapoints)
+console.log(data.datapoints);
 setTimeout(() => {
-    data.load()
+    data.load();
     setTimeout(() => {
-        data.save()
-    }, 200)
+        data.save();
+    }, 200);
 }, 200);
 
-var resetting = false
+var resetting = false;
 
 var simulation_time = 0;
-
-
 
 // fetch("save.json")
 //     .then((response) => response.json())
@@ -350,8 +354,8 @@ function draw() {
         }
         ctx.stroke();
     }
-    if (!data.loaded){
-        return
+    if (!data.loaded) {
+        return;
     }
 
     // draw the holes
