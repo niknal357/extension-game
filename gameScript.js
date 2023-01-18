@@ -1,6 +1,48 @@
-setTimeout(ready, 100);
+// setTimeout(ready, 100);
+
+var holdingitem = false;
+var itemHeld = null;
+
+var holePositions = [];
+
+hole_size = 100;
+gnome_size = 100;
+wind = 0;
 
 function ready() {
+    let mainCanvas = document.getElementById("mainCanvas");
+    let ctx = mainCanvas.getContext("2d");
+    let canvas_width = mainCanvas.clientWidth;
+    let canvas_height = mainCanvas.clientHeight;
+    document.getElementById('mainCanvas').addEventListener('click', handleClick);
+
+    let numHoleRows = 3;
+    let numHoleCols = 3;
+    let x_spacing = 20;
+    let y_spacing = 20;
+    let widthOfHoles = numHoleCols * (x_spacing + hole_size);
+    let heightOfHoles = numHoleRows * (y_spacing + hole_size);
+    let top_left_x = (canvas_width - widthOfHoles) / 2;
+    let top_left_y = (canvas_height - heightOfHoles) / 2;
+
+    let vertical_offset = canvas_height * -0.045;
+    for (x = 0; x < numHoleCols; x++) {
+        for (y = 0; y < numHoleCols; y++) {
+            holePositions.push({
+                'xPos': top_left_x + x * (x_spacing + hole_size),
+                'yPos': top_left_y + y * (y_spacing + hole_size) + vertical_offset,
+                'x': x,
+                'y': y,
+            });
+        }
+    }
+    console.log(holePositions);
+    
+    generateUI();
+    
+}
+
+function generateUI() {
     let gnomeButton = document.getElementById("gnome-dex-button");
 
     gnomeButton.addEventListener("click", function () {
@@ -73,6 +115,7 @@ function generateGnomeDex(data) {
 const checker = setInterval(() => {
     console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
+        ready();
         console.log("starting");
         setInterval(draw, 1000 / 60);
         clearInterval(checker);
@@ -145,16 +188,16 @@ setTimeout(() => {
     }, 16);
 }, 100);
 
-hole_size = 100;
-gnome_size = 100;
-wind = 0;
 
 function draw() {
-    wind = wind + (Math.random() - 0.5) * 0.01;
+    var mainCanvas = document.getElementById("mainCanvas");
+    var ctx = mainCanvas.getContext("2d");
+    var canvas_width = mainCanvas.clientWidth;
+    var canvas_height = mainCanvas.clientHeight;
+
+    // wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
     console.log(wind);
-    mainCanvas = document.getElementById("mainCanvas");
-    ctx = mainCanvas.getContext("2d");
     //draw the background
     GRASS = "#82d479";
     GRASS_BLADE_1 = "#519645";
@@ -162,8 +205,6 @@ function draw() {
     mainCanvas.width = mainCanvas.clientWidth;
     mainCanvas.height = mainCanvas.clientHeight;
 
-    canvas_width = mainCanvas.clientWidth;
-    canvas_height = mainCanvas.clientHeight;
 
     if (grass_blades.length == 0) {
         var noisefn = fn === "simplex" ? noise.simplex2 : noise.perlin2;
@@ -179,7 +220,7 @@ function draw() {
     }
     ctx.fillStyle = GRASS;
     ctx.fillRect(0, 0, canvas_width, canvas_height);
-    //draw the grass blades
+    // draw the grass blades
     for (i = 0; i < grass_blades.length; i++) {
         ctx.beginPath();
         ctx.moveTo(grass_blades[i].x, grass_blades[i].y);
@@ -199,9 +240,11 @@ function draw() {
         }
         ctx.stroke();
     }
-    x_spacing = canvas_width * 0.235;
-    y_spacing = canvas_height * 0.235;
-    vertical_offset = canvas_height * -0.045;
+
+    // draw the holes
+    /*let x_spacing = canvas_width * 0.235;
+    let y_spacing = canvas_height * 0.235;
+    let vertical_offset = canvas_height * -0.045;
     for (x = -1; x < 2; x++) {
         for (y = -1; y < 2; y++) {
             ctx.drawImage(
@@ -215,7 +258,34 @@ function draw() {
                 hole_size
             );
         }
+    }*/
+
+    for(let hole = 0; hole < holePositions.length; hole++){
+        // call ctx.drawImage() for each position, and pass in the value for the keys 'xPox', 'yPos', 'width', and 'height'
+
+        console.log(holePositions[hole]);
+        console.log(holePositions[hole].xPos);
+        console.log(holePositions[hole].yPos);
+        ctx.drawImage(
+            hole_img,
+            holePositions[hole].xPos,
+            holePositions[hole].yPos,
+            hole_size,
+            hole_size
+            );
+
+        // ctx.drawImage(
+        //     hole_img,
+        //     holePositions[hole].x,
+        //     y_spacing * y +
+        //         canvas_height / 2 -
+        //         hole_size / 2 +
+        //         vertical_offset,
+        //     hole_size,
+        //     hole_size
+        // );
     }
+
     let gnomes = data.get("gnomes");
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
@@ -231,4 +301,23 @@ function draw() {
             gnome_size * g
         );
     }
+}
+
+
+function handleClick(e){
+    let posX = e.clientX;
+    let posY = e.clientY;
+    // if holding tool or item
+    if(holdingitem){
+        if(itemHeld == 'Shovel'){
+            // if clicked on hole
+            
+
+
+
+            // dig hole && purchase hole
+
+        }
+    }
+    // if clicked on gnome / enemy / mob
 }
