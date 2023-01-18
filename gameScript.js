@@ -1,5 +1,11 @@
 // setTimeout(ready, 100);
 
+
+var mainCanvas;
+var ctx;
+var canvas_width;
+var canvas_height;
+
 var holdingitem = false;
 var itemHeld = null;
 
@@ -10,32 +16,13 @@ gnome_size = 100;
 wind = 0;
 
 function ready() {
-    let mainCanvas = document.getElementById("mainCanvas");
-    let ctx = mainCanvas.getContext("2d");
-    let canvas_width = mainCanvas.clientWidth;
-    let canvas_height = mainCanvas.clientHeight;
+    mainCanvas = document.getElementById("mainCanvas");
+    ctx = mainCanvas.getContext("2d");
+    canvas_width = mainCanvas.clientWidth;
+    canvas_height = mainCanvas.clientHeight;
     document.getElementById('mainCanvas').addEventListener('click', handleClick);
 
-    let numHoleRows = 3;
-    let numHoleCols = 3;
-    let x_spacing = 20;
-    let y_spacing = 20;
-    let widthOfHoles = numHoleCols * (x_spacing + hole_size);
-    let heightOfHoles = numHoleRows * (y_spacing + hole_size);
-    let top_left_x = (canvas_width - widthOfHoles) / 2;
-    let top_left_y = (canvas_height - heightOfHoles) / 2;
-
-    let vertical_offset = canvas_height * -0.045;
-    for (x = 0; x < numHoleCols; x++) {
-        for (y = 0; y < numHoleCols; y++) {
-            holePositions.push({
-                'xPos': top_left_x + x * (x_spacing + hole_size),
-                'yPos': top_left_y + y * (y_spacing + hole_size) + vertical_offset,
-                'x': x,
-                'y': y,
-            });
-        }
-    }
+    generateHoles();
     console.log(holePositions);
     
     generateUI();
@@ -64,6 +51,26 @@ function generateUI() {
         .then((response) => response.text())
         .then((text) => generateGnomeDex(text));
 }
+
+function generateHoles(numHoleRows = 3, numHoleCols = 3, x_spacing = 140, y_spacing = 20) {
+    // the above set defaults if no value is passed
+
+    let widthOfHoles = numHoleCols * (x_spacing + hole_size);
+    let heightOfHoles = numHoleRows * (y_spacing + hole_size);
+    let top_left_x = (canvas_width - widthOfHoles) / 2;
+    let top_left_y = (canvas_height - heightOfHoles) / 2;
+
+    let vertical_offset = canvas_height * -0.045;
+    for (x = 0; x < numHoleCols; x++) {
+        for (y = 0; y < numHoleCols; y++) {
+            holePositions.push({
+                'xPos': top_left_x + x * (x_spacing + hole_size) + x_spacing/2,
+                'yPos': top_left_y + y * (y_spacing + hole_size) + vertical_offset + y_spacing/2,
+                'x': x,
+                'y': y,
+            });
+        }
+    }}
 
 function generateGnomeDex(data) {
     // get rid of new lines in data
@@ -190,10 +197,6 @@ setTimeout(() => {
 
 
 function draw() {
-    var mainCanvas = document.getElementById("mainCanvas");
-    var ctx = mainCanvas.getContext("2d");
-    var canvas_width = mainCanvas.clientWidth;
-    var canvas_height = mainCanvas.clientHeight;
 
     // wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
