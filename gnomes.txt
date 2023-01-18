@@ -39,7 +39,7 @@ Name Here;
 This gnome has built all its strength in its right arm by making swords, but its left arm has become incredibly flimsy.;
 
 Level 11;
-Name Here;
+Miner;
 This gnome mines diamonds as a side hustle and was able to afford this stylish red shirt.;
 
 Level 12;
