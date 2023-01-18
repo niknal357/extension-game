@@ -186,13 +186,7 @@ class DataStorage {
     constructor() {
         this.data = {};
         this.lastSave = Date.now() + 1000000000;
-        this.datapoints = [
-            "logoffTime",
-            "gnomes",
-            "holes",
-            "inventory",
-            "inventory",
-        ];
+        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory"];
         this.defaults = [
             Date.now(),
             [
@@ -205,7 +199,6 @@ class DataStorage {
                     customData: {},
                 },
             ],
-            [],
             [],
             [],
         ];
