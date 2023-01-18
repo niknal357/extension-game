@@ -1,6 +1,5 @@
 // setTimeout(ready, 100);
 
-
 var mainCanvas;
 var ctx;
 var canvas_width;
@@ -20,15 +19,14 @@ function ready() {
     ctx = mainCanvas.getContext("2d");
     canvas_width = mainCanvas.clientWidth;
     canvas_height = mainCanvas.clientHeight;
-    document.getElementById('mainCanvas').addEventListener('click', handleClick);
+    document
+        .getElementById("mainCanvas")
+        .addEventListener("click", handleClick);
 
     generateHoles();
     console.log(holePositions);
-    
-    
 
     generateUI();
-    
 }
 
 function generateUI() {
@@ -45,8 +43,12 @@ function generateUI() {
 
     let inventoryButton = document.getElementById("toolbar-button-5");
     inventoryButton.addEventListener("click", function () {
-        document.getElementById('inventory').classList.toggle('inventory-hidden');
-        inventoryButton.getElementsByClassName('button-icon')[0].classList.toggle('inventory-icon-toggled');
+        document
+            .getElementById("inventory")
+            .classList.toggle("inventory-hidden");
+        inventoryButton
+            .getElementsByClassName("button-icon")[0]
+            .classList.toggle("inventory-icon-toggled");
     });
 
     fetch("gnomes.txt")
@@ -54,28 +56,31 @@ function generateUI() {
         .then((text) => generateGnomeDex(text));
 }
 
-function generateHoles(numHoleRows = 3, numHoleCols = 3, x_spacing = 140, y_spacing = 20) {
+function generateHoles(
+    numHoleRows = 3,
+    numHoleCols = 3,
+    x_spacing = 140,
+    y_spacing = 20
+) {
     // the above set defaults if no value is passed
-    let newHoles = []
+    let newHoles = [];
 
-    let holeBoundingBoxWidth = numHoleCols * hole_size + (numHoleCols - 1) * x_spacing;
-    let holeBoundingBoxHeight = numHoleRows * hole_size + (numHoleRows - 1) * y_spacing;
-    let top_left_x = (canvas_width - holeBoundingBoxWidth) / 2;
-    let top_left_y = (canvas_height - holeBoundingBoxHeight) / 2;
+    let total_width = numHoleCols * hole_size + (numHoleCols - 1) * x_spacing;
+    let total_height = numHoleRows * hole_size + (numHoleRows - 1) * y_spacing;
+    let left_offset = (canvas_width - total_width) / 2;
+    let top_offset = (canvas_height - total_height) / 2 - canvas_height * 0.045;
+    console.log(total_width);
+    console.log(total_height);
+    console.log(left_offset);
+    console.log(top_offset);
 
-    console.log(numHoleRows + '  ' + numHoleCols + '  ' + x_spacing + '  ' + y_spacing);
-    console.log(canvas_width + '  ' + canvas_height);
-    console.log(top_left_x + '  ' + top_left_y);
-    console.log('width: ' + holeBoundingBoxWidth + '  ' + 'height: ' + holeBoundingBoxHeight);
-
-    let vertical_offset = canvas_height * -0.045;
     for (let row = 0; row < numHoleRows; row++) {
         for (let column = 0; column < numHoleCols; column++) {
             newHoles.push({
-                'xPos': top_left_x + row * (x_spacing + hole_size),
-                'yPos': top_left_y + column * (y_spacing + hole_size) + vertical_offset,
-                'x': row,
-                'y': column,
+                xPos: left_offset + column * (x_spacing + hole_size),
+                yPos: top_offset + row * (y_spacing + hole_size),
+                x: column,
+                y: row,
             });
         }
     }
@@ -93,7 +98,7 @@ function generateGnomeDex(data) {
     const linesPerGnomeEntry = 3;
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
-    let highestGnomeDiscovered = 3;  //TODO: this should pull from save.json file
+    let highestGnomeDiscovered = 3; //TODO: this should pull from save.json file
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -116,7 +121,7 @@ function generateGnomeDex(data) {
         gnomeDescription.classList.add("gnome-description");
         gnomeDescription.innerHTML = lines[i * linesPerGnomeEntry + 2];
 
-        if(highestGnomeDiscovered <= i){
+        if (highestGnomeDiscovered <= i) {
             gnomeImage.classList.add("undiscovered");
             gnomeName.innerHTML = "???";
             gnomeDescription.innerHTML = "???";
@@ -129,7 +134,6 @@ function generateGnomeDex(data) {
         document.getElementById("gnome-dex").appendChild(gnome);
     }
 }
-
 
 const checker = setInterval(() => {
     console.log(document.getElementById("mainCanvas"));
@@ -207,9 +211,7 @@ setTimeout(() => {
     }, 16);
 }, 100);
 
-
 function draw() {
-
     // wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
     //draw the background
@@ -218,7 +220,6 @@ function draw() {
     GRASS_BLADE_2 = "#419633";
     mainCanvas.width = mainCanvas.clientWidth;
     mainCanvas.height = mainCanvas.clientHeight;
-
 
     if (grass_blades.length == 0) {
         var noisefn = fn === "simplex" ? noise.simplex2 : noise.perlin2;
@@ -274,7 +275,7 @@ function draw() {
         }
     }*/
 
-    for(let hole = 0; hole < holePositions.length; hole++){
+    for (let hole = 0; hole < holePositions.length; hole++) {
         // call ctx.drawImage() for each position, and pass in the value for the keys 'xPox', 'yPos', 'width', and 'height'
         ctx.drawImage(
             hole_img,
@@ -282,7 +283,7 @@ function draw() {
             holePositions[hole].yPos,
             hole_size,
             hole_size
-            );
+        );
     }
 
     let gnomes = data.get("gnomes");
@@ -302,20 +303,14 @@ function draw() {
     }
 }
 
-
-function handleClick(e){
+function handleClick(e) {
     let posX = e.clientX;
     let posY = e.clientY;
     // if holding tool or item
-    if(holdingitem){
-        if(itemHeld == 'Shovel'){
+    if (holdingitem) {
+        if (itemHeld == "Shovel") {
             // if clicked on hole
-            
-
-
-
             // dig hole && purchase hole
-
         }
     }
     // if clicked on gnome / enemy / mob
