@@ -54,7 +54,7 @@ function generateUI() {
         .then((text) => generateGnomeDex(text));
 }
 
-function generateHoles(numHoleRows = 3, numHoleCols = 1, x_spacing = 140, y_spacing = 20) {
+function generateHoles(numHoleRows = 3, numHoleCols = 3, x_spacing = 140, y_spacing = 20) {
     // the above set defaults if no value is passed
     let newHoles = []
 
