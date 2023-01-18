@@ -75,6 +75,7 @@ const checker = setInterval(() => {
     if (document.getElementById("mainCanvas") != null) {
         console.log("starting");
         setInterval(draw, 1000 / 60);
+        
         clearInterval(checker);
     }
 }, 10);
@@ -98,13 +99,88 @@ for (i = 1; i <= 16; i++) {
 }
 console.log(gnome_imgs);
 
+var to_store = [];
+
+setInterval(() => {
+    let clearing = to_store.length;
+    console.log(to_store)
+    if (clearing == 0) {
+        return;
+    }
+    let datar = to_store.pop();
+    console.log(datar);
+    let key = datar["key"];
+    let data = datar["data"];
+    console.log(key, data)
+    console.log(JSON.stringify(data))
+    let val = {}
+    val[key] = JSON.stringify(data);
+    chrome.storage.sync.set(val, () => {
+        console.log("Stored "+JSON.stringify(data)+ " in "+key)
+    })
+}, 100);
+
 class DataStorage {
     constructor() {
         this.data = {};
+        this.lastSave = Date.now()+1000000000;
+        this.datapoints = ["gnomes", "holes", "inventory", "logoffTime", "inventory"];
+        this.defaults = [
+            [
+                {
+                    x: 60,
+                    y: 60,
+                    heading: 1,
+                    num: 1,
+                    waddleOffset: 4,
+                    customData: {}
+                }
+            ],
+            [],
+            [],
+            [],
+            Date.now()
+        ];
+        this.loaded = false;
     }
 
     set(key, value) {
         this.data[key] = value;
+        if (this.lastSave + 1000 < Date.now()) {
+            this.save();
+        }
+    }
+
+    save() {
+        this.lastSave = Date.now();
+        var dat = this
+        for (i = 0; i < dat.datapoints.length; i++) {
+            let key = dat.datapoints[i];
+            console.log(key, dat.get(key))
+            to_store.push({"key": key, "data": dat.get(key)})
+        }
+    }
+
+    load() {
+        var dp = this.datapoints
+        var defau = this.defaults
+        var dat = this
+        chrome.storage.sync.get(this.datapoints, function(items){
+            for (i = 0; i < dp.length; i++) {
+                let key = dp[i];
+                console.log(key)
+                if (key in items) {
+                    console.log('taking from storage')
+                    dat.set(key, JSON.parse(items[key]));
+                } else {
+                    console.log('taking from default')
+                    dat.set(key, defau[i]);
+                }
+                // dat.set(key, defau[i]);
+            }
+            simulation_time = dat.get("logoffTime");
+            dat.loaded = true;
+        })
     }
 
     get(key) {
@@ -112,18 +188,29 @@ class DataStorage {
     }
 }
 
-chrome.storage.local.set({ logoffTime: 1673908787000 }).then(() => {
-    console.log("Value is set to ");
-});
+var data = new DataStorage();
+console.log(data.datapoints)
+setTimeout(() => {
+    data.load()
+    setTimeout(() => {
+        data.save()
+    }, 200)
+}, 200);
 
-fetch("save.json")
-    .then((response) => response.json())
-    .then((json) => {
-        data = new DataStorage();
-        data.set("gnomes", json.gnomes);
-        simulation_time = json.logoffTime;
-        simulation_time = Date.now();
-    });
+var resetting = false
+
+var simulation_time = 0;
+
+
+
+// fetch("save.json")
+//     .then((response) => response.json())
+//     .then((json) => {
+//         data = new DataStorage();
+//         data.set("gnomes", json.gnomes);
+//         simulation_time = json.logoffTime;
+//         simulation_time = Date.now();
+//     });
 
 function run_tick() {
     let gnomes = data.get("gnomes");
@@ -138,12 +225,14 @@ function run_tick() {
 
 setTimeout(() => {
     setInterval(() => {
-        while (Date.now() - simulation_time > 8) {
+        if (Date.now() - simulation_time > 8) {
             run_tick();
             simulation_time += 8;
+            data.set("logoffTime", simulation_time);
+            // console.log(Date.now()-simulation_time)
         }
-    }, 16);
-}, 100);
+    }, 3);
+}, 1000);
 
 hole_size = 100;
 gnome_size = 100;
@@ -152,7 +241,7 @@ wind = 0;
 function draw() {
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
-    console.log(wind);
+    // console.log(wind);
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
     //draw the background
@@ -198,6 +287,9 @@ function draw() {
             ctx.strokeStyle = GRASS_BLADE_2;
         }
         ctx.stroke();
+    }
+    if (!data.loaded){
+        return
     }
     x_spacing = canvas_width * 0.235;
     y_spacing = canvas_height * 0.235;
