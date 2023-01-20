@@ -15,7 +15,7 @@ wind = 0;
 gravitationalConstant = 0.4;
 
 
-coinDropInterval = 2000;
+coinDropInterval = 10000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 
