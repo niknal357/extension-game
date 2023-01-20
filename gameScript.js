@@ -390,14 +390,19 @@ function draw() {
     }
 
 
+    let holes = data.get("holes");
     for (let hole = 0; hole < holePositions.length; hole++) {
-        ctx.drawImage(
-            hole_img,
-            holePositions[hole].xPos-camera_x,
-            holePositions[hole].yPos-camera_y,
-            hole_size,
-            hole_size
-        );
+        for (let i = 0; i < holes.length; i++) {
+            if (holes[i].x == holePositions[hole].x && holes[i].y == holePositions[hole].y) {
+                ctx.drawImage(
+                    hole_img,
+                    holePositions[hole].xPos-camera_x,
+                    holePositions[hole].yPos-camera_y,
+                    hole_size,
+                    hole_size
+                );
+            }
+        }
     }
 
     let gnomes = data.get("gnomes");
