@@ -12,8 +12,12 @@ hole_size = 100;
 gnome_size = 100;
 coin_size = 50;
 wind = 0;
-coinDropInterval = 2000;
 gravitationalConstant = 0.4;
+
+
+coinDropInterval = 2000;
+inHoleCoinBoost = 3;
+enchantedCoinBoost = 3;
 
 function resetProgress() {
     for (let i = 0; i < data.datapoints.length; i++) {
@@ -332,7 +336,7 @@ function run_tick(gameTime) {
                 if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
                     gnome.x = holePositions[j].xPos;
                     gnome.y = holePositions[j].yPos+gnome_size-5;
-                    gnome.coinBoost = 4;
+                    gnome.coinBoost = inHoleCoinBoost;
                     console.log(gnome)
                     gnomes.push(gnome);
                 }
