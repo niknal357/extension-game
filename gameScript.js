@@ -35,6 +35,7 @@ function ready() {
         .addEventListener("mousemove", handleMouseMove);
 
     generateHoles();
+    setInterval(draw, 1000 / 60);
     console.log(holePositions);
 
     generateUI();
@@ -161,9 +162,9 @@ var camera_approach_y = 0
 const checker = setInterval(() => {
     console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
-        ready();
+        setTimeout(ready, 50);
+        // ready();
         console.log("starting");
-        setInterval(draw, 1000 / 60);
 
         clearInterval(checker);
     }
@@ -221,7 +222,7 @@ class DataStorage {
                     "x": 1,
                     "y": 2,
                     "contents": {
-                        "num": 8,
+                        "num": 3,
                         "id": 9,
                         "customData": {
                             "ai_mode": "idle",
@@ -272,7 +273,7 @@ class DataStorage {
                 data.data[data.datapoints[i]]
             );
         }
-        chrome.storage.sync.set(val, () => {
+        chrome.storage.local.set(val, () => {
             console.log("Stored");
         });
     }
@@ -281,7 +282,7 @@ class DataStorage {
         var dp = this.datapoints;
         var defau = this.defaults;
         var dat = this;
-        chrome.storage.sync.get(this.datapoints, function (items) {
+        chrome.storage.local.get(this.datapoints, function (items) {
             for (i = 0; i < dp.length; i++) {
                 let key = dp[i];
                 console.log(key);
@@ -316,13 +317,35 @@ var resetting = false;
 
 
 function run_tick(gameTime) {
-    let gnomes = data.get("gnomes");
+    let holes = data.get("holes");
+    let gs = data.get("gnomes");
+    let gnomes = [];
+    for (i = 0; i < gs.length; i++) {
+        let gnome = gs[i];
+        gnome.coinBoost = 1;
+        gnomes.push(gnome);
+    }
+    for (i = 0; i < holes.length; i++){
+        if (holes[i].contents != null){
+            let gnome = holes[i].contents;
+            for (j = 0; j < holePositions.length; j++){
+                if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
+                    gnome.x = holePositions[j].xPos;
+                    gnome.y = holePositions[j].yPos+gnome_size-5;
+                    gnome.coinBoost = 4;
+                    console.log(gnome)
+                    gnomes.push(gnome);
+                }
+            }
+        }
+    }
+    console.log(gnomes)
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
         if(coinTime < gameTime) {
-            gnome.customData.nextCoinTime = gameTime + coinDropInterval;
-            dropCoin(1, gnome.x + gnome_size/2, gnome.y - gnome_size*0.8); // TODO: make this a function of the gnome's level
+            gnome.customData.nextCoinTime = gameTime + 1000/gnome.coinBoost;
+            dropCoin(1, gnome.x, gnome.y); // TODO: make this a function of the gnome's level
         }
         let ai_mode = gnome.customData.ai_mode;
         if (ai_mode == "wander") {
@@ -446,13 +469,22 @@ function draw() {
         );
     }
 
-    let gnomes = data.get("gnomes");
+    let gs = data.get("gnomes");
+    let gnomes = [];
+    for (i = 0; i < gs.length; i++) {
+        let gnome = gs[i];
+        gnomes.push(gnome);
+    }
     for (i = 0; i < holes.length; i++){
         if (holes[i].contents != null){
             let gnome = holes[i].contents;
-            gnome.x = holes[i].xPos;
-            gnome.y = holes[i].yPos;
-            gnomes.push(gnome);
+            for (j = 0; j < holePositions.length; j++){
+                if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
+                    gnome.x = holePositions[j].xPos;
+                    gnome.y = holePositions[j].yPos+gnome_size-5;
+                    gnomes.push(gnome);
+                }
+            }
         }
     }
     for (i = 0; i < gnomes.length; i++) {
@@ -477,6 +509,22 @@ function draw() {
             gnome_size,
             gnome_size * g
         );
+    }
+    
+    for (i = 0; i < holes.length; i++){
+        if (holes[i].contents != null){
+            for (j = 0; j < holePositions.length; j++){
+                if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
+                    ctx.drawImage(
+                        hole_front_img,
+                        holePositions[j].xPos-camera_x,
+                        holePositions[j].yPos-camera_y,
+                        hole_size,
+                        hole_size
+                    );
+                }
+            }
+        }
     }
 
 }
