@@ -431,5 +431,5 @@ function handleClick(e) {
             // dig hole && purchase hole
         }
     }
-    // if clicked on gnome / enemy / mob
+    // if clicked on a gnome / enemy / mob
 }
