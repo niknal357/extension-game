@@ -306,6 +306,11 @@ function run_tick(gameTime) {
     let gnomes = data.get("gnomes");
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
+        let coinTime = gnome.customData.nextCoinTime;
+        if(coinTime < gameTime) {
+            gnome.customData.nextCoinTime = gameTime + 1000;
+            dropCoin(1, gnome.x, gnome,y); // TODO: make this a function of the gnome's level
+        }
         let ai_mode = gnome.customData.ai_mode;
         if (ai_mode == "wander") {
             let vx = Math.cos(gnome.customData.heading) * 0.5;
@@ -429,4 +434,15 @@ function handleClick(e) {
         }
     }
     // if clicked on a gnome / enemy / mob
+}
+
+function dropCoin(amount, x, y){
+    let coinEntities = data.get("coinEntities");
+    coinEntities.push({
+        x: x,
+        y: y,
+        amount: amount,
+        id: Math.random()
+    });
+    data.set("coinEntities", coinEntities);
 }
