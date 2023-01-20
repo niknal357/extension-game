@@ -213,6 +213,7 @@ class DataStorage {
                     "y": 2,
                     "contents": {
                         "num": 8,
+                        "id": 9,
                         "customData": {
                             "ai_mode": "idle",
                             "targets": [],
@@ -406,6 +407,14 @@ function draw() {
     }
 
     let gnomes = data.get("gnomes");
+    for (i = 0; i < holes.length; i++){
+        if (holes[i].contents != null){
+            let gnome = holes[i].contents;
+            gnome.x = holes[i].xPos;
+            gnome.y = holes[i].yPos;
+            gnomes.push(gnome);
+        }
+    }
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         t = Date.now() * 0.01 + gnome.id;
