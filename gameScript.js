@@ -10,6 +10,7 @@ var holePositions = [];
 
 hole_size = 100;
 gnome_size = 100;
+coin_size = 50;
 wind = 0;
 
 function resetProgress() {
@@ -27,6 +28,9 @@ function ready() {
     document
         .getElementById("mainCanvas")
         .addEventListener("click", handleClick);
+    document
+        .getElementById("mainCanvas")
+        .addEventListener("mousemove", handleMouseMove);
 
     generateHoles();
     console.log(holePositions);
@@ -174,6 +178,9 @@ hole_img.src = "gnomes/Hole.png";
 hole_front_img = document.createElement("img");
 hole_front_img.src = "gnomes/Hole Front.png";
 
+coin_img = document.createElement("img");
+coin_img.src = "gnomes/Coin.png";
+
 gnome_imgs = [];
 for (i = 1; i <= 16; i++) {
     gnome_imgs.push(document.createElement("img"));
@@ -312,7 +319,7 @@ function run_tick(gameTime) {
         let coinTime = gnome.customData.nextCoinTime;
         if(coinTime < gameTime) {
             gnome.customData.nextCoinTime = gameTime + 1000;
-            dropCoin(1, gnome.x, gnome,y); // TODO: make this a function of the gnome's level
+            dropCoin(1, gnome.x, gnome.y); // TODO: make this a function of the gnome's level
         }
         let ai_mode = gnome.customData.ai_mode;
         if (ai_mode == "wander") {
@@ -424,6 +431,18 @@ function draw() {
             gnome_size * g
         );
     }
+
+    let coinEntities = data.get("coinEntities");
+    for (let i = 0; i < coinEntities.length; i++) {
+        let coin = coinEntities[i];
+        ctx.drawImage(
+            coin_img,
+            coin.x-camera_x,
+            coin.y-camera_y,
+            coin_size,
+            coin_size
+        );
+    }
 }
 
 function handleClick(e) {
@@ -439,13 +458,29 @@ function handleClick(e) {
     // if clicked on a gnome / enemy / mob
 }
 
-function dropCoin(amount, x, y){
+function dropCoin(amount, xPos, yPos){
+    console.log("dropping coin");
     let coinEntities = data.get("coinEntities");
     coinEntities.push({
-        x: x,
-        y: y,
+        x: xPos,
+        y: yPos,
         amount: amount,
         id: Math.random()
     });
     data.set("coinEntities", coinEntities);
+}
+
+function handleMouseMove(e){
+    let posX = e.clientX;
+    let posY = e.clientY;
+    // check if mouse is over coin:
+    let coinEntities = data.get("coinEntities");
+    for (let i = 0; i < coinEntities.length; i++) {
+        let coin = coinEntities[i];
+        if (posX > coin.x && posX < coin.x + coin_size && posY > coin.y && posY < coin.y + coin_size) {
+            coinEntities.splice(i, 1);
+            //add coin to counter 
+            data.set("coinsInCurrentRun", data.get("coinsInCurrentRun") + coin.amount);
+        }
+    }
 }
