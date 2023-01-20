@@ -320,6 +320,7 @@ function run_tick(gameTime) {
     let gnomes = [];
     for (i = 0; i < gs.length; i++) {
         let gnome = gs[i];
+        gnome.coinBoost = 1;
         gnomes.push(gnome);
     }
     for (i = 0; i < holes.length; i++){
@@ -329,6 +330,7 @@ function run_tick(gameTime) {
                 if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
                     gnome.x = holePositions[j].xPos;
                     gnome.y = holePositions[j].yPos+gnome_size-5;
+                    gnome.coinBoost = 4;
                     console.log(gnome)
                     gnomes.push(gnome);
                 }
@@ -340,7 +342,7 @@ function run_tick(gameTime) {
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
         if(coinTime < gameTime) {
-            gnome.customData.nextCoinTime = gameTime + 1000;
+            gnome.customData.nextCoinTime = gameTime + 1000/gnome.coinBoost;
             dropCoin(1, gnome.x, gnome.y); // TODO: make this a function of the gnome's level
         }
         let ai_mode = gnome.customData.ai_mode;
