@@ -185,17 +185,21 @@ class DataStorage {
     constructor() {
         this.data = {};
         this.lastSave = Date.now() + 1000000000;
-        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinsInCurrentRun", "totalCoins", "totalResets"];
+        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinEntities", "coinsInCurrentRun", "totalCoins", "totalResets"];
         this.defaults = [
             Date.now(),
             [
                 {
-                    x: 60,
-                    y: 60,
-                    heading: 1,
+                    x: 300,
+                    y: 200,
                     num: 1,
-                    waddleOffset: 4,
-                    customData: {},
+                    id: 4,
+                    customData: {
+                        "ai_mode": "idle", // idle, pathfind, wander, disabled
+                        "targets": [],
+                        "heading": 1,
+                        "nextCoinTime": Date.now()
+                    },
                 },
             ],
             [
@@ -209,7 +213,12 @@ class DataStorage {
                     "y": 2,
                     "contents": {
                         "num": 8,
-                        "customData": {}
+                        "customData": {
+                            "ai_mode": "idle",
+                            "targets": [],
+                            "heading": 0,
+                            "nextCoinTime": Date.now()
+                        }
                     }
                 }
             ],
@@ -230,6 +239,7 @@ class DataStorage {
                     "discovered": false
                 }
             ],
+            [],
             0,
             0,
             0
@@ -272,6 +282,7 @@ class DataStorage {
                     console.log("taking from default");
                     dat.set(key, defau[i]);
                 }
+                dat.set(key, defau[i]);
             }
             dat.loaded = true;
         });
@@ -294,14 +305,22 @@ setTimeout(() => {
 var resetting = false;
 
 
-function run_tick() {
+function run_tick(gameTime) {
     let gnomes = data.get("gnomes");
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
-        let vx = Math.cos(gnome.heading) * 0.5;
-        let vy = Math.sin(gnome.heading) * 0.5;
-        gnome.x += vx;
-        gnome.y += vy;
+        let coinTime = gnome.customData.nextCoinTime;
+        if(coinTime < gameTime) {
+            gnome.customData.nextCoinTime = gameTime + 1000;
+            dropCoin(1, gnome.x, gnome,y); // TODO: make this a function of the gnome's level
+        }
+        let ai_mode = gnome.customData.ai_mode;
+        if (ai_mode == "wander") {
+            let vx = Math.cos(gnome.customData.heading) * 0.5;
+            let vy = Math.sin(gnome.customData.heading) * 0.5;
+            gnome.x += vx;
+            gnome.y += vy;
+        }
     }
 }
 
@@ -311,13 +330,14 @@ setTimeout(() => {
             return;
         }
         if (Date.now() - data.get("logoffTime") > 8) {
-            run_tick();
+            run_tick(data.get("logoffTime"));
             data.set("logoffTime", data.get("logoffTime") + 8);
         }
     }, 3);
 }, 100);
 
 function draw() {
+    document.getElementById('coin-count').innerText = data.get('coinsInCurrentRun');
     camera_x = camera_x * 0.9 + camera_approach_x * 0.1;
     camera_y = camera_y * 0.9 + camera_approach_y * 0.1;
     wind = wind + (Math.random() - 0.5) * 0.01;
@@ -383,10 +403,19 @@ function draw() {
     let gnomes = data.get("gnomes");
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
-        t = Date.now() * 0.01 + gnome.waddleOffset;
-        u_d = -Math.abs(Math.sin(t)) * 15;
-        l_r = Math.cos(t) * (1 - Math.abs(Math.cos(gnome.heading))) * 8;
-        g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
+        t = Date.now() * 0.01 + gnome.id;
+        if (gnome.customData.ai_mode == "wander" || gnome.customData.ai_mode == "pathfind") {
+            u_d = -Math.abs(Math.sin(t)) * 15;
+            l_r = Math.cos(t) * (1 - Math.abs(Math.cos(gnome.customData.heading))) * 8;
+        } else {
+            u_d = 0;
+            l_r = 0;
+        }
+        if (gnome.customData.ai_mode == "disabled") {
+            g = 0
+        } else {
+            g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
+        }
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
             gnome.x + l_r-camera_x,
@@ -407,5 +436,16 @@ function handleClick(e) {
             // dig hole && purchase hole
         }
     }
-    // if clicked on gnome / enemy / mob
+    // if clicked on a gnome / enemy / mob
+}
+
+function dropCoin(amount, x, y){
+    let coinEntities = data.get("coinEntities");
+    coinEntities.push({
+        x: x,
+        y: y,
+        amount: amount,
+        id: Math.random()
+    });
+    data.set("coinEntities", coinEntities);
 }
