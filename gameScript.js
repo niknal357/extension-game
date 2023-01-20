@@ -10,7 +10,7 @@ var holePositions = [];
 
 hole_size = 100;
 gnome_size = 100;
-coin_size = 50;
+coin_size = 40;
 wind = 0;
 gravitationalConstant = 0.4;
 
