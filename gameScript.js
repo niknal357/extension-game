@@ -33,6 +33,7 @@ function ready() {
         .addEventListener("mousemove", handleMouseMove);
 
     generateHoles();
+    setInterval(draw, 1000 / 60);
     console.log(holePositions);
 
     generateUI();
@@ -159,9 +160,9 @@ var camera_approach_y = 0
 const checker = setInterval(() => {
     console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
-        ready();
+        setTimeout(ready, 50);
+        // ready();
         console.log("starting");
-        setInterval(draw, 1000 / 60);
 
         clearInterval(checker);
     }
@@ -219,7 +220,7 @@ class DataStorage {
                     "x": 1,
                     "y": 2,
                     "contents": {
-                        "num": 8,
+                        "num": 3,
                         "id": 9,
                         "customData": {
                             "ai_mode": "idle",
@@ -314,7 +315,25 @@ var resetting = false;
 
 
 function run_tick(gameTime) {
-    let gnomes = data.get("gnomes");
+    let gs = data.get("gnomes");
+    let gnomes = [];
+    for (i = 0; i < gs.length; i++) {
+        let gnome = gs[i];
+        gnomes.push(gnome);
+    }
+    for (i = 0; i < holes.length; i++){
+        if (holes[i].contents != null){
+            let gnome = holes[i].contents;
+            for (j = 0; j < holePositions.length; j++){
+                if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
+                    gnome.x = holePositions[j].xPos;
+                    gnome.y = holePositions[j].yPos+gnome_size-5;
+                    console.log(gnome)
+                    gnomes.push(gnome);
+                }
+            }
+        }
+    }
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
@@ -413,14 +432,23 @@ function draw() {
         }
     }
 
-    let gnomes = data.get("gnomes");
+    let gs = data.get("gnomes");
+    let gnomes = [];
+    for (i = 0; i < gs.length; i++) {
+        let gnome = gs[i];
+        gnomes.push(gnome);
+    }
     for (i = 0; i < holes.length; i++){
         if (holes[i].contents != null){
             let gnome = holes[i].contents;
-            gnome.x = holes[i].xPos;
-            gnome.y = holes[i].yPos;
-            console.log(gnome)
-            gnomes.push(gnome);
+            for (j = 0; j < holePositions.length; j++){
+                if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
+                    gnome.x = holePositions[j].xPos;
+                    gnome.y = holePositions[j].yPos+gnome_size-5;
+                    console.log(gnome)
+                    gnomes.push(gnome);
+                }
+            }
         }
     }
     for (i = 0; i < gnomes.length; i++) {
@@ -445,6 +473,22 @@ function draw() {
             gnome_size,
             gnome_size * g
         );
+    }
+    
+    for (i = 0; i < holes.length; i++){
+        if (holes[i].contents != null){
+            for (j = 0; j < holePositions.length; j++){
+                if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
+                    ctx.drawImage(
+                        hole_front_img,
+                        holePositions[j].xPos-camera_x,
+                        holePositions[j].yPos-camera_y,
+                        hole_size,
+                        hole_size
+                    );
+                }
+            }
+        }
     }
 
     let coinEntities = data.get("coinEntities");
