@@ -1,5 +1,3 @@
-// setTimeout(ready, 100);
-
 var mainCanvas;
 var ctx;
 var canvas_width;
@@ -101,7 +99,6 @@ function generateHoles(
     console.log(newHoles);
     holePositions = newHoles;
 
-    // setTimeout(generateHoles, 5000, Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100));
 }
 
 function generateGnomeDex(data) {
@@ -166,7 +163,6 @@ const checker = setInterval(() => {
     }
 }, 10);
 
-// setTimeout(ready, 200);
 
 grass_blades = [];
 
@@ -305,14 +301,6 @@ setTimeout(() => {
 
 var resetting = false;
 
-// fetch("save.json")
-//     .then((response) => response.json())
-//     .then((json) => {
-//         data = new DataStorage();
-//         data.set("gnomes", json.gnomes);
-//         simulation_time = json.logoffTime;
-//         simulation_time = Date.now();
-//     });
 
 function run_tick(gameTime) {
     let gnomes = data.get("gnomes");
@@ -336,7 +324,6 @@ setTimeout(() => {
         if (Date.now() - data.get("logoffTime") > 8) {
             run_tick(data.get("logoffTime"));
             data.set("logoffTime", data.get("logoffTime") + 8);
-            // console.log(Date.now()-simulation_time)
         }
     }, 3);
 }, 100);
@@ -347,7 +334,6 @@ function draw() {
     camera_y = camera_y * 0.9 + camera_approach_y * 0.1;
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
-    // console.log(wind);
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
     //draw the background
@@ -395,27 +381,8 @@ function draw() {
         return;
     }
 
-    // draw the holes
-    /*let x_spacing = canvas_width * 0.235;
-    let y_spacing = canvas_height * 0.235;
-    let vertical_offset = canvas_height * -0.045;
-    for (x = -1; x < 2; x++) {
-        for (y = -1; y < 2; y++) {
-            ctx.drawImage(
-                hole_img,
-                x_spacing * x + canvas_width / 2 - hole_size / 2,
-                y_spacing * y +
-                    canvas_height / 2 -
-                    hole_size / 2 +
-                    vertical_offset,
-                hole_size,
-                hole_size
-            );
-        }
-    }*/
 
     for (let hole = 0; hole < holePositions.length; hole++) {
-        // call ctx.drawImage() for each position, and pass in the value for the keys 'xPox', 'yPos', 'width', and 'height'
         ctx.drawImage(
             hole_img,
             holePositions[hole].xPos-camera_x,
