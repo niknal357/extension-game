@@ -1,5 +1,3 @@
-// setTimeout(ready, 100);
-
 var mainCanvas;
 var ctx;
 var canvas_width;
@@ -101,7 +99,6 @@ function generateHoles(
     console.log(newHoles);
     holePositions = newHoles;
 
-    // setTimeout(generateHoles, 5000, Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 4) + 1, Math.floor(Math.random() * 100), Math.floor(Math.random() * 100));
 }
 
 function generateGnomeDex(data) {
@@ -149,6 +146,12 @@ function generateGnomeDex(data) {
     }
 }
 
+var camera_x = 0
+var camera_y = 0
+
+var camera_approach_x = 0
+var camera_approach_y = 0
+
 const checker = setInterval(() => {
     console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
@@ -160,7 +163,6 @@ const checker = setInterval(() => {
     }
 }, 10);
 
-// setTimeout(ready, 200);
 
 grass_blades = [];
 
@@ -183,7 +185,7 @@ class DataStorage {
     constructor() {
         this.data = {};
         this.lastSave = Date.now() + 1000000000;
-        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory"];
+        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinsInCurrentRun", "totalCoins", "totalResets"];
         this.defaults = [
             Date.now(),
             [
@@ -196,8 +198,41 @@ class DataStorage {
                     customData: {},
                 },
             ],
-            [],
-            [],
+            [
+                {
+                    "x": 0,
+                    "y": 0,
+                    "contents": null
+                },
+                {
+                    "x": 1,
+                    "y": 2,
+                    "contents": {
+                        "num": 8,
+                        "customData": {}
+                    }
+                }
+            ],
+            [
+                {
+                    "name": "Seed 1",
+                    "amount": 1,
+                    "discovered": true
+                },
+                {
+                    "name": "Seed 2",
+                    "amount": 148,
+                    "discovered": true
+                },
+                {
+                    "name": "Seed 3",
+                    "amount": 0,
+                    "discovered": false
+                }
+            ],
+            0,
+            0,
+            0
         ];
         this.loaded = false;
     }
@@ -237,7 +272,6 @@ class DataStorage {
                     console.log("taking from default");
                     dat.set(key, defau[i]);
                 }
-                // dat.set(key, defau[i]);
             }
             dat.loaded = true;
         });
@@ -259,14 +293,6 @@ setTimeout(() => {
 
 var resetting = false;
 
-// fetch("save.json")
-//     .then((response) => response.json())
-//     .then((json) => {
-//         data = new DataStorage();
-//         data.set("gnomes", json.gnomes);
-//         simulation_time = json.logoffTime;
-//         simulation_time = Date.now();
-//     });
 
 function run_tick() {
     let gnomes = data.get("gnomes");
@@ -287,15 +313,15 @@ setTimeout(() => {
         if (Date.now() - data.get("logoffTime") > 8) {
             run_tick();
             data.set("logoffTime", data.get("logoffTime") + 8);
-            // console.log(Date.now()-simulation_time)
         }
     }, 3);
 }, 100);
 
 function draw() {
+    camera_x = camera_x * 0.9 + camera_approach_x * 0.1;
+    camera_y = camera_y * 0.9 + camera_approach_y * 0.1;
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
-    // console.log(wind);
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
     //draw the background
@@ -322,14 +348,14 @@ function draw() {
     // draw the grass blades
     for (i = 0; i < grass_blades.length; i++) {
         ctx.beginPath();
-        ctx.moveTo(grass_blades[i].x, grass_blades[i].y);
+        ctx.moveTo(grass_blades[i].x-camera_x, grass_blades[i].y-camera_y);
         rotation =
             Math.sin(Date.now() * 0.0005 + grass_blades[i].offset) * 0.3 -
             Math.PI / 2 +
             wind;
         ctx.lineTo(
-            grass_blades[i].x + Math.cos(rotation) * 20,
-            grass_blades[i].y + Math.sin(rotation) * 20
+            grass_blades[i].x + Math.cos(rotation) * 20-camera_x,
+            grass_blades[i].y + Math.sin(rotation) * 20-camera_y
         );
         ctx.lineWidth = 2;
         if (grass_blades[i].y % 100 < 50) {
@@ -343,31 +369,12 @@ function draw() {
         return;
     }
 
-    // draw the holes
-    /*let x_spacing = canvas_width * 0.235;
-    let y_spacing = canvas_height * 0.235;
-    let vertical_offset = canvas_height * -0.045;
-    for (x = -1; x < 2; x++) {
-        for (y = -1; y < 2; y++) {
-            ctx.drawImage(
-                hole_img,
-                x_spacing * x + canvas_width / 2 - hole_size / 2,
-                y_spacing * y +
-                    canvas_height / 2 -
-                    hole_size / 2 +
-                    vertical_offset,
-                hole_size,
-                hole_size
-            );
-        }
-    }*/
 
     for (let hole = 0; hole < holePositions.length; hole++) {
-        // call ctx.drawImage() for each position, and pass in the value for the keys 'xPox', 'yPos', 'width', and 'height'
         ctx.drawImage(
             hole_img,
-            holePositions[hole].xPos,
-            holePositions[hole].yPos,
+            holePositions[hole].xPos-camera_x,
+            holePositions[hole].yPos-camera_y,
             hole_size,
             hole_size
         );
@@ -382,8 +389,8 @@ function draw() {
         g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
-            gnome.x + l_r,
-            gnome.y + u_d - gnome_size * g,
+            gnome.x + l_r-camera_x,
+            gnome.y + u_d - gnome_size * g-camera_y,
             gnome_size,
             gnome_size * g
         );
