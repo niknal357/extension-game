@@ -344,7 +344,7 @@ function run_tick(gameTime) {
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
         if(coinTime < gameTime) {
-            gnome.customData.nextCoinTime = gameTime + 1000/gnome.coinBoost;
+            gnome.customData.nextCoinTime = gameTime + coinDropInterval/gnome.coinBoost;
             dropCoin(1, gnome.x + gnome_size/2, gnome.y - gnome_size*0.8);
         }
         let ai_mode = gnome.customData.ai_mode;
