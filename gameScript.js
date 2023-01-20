@@ -12,6 +12,8 @@ hole_size = 100;
 gnome_size = 100;
 coin_size = 50;
 wind = 0;
+coinDropInterval = 2000;
+gravitationalConstant = 0.4;
 
 function resetProgress() {
     for (let i = 0; i < data.datapoints.length; i++) {
@@ -319,8 +321,8 @@ function run_tick(gameTime) {
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
         if(coinTime < gameTime) {
-            gnome.customData.nextCoinTime = gameTime + 1000;
-            dropCoin(1, gnome.x, gnome.y); // TODO: make this a function of the gnome's level
+            gnome.customData.nextCoinTime = gameTime + coinDropInterval;
+            dropCoin(1, gnome.x + gnome_size/2, gnome.y - gnome_size*0.8); // TODO: make this a function of the gnome's level
         }
         let ai_mode = gnome.customData.ai_mode;
         if (ai_mode == "wander") {
@@ -329,6 +331,25 @@ function run_tick(gameTime) {
             gnome.x += vx;
             gnome.y += vy;
         }
+    }
+    let coinEntities = data.get("coinEntities");
+    for (i = 0; i < coinEntities.length; i++) {
+        let coin = coinEntities[i];
+        let yeetStrengthYOffset = 0;
+        if(coin.z > 0){
+            yeetStrengthYOffset = 0.7;
+        }
+
+        coin.x += coin.yeetStrength * Math.cos(coin.heading);
+        coin.y -= (coin.yeetStrength - yeetStrengthYOffset) * Math.sin(coin.heading)  + coin.yeetStrengthZ;
+        coin.z += coin.yeetStrengthZ;
+        coin.yeetStrengthZ -= gravitationalConstant;
+        if (coin.z <= 0) {
+            coin.yeetStrength = 0;
+            coin.yeetStrengthZ = 0;
+        }
+        // console.log(Math.cos(coin.heading));
+        console.log(coin.heading);
     }
 }
 
@@ -413,6 +434,18 @@ function draw() {
         }
     }
 
+    let coinEntities = data.get("coinEntities");
+    for (let i = 0; i < coinEntities.length; i++) {
+        let coin = coinEntities[i];
+        ctx.drawImage(
+            coin_img,
+            coin.x-camera_x,
+            coin.y-camera_y,
+            coin_size,
+            coin_size
+        );
+    }
+
     let gnomes = data.get("gnomes");
     for (i = 0; i < holes.length; i++){
         if (holes[i].contents != null){
@@ -446,17 +479,6 @@ function draw() {
         );
     }
 
-    let coinEntities = data.get("coinEntities");
-    for (let i = 0; i < coinEntities.length; i++) {
-        let coin = coinEntities[i];
-        ctx.drawImage(
-            coin_img,
-            coin.x-camera_x,
-            coin.y-camera_y,
-            coin_size,
-            coin_size
-        );
-    }
 }
 
 function handleClick(e) {
@@ -478,8 +500,13 @@ function dropCoin(amount, xPos, yPos){
     coinEntities.push({
         x: xPos,
         y: yPos,
+        z: 0,
         amount: amount,
-        id: Math.random()
+        id: Math.random(),
+        initialYPos: yPos,
+        heading: Math.random() * 2 * Math.PI,
+        yeetStrength: Math.random() * 1.5 + 2,
+        yeetStrengthZ: Math.random() * 5.5 + 5,
     });
     data.set("coinEntities", coinEntities);
 }
@@ -493,7 +520,6 @@ function handleMouseMove(e){
         let coin = coinEntities[i];
         if (posX > coin.x && posX < coin.x + coin_size && posY > coin.y && posY < coin.y + coin_size) {
             coinEntities.splice(i, 1);
-            //add coin to counter 
             data.set("coinsInCurrentRun", data.get("coinsInCurrentRun") + coin.amount);
         }
     }
