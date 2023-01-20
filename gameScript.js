@@ -270,7 +270,7 @@ class DataStorage {
                 data.data[data.datapoints[i]]
             );
         }
-        chrome.storage.sync.set(val, () => {
+        chrome.storage.local.set(val, () => {
             console.log("Stored");
         });
     }
@@ -279,7 +279,7 @@ class DataStorage {
         var dp = this.datapoints;
         var defau = this.defaults;
         var dat = this;
-        chrome.storage.sync.get(this.datapoints, function (items) {
+        chrome.storage.local.get(this.datapoints, function (items) {
             for (i = 0; i < dp.length; i++) {
                 let key = dp[i];
                 console.log(key);
