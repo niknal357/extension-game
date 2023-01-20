@@ -419,6 +419,7 @@ function draw() {
             let gnome = holes[i].contents;
             gnome.x = holes[i].xPos;
             gnome.y = holes[i].yPos;
+            console.log(gnome)
             gnomes.push(gnome);
         }
     }
