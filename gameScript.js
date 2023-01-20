@@ -149,6 +149,12 @@ function generateGnomeDex(data) {
     }
 }
 
+var camera_x = 0
+var camera_y = 0
+
+var camera_approach_x = 0
+var camera_approach_y = 0
+
 const checker = setInterval(() => {
     console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
@@ -183,7 +189,7 @@ class DataStorage {
     constructor() {
         this.data = {};
         this.lastSave = Date.now() + 1000000000;
-        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory"];
+        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinsInCurrentRun", "totalCoins", "totalResets"];
         this.defaults = [
             Date.now(),
             [
@@ -196,8 +202,41 @@ class DataStorage {
                     customData: {},
                 },
             ],
-            [],
-            [],
+            [
+                {
+                    "x": 0,
+                    "y": 0,
+                    "contents": null
+                },
+                {
+                    "x": 1,
+                    "y": 2,
+                    "contents": {
+                        "num": 8,
+                        "customData": {}
+                    }
+                }
+            ],
+            [
+                {
+                    "name": "Seed 1",
+                    "amount": 1,
+                    "discovered": true
+                },
+                {
+                    "name": "Seed 2",
+                    "amount": 148,
+                    "discovered": true
+                },
+                {
+                    "name": "Seed 3",
+                    "amount": 0,
+                    "discovered": false
+                }
+            ],
+            0,
+            0,
+            0
         ];
         this.loaded = false;
     }
@@ -293,6 +332,8 @@ setTimeout(() => {
 }, 100);
 
 function draw() {
+    camera_x = camera_x * 0.9 + camera_approach_x * 0.1;
+    camera_y = camera_y * 0.9 + camera_approach_y * 0.1;
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
     // console.log(wind);
@@ -322,14 +363,14 @@ function draw() {
     // draw the grass blades
     for (i = 0; i < grass_blades.length; i++) {
         ctx.beginPath();
-        ctx.moveTo(grass_blades[i].x, grass_blades[i].y);
+        ctx.moveTo(grass_blades[i].x-camera_x, grass_blades[i].y-camera_y);
         rotation =
             Math.sin(Date.now() * 0.0005 + grass_blades[i].offset) * 0.3 -
             Math.PI / 2 +
             wind;
         ctx.lineTo(
-            grass_blades[i].x + Math.cos(rotation) * 20,
-            grass_blades[i].y + Math.sin(rotation) * 20
+            grass_blades[i].x + Math.cos(rotation) * 20-camera_x,
+            grass_blades[i].y + Math.sin(rotation) * 20-camera_y
         );
         ctx.lineWidth = 2;
         if (grass_blades[i].y % 100 < 50) {
@@ -366,8 +407,8 @@ function draw() {
         // call ctx.drawImage() for each position, and pass in the value for the keys 'xPox', 'yPos', 'width', and 'height'
         ctx.drawImage(
             hole_img,
-            holePositions[hole].xPos,
-            holePositions[hole].yPos,
+            holePositions[hole].xPos-camera_x,
+            holePositions[hole].yPos-camera_y,
             hole_size,
             hole_size
         );
@@ -382,8 +423,8 @@ function draw() {
         g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
-            gnome.x + l_r,
-            gnome.y + u_d - gnome_size * g,
+            gnome.x + l_r-camera_x,
+            gnome.y + u_d - gnome_size * g-camera_y,
             gnome_size,
             gnome_size * g
         );
