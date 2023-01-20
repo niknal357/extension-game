@@ -185,7 +185,7 @@ class DataStorage {
     constructor() {
         this.data = {};
         this.lastSave = Date.now() + 1000000000;
-        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinsInCurrentRun", "totalCoins", "totalResets"];
+        this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinEntities", "coinsInCurrentRun", "totalCoins", "totalResets"];
         this.defaults = [
             Date.now(),
             [
@@ -198,6 +198,7 @@ class DataStorage {
                         "ai_mode": "idle", // idle, pathfind, wander, disabled
                         "targets": [],
                         "heading": 1,
+                        "nextCoinTime": Date.now()
                     },
                 },
             ],
@@ -215,7 +216,8 @@ class DataStorage {
                         "customData": {
                             "ai_mode": "idle",
                             "targets": [],
-                            "heading": 0
+                            "heading": 0,
+                            "nextCoinTime": Date.now()
                         }
                     }
                 }
@@ -237,6 +239,7 @@ class DataStorage {
                     "discovered": false
                 }
             ],
+            [],
             0,
             0,
             0
