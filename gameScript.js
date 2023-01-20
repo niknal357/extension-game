@@ -315,6 +315,7 @@ var resetting = false;
 
 
 function run_tick(gameTime) {
+    let holes = data.get("holes");
     let gs = data.get("gnomes");
     let gnomes = [];
     for (i = 0; i < gs.length; i++) {
@@ -334,6 +335,7 @@ function run_tick(gameTime) {
             }
         }
     }
+    console.log(gnomes)
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
@@ -445,7 +447,6 @@ function draw() {
                 if (holePositions[j].x == holes[i].x && holePositions[j].y == holes[i].y){
                     gnome.x = holePositions[j].xPos;
                     gnome.y = holePositions[j].yPos+gnome_size-5;
-                    console.log(gnome)
                     gnomes.push(gnome);
                 }
             }
