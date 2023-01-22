@@ -14,7 +14,7 @@ coin_size = 40;
 wind = 0;
 gravitationalConstant = 0.4;
 
-COIN_LIMIT = 500;
+COIN_LIMIT = 5000;
 
 
 coinDropInterval = 10000;
@@ -206,7 +206,7 @@ class DataStorage {
         this.data = {};
         this.lastSave = Date.now() + 1000000000;
         this.datapoints = ["logoffTime", "gnomes", "holes", "inventory", "coinEntities", "coinsInCurrentRun", "totalCoins", "totalResets"];
-        let restartOffset = 60*60*24
+        let restartOffset = 60*30
         this.defaults = [
             Date.now()-restartOffset*1000,
             [
@@ -380,13 +380,18 @@ setTimeout(() => {
         if (!data.loaded) {
             return;
         }
+        let iterations = 0;
         // console.log(Date.now() - data.get("logoffTime"))
         while (Date.now() - data.get("logoffTime") > 8) {
             run_tick(data.get("logoffTime"));
             data.set("logoffTime", data.get("logoffTime") + 16);
+            if (iterations > 50000) {
+                break;
+            }
+            iterations++;
         }
     }, 3);
-}, 500);
+}, 300);
 
 function draw() {
     if (!data.loaded) {
@@ -396,6 +401,7 @@ function draw() {
     for (let i = 0; i < moving_coins.length; i++) {
         evaluation -= moving_coins[i].amount;
     }
+    
     let cE = data.get("coinEntities");
     for (i = 0; i < cE.length; i++) {
         let coin = cE[i];
