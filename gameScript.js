@@ -386,8 +386,8 @@ function run_tick(gameTime, advanced) {
             gnome.y += vy;
         }
     }
-    if (advanced) {
-        let cE = data.get("coinEntities");
+    let cE = data.get("coinEntities");
+    if (advanced || cE.length < 500) {
         for (i = 0; i < cE.length; i++) {
             let coin = cE[i];
             // console.log(coin)
@@ -425,11 +425,13 @@ setTimeout(() => {
         if (!data.loaded) {
             return;
         }
+        let tickrate = 16;
         let p_bar = document.getElementById("catchup-bar");
         if (Date.now() - data.get("logoffTime") > 60) {
             console.log("catching up");
             start_chase = data.get("logoffTime");
             p_bar.classList.remove("hidden");
+            tickrate = 1000;
         } else {
             console.log("caught up");
             start_chase = 0;
@@ -437,12 +439,12 @@ setTimeout(() => {
         }
         let iterations = 0;
         // console.log(Date.now() - data.get("logoffTime"))
-        while (Date.now() - data.get("logoffTime") > 8) {
+        while (Date.now() - data.get("logoffTime") > tickrate / 2) {
             p_bar.value =
                 (data.get("logoffTime") - start_chase) /
                 (Date.now() - start_chase);
             run_tick(data.get("logoffTime"), start_chase == 0);
-            data.set("logoffTime", data.get("logoffTime") + 16);
+            data.set("logoffTime", data.get("logoffTime") + tickrate);
             if (iterations > 10000) {
                 break;
             }
