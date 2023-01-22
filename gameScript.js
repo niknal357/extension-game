@@ -27,6 +27,8 @@ function resetProgress() {
     data.save();
 }
 
+var isDown = false;
+var isMoving = false;
 function ready() {
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
@@ -212,7 +214,7 @@ class DataStorage {
             "totalCoins",
             "totalResets",
         ];
-        let restartOffset = 60 * 60 * 50;
+        let restartOffset = 0;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [
@@ -225,6 +227,18 @@ class DataStorage {
                         ai_mode: "idle", // idle, pathfind, wander, disabled
                         targets: [],
                         heading: 1,
+                        nextCoinTime: Date.now() - restartOffset * 1000,
+                    },
+                },
+                {
+                    x: 400,
+                    y: 150,
+                    num: 1,
+                    id: 5,
+                    customData: {
+                        ai_mode: "wander", // idle, pathfind, wander, disabled
+                        targets: [],
+                        heading: Math.PI,
                         nextCoinTime: Date.now() - restartOffset * 1000,
                     },
                 },
@@ -384,6 +398,48 @@ function run_tick(gameTime, deltaT, advanced) {
             gnome.y += vy * deltaT;
         }
     }
+
+    let found = false;
+    var i, j, gnome1, gnome2;
+    gnomes = data.get("gnomes");
+    for (i = 0; i < gnomes.length; i++) {
+        gnome1 = gnomes[i];
+        for (j = 0; j < gnomes.length; j++) {
+            gnome2 = gnomes[j];
+            if (gnome1 == gnome2) {
+                continue;
+            }
+            if (gnome1.num != gnome2.num) {
+                continue;
+            }
+            if (
+                Math.abs(gnome1.x - gnome2.x) < gnome_size / 2 &&
+                Math.abs(gnome1.y - gnome2.y) < gnome_size / 2
+            ) {
+                //merge
+                // gnome1.num += 1;
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    console.log(found);
+    if (found) {
+        //remove j-th gnome
+        gnome1.num += 1;
+        gnome1.customData.nextCoinTime = Math.min(
+            gnome1.customData.nextCoinTime,
+            gnome2.customData.nextCoinTime
+        );
+        gnome1.x = (gnome1.x + gnome2.x) / 2;
+        gnome1.y = (gnome1.y + gnome2.y) / 2;
+        gnomes.splice(j, 1);
+    }
+    data.set("gnomes", gnomes);
+
     let cE = data.get("coinEntities");
     if (advanced || cE.length < 500) {
         for (i = 0; i < cE.length; i++) {
@@ -426,11 +482,9 @@ setTimeout(() => {
         let tickrate = 16;
         let p_bar = document.getElementById("catchup-bar");
         if (Date.now() - data.get("logoffTime") > 60) {
-            console.log("catching up");
             start_chase = data.get("logoffTime");
             p_bar.classList.remove("hidden");
         } else {
-            console.log("caught up");
             start_chase = 0;
             p_bar.classList.add("hidden");
         }
