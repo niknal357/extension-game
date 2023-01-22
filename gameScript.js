@@ -212,7 +212,7 @@ class DataStorage {
             "totalCoins",
             "totalResets",
         ];
-        let restartOffset = 60 * 60 * 10;
+        let restartOffset = 60 * 30;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [
@@ -719,6 +719,9 @@ function handleMouseMove(e) {
     let posY = e.clientY + camera_y;
     if (prev_mouse_move_pos == null) {
         prev_mouse_move_pos = [posX, posY];
+        return;
+    }
+    if (start_chase != 0) {
         return;
     }
     // check if mouse is over coin:
