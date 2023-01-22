@@ -212,13 +212,13 @@ class DataStorage {
             "totalCoins",
             "totalResets",
         ];
-        let restartOffset = 60 * 30;
+        let restartOffset = 60 * 60 * 50;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [
                 {
-                    x: 550,
-                    y: 250,
+                    x: 150,
+                    y: 150,
                     num: 1,
                     id: 4,
                     customData: {
@@ -338,7 +338,7 @@ setTimeout(() => {
 
 var resetting = false;
 
-function run_tick(gameTime, advanced) {
+function run_tick(gameTime, deltaT, advanced) {
     let holes = data.get("holes");
     let gs = data.get("gnomes");
     let gnomes = [];
@@ -367,10 +367,8 @@ function run_tick(gameTime, advanced) {
     // console.log(gnomes)
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
-        let coinTime = gnome.customData.nextCoinTime;
-        if (coinTime < gameTime) {
-            gnome.customData.nextCoinTime =
-                coinTime + coinDropInterval / gnome.coinBoost;
+        while (gnome.customData.nextCoinTime < gameTime) {
+            gnome.customData.nextCoinTime += coinDropInterval / gnome.coinBoost;
             // console.log(gnome)
             dropCoin(
                 1,
@@ -380,10 +378,10 @@ function run_tick(gameTime, advanced) {
         }
         let ai_mode = gnome.customData.ai_mode;
         if (ai_mode == "wander") {
-            let vx = Math.cos(gnome.customData.heading) * 0.5;
-            let vy = Math.sin(gnome.customData.heading) * 0.5;
-            gnome.x += vx;
-            gnome.y += vy;
+            let vx = Math.cos(gnome.customData.heading) * 0.03125;
+            let vy = Math.sin(gnome.customData.heading) * 0.03125;
+            gnome.x += vx * deltaT;
+            gnome.y += vy * deltaT;
         }
     }
     let cE = data.get("coinEntities");
@@ -431,7 +429,6 @@ setTimeout(() => {
             console.log("catching up");
             start_chase = data.get("logoffTime");
             p_bar.classList.remove("hidden");
-            tickrate = 1000;
         } else {
             console.log("caught up");
             start_chase = 0;
@@ -439,11 +436,14 @@ setTimeout(() => {
         }
         let iterations = 0;
         // console.log(Date.now() - data.get("logoffTime"))
+        if (Date.now() - data.get("logoffTime") > 60 * 60) {
+            tickrate = 1000;
+        }
         while (Date.now() - data.get("logoffTime") > tickrate / 2) {
             p_bar.value =
                 (data.get("logoffTime") - start_chase) /
                 (Date.now() - start_chase);
-            run_tick(data.get("logoffTime"), start_chase == 0);
+            run_tick(data.get("logoffTime"), tickrate, start_chase == 0);
             data.set("logoffTime", data.get("logoffTime") + tickrate);
             if (iterations > 10000) {
                 break;
@@ -452,6 +452,38 @@ setTimeout(() => {
         }
     }, 3);
 }, 300);
+
+function render_gnomes(gnomes) {
+    for (i = 0; i < gnomes.length; i++) {
+        let gnome = gnomes[i];
+        t = Date.now() * 0.01 + gnome.id;
+        if (
+            gnome.customData.ai_mode == "wander" ||
+            gnome.customData.ai_mode == "pathfind"
+        ) {
+            u_d = -Math.abs(Math.sin(t)) * 15;
+            l_r =
+                Math.cos(t) *
+                (1 - Math.abs(Math.cos(gnome.customData.heading))) *
+                8;
+        } else {
+            u_d = 0;
+            l_r = 0;
+        }
+        if (gnome.customData.ai_mode == "disabled") {
+            g = 0;
+        } else {
+            g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
+        }
+        ctx.drawImage(
+            gnome_imgs[gnome.num - 1],
+            gnome.x + l_r - camera_x,
+            gnome.y + u_d - gnome_size * g - camera_y,
+            gnome_size,
+            gnome_size * g
+        );
+    }
+}
 
 function draw() {
     if (!data.loaded) {
@@ -557,16 +589,13 @@ function draw() {
         coin.scr_y += coin_to_icon_y_normalized * coin_to_icon_speed;
         if (coin_to_icon_distance < 10) {
             moving_coins.splice(i, 1);
+            ``;
             i--;
         }
     }
 
     let gs = data.get("gnomes");
     let gnomes = [];
-    for (i = 0; i < gs.length; i++) {
-        let gnome = gs[i];
-        gnomes.push(gnome);
-    }
     for (i = 0; i < holes.length; i++) {
         if (holes[i].contents != null) {
             let gnome = holes[i].contents;
@@ -582,35 +611,7 @@ function draw() {
             }
         }
     }
-    for (i = 0; i < gnomes.length; i++) {
-        let gnome = gnomes[i];
-        t = Date.now() * 0.01 + gnome.id;
-        if (
-            gnome.customData.ai_mode == "wander" ||
-            gnome.customData.ai_mode == "pathfind"
-        ) {
-            u_d = -Math.abs(Math.sin(t)) * 15;
-            l_r =
-                Math.cos(t) *
-                (1 - Math.abs(Math.cos(gnome.customData.heading))) *
-                8;
-        } else {
-            u_d = 0;
-            l_r = 0;
-        }
-        if (gnome.customData.ai_mode == "disabled") {
-            g = 0;
-        } else {
-            g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
-        }
-        ctx.drawImage(
-            gnome_imgs[gnome.num - 1],
-            gnome.x + l_r - camera_x,
-            gnome.y + u_d - gnome_size * g - camera_y,
-            gnome_size,
-            gnome_size * g
-        );
-    }
+    render_gnomes(gnomes);
 
     for (i = 0; i < holes.length; i++) {
         if (holes[i].contents != null) {
@@ -630,6 +631,12 @@ function draw() {
             }
         }
     }
+    gnomes = [];
+    for (i = 0; i < gs.length; i++) {
+        let gnome = gs[i];
+        gnomes.push(gnome);
+    }
+    render_gnomes(gnomes);
     let coins_to_draw = [];
     let coinEntities = data.get("coinEntities");
     for (let i = 0; i < coinEntities.length; i++) {
