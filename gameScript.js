@@ -195,6 +195,8 @@ for (i = 1; i <= 16; i++) {
 }
 console.log(gnome_imgs);
 
+moving_coins = [];
+
 class DataStorage {
     constructor() {
         this.data = {};
@@ -337,13 +339,13 @@ function run_tick(gameTime) {
                     gnome.x = holePositions[j].xPos;
                     gnome.y = holePositions[j].yPos+gnome_size-5;
                     gnome.coinBoost = inHoleCoinBoost;
-                    console.log(gnome)
+                    // console.log(gnome)
                     gnomes.push(gnome);
                 }
             }
         }
     }
-    console.log(gnomes)
+    // console.log(gnomes)
     for (i = 0; i < gnomes.length; i++) {   
         let gnome = gnomes[i];
         let coinTime = gnome.customData.nextCoinTime;
@@ -376,7 +378,7 @@ function run_tick(gameTime) {
             coin.yeetStrengthZ = 0;
         }
         // console.log(Math.cos(coin.heading));
-        console.log(coin.heading);
+        // console.log(coin.heading);
     }
 }
 
@@ -393,7 +395,11 @@ setTimeout(() => {
 }, 100);
 
 function draw() {
-    document.getElementById('coin-count').innerText = data.get('coinsInCurrentRun');
+    let evaluation = data.get('coinsInCurrentRun');
+    for (let i = 0; i < moving_coins.length; i++) {
+        evaluation -= moving_coins[i].amount;
+    }
+    document.getElementById('coin-count').innerText = evaluation;
     camera_x = camera_x * 0.9 + camera_approach_x * 0.1;
     camera_y = camera_y * 0.9 + camera_approach_y * 0.1;
     wind = wind + (Math.random() - 0.5) * 0.01;
@@ -461,13 +467,54 @@ function draw() {
         }
     }
 
+    for (let i = 0; i < moving_coins.length; i++) {
+        let coin = moving_coins[i];
+        //move coin towards coin icon in the top left
+        let coin_icon_x = 25;
+        let coin_icon_y = 25;
+        let coin_icon_size = 50;
+        let coin_icon_center_x = coin_icon_x + coin_icon_size / 2;
+        let coin_icon_center_y = coin_icon_y + coin_icon_size / 2;
+        let coin_center_x = coin.scr_x + coin_size / 2;
+        let coin_center_y = coin.scr_y + coin_size / 2;
+        let coin_to_icon_x = coin_icon_center_x - coin_center_x;
+        let coin_to_icon_y = coin_icon_center_y - coin_center_y;
+        let coin_to_icon_distance = Math.sqrt(
+            coin_to_icon_x * coin_to_icon_x + coin_to_icon_y * coin_to_icon_y
+        );
+        let coin_to_icon_x_normalized = coin_to_icon_x / coin_to_icon_distance;
+        let coin_to_icon_y_normalized = coin_to_icon_y / coin_to_icon_distance;
+        let coin_to_icon_speed = 60;
+        if (coin_to_icon_distance < coin_to_icon_speed) {
+            coin_to_icon_speed = coin_to_icon_distance;
+        }
+        coin.scr_x += coin_to_icon_x_normalized * coin_to_icon_speed;
+        coin.scr_y += coin_to_icon_y_normalized * coin_to_icon_speed;
+        if (coin_to_icon_distance < 10) {
+            moving_coins.splice(i, 1);
+            i--;
+        }
+    }
+    let coins_to_draw = [];
     let coinEntities = data.get("coinEntities");
     for (let i = 0; i < coinEntities.length; i++) {
-        let coin = coinEntities[i];
+        coins_to_draw.push({
+            x: coinEntities[i].x-camera_x,
+            y: coinEntities[i].y-camera_y,
+        });
+    }
+    for (let i = 0; i < moving_coins.length; i++) {
+        coins_to_draw.push({
+            x: moving_coins[i].scr_x,
+            y: moving_coins[i].scr_y,
+        });
+    }
+    for (let i = 0; i < coins_to_draw.length; i++) {
+        let coin = coins_to_draw[i];
         ctx.drawImage(
             coin_img,
-            coin.x-camera_x,
-            coin.y-camera_y,
+            coin.x,
+            coin.y,
             coin_size,
             coin_size
         );
@@ -564,8 +611,8 @@ function dropCoin(amount, xPos, yPos){
 }
 
 function handleMouseMove(e){
-    let posX = e.clientX;
-    let posY = e.clientY;
+    let posX = e.clientX+camera_x;
+    let posY = e.clientY+camera_y;
     // check if mouse is over coin:
     let coinEntities = data.get("coinEntities");
     for (let i = 0; i < coinEntities.length; i++) {
@@ -573,6 +620,11 @@ function handleMouseMove(e){
         if (posX > coin.x && posX < coin.x + coin_size && posY > coin.y && posY < coin.y + coin_size) {
             coinEntities.splice(i, 1);
             data.set("coinsInCurrentRun", data.get("coinsInCurrentRun") + coin.amount);
+            moving_coins.push({
+                scr_x: coin.x-camera_x,
+                scr_y: coin.y-camera_y,
+                amount: coin.amount
+            });
         }
     }
 }
