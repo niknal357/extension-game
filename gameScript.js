@@ -20,6 +20,8 @@ coin_size = 40;
 wind = 0;
 gravitationalConstant = 0.4;
 
+
+
 COIN_LIMIT = 5000;
 
 coinDropInterval = 10000;
@@ -214,6 +216,9 @@ class DataStorage {
             "coinsInCurrentRun",
             "totalCoins",
             "totalResets",
+            "msUntillForGnomeSpawnMin",
+            "msUntillForGnomeSpawnMax",
+            "timeOfNextGnomeSpawn",
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -286,6 +291,9 @@ class DataStorage {
             0,
             0,
             0,
+            7000,
+            10000,
+            Date.now() - restartOffset * 1000,
         ];
         this.loaded = false;
     }
@@ -423,7 +431,6 @@ function updateHoles(holes, gnomes){
 function updateGnomes(gnomes, gameTime, deltaT){
 
     // Handle Gnome Move
-
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         while (gnome.customData.nextCoinTime < gameTime) {
@@ -482,7 +489,19 @@ function updateGnomes(gnomes, gameTime, deltaT){
         gnomes.splice(j, 1);
     }
     data.set("gnomes", gnomes);
+
+
+    // Spawning Gnomes
+    let timeOfNextGnomeSpawn = data.get("timeOfNextGnomeSpawn");
+    if (timeOfNextGnomeSpawn < gameTime) {
+        spawnGnome(level, x, y);
+        let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
+        let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
+        let gnomeSpawnInterval = Math.floor(Math.random()) * (msUntillForGnomeSpawnMax - msUntillForGnomeSpawnMin) + msUntillForGnomeSpawnMin;
+        data.set("timeOfNextGnomeSpawn", gameTime + gnomeSpawnInterval);
+    }
 }
+
 function updateCoins(advanced){
     let cE = data.get("coinEntities");
     if (advanced || cE.length < 500) {
@@ -514,6 +533,13 @@ function updateCoins(advanced){
         data.set("coinEntities", cE);
     }
 
+}
+
+function spawnGnome(level, x, y){
+    let gnome = {
+        
+    };
+    gnomes.push(gnome);
 }
 
 function render_gnomes(gnomes) {
