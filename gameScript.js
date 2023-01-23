@@ -311,58 +311,19 @@ class DataStorage {
             "coinsInCurrentRun",
             "totalCoins",
             "totalResets",
+            "msUntillForGnomeSpawnMin",
+            "msUntillForGnomeSpawnMax",
+            "timeOfNextGnomeSpawn",
         ];
         let restartOffset = 0;
         this.defaults = [
             Date.now() - restartOffset * 1000,
+            [],
             [
-                {
-                    x: 150,
-                    y: 150,
-                    num: 1,
-                    id: 4,
-                    customData: {
-                        ai_mode: "idle", // idle, pathfind, wander, disabled
-                        targets: [],
-                        heading: 1,
-                        nextCoinTime: Date.now() - restartOffset * 1000,
-                        inHole: false,
-                    },
-                },
-                {
-                    x: 400,
-                    y: 150,
-                    num: 1,
-                    id: 5,
-                    customData: {
-                        ai_mode: "wander", // idle, pathfind, wander, disabled
-                        targets: [],
-                        heading: Math.PI,
-                        nextCoinTime: Date.now() - restartOffset * 1000,
-                        inHole: false,
-                    },
-                },
-            ],
-            [
-                {
-                    x: 0,
-                    y: 0,
-                    contents: null,
-                },
                 {
                     x: 1,
-                    y: 2,
-                    contents: {
-                        num: 3,
-                        id: 9,
-                        customData: {
-                            ai_mode: "idle",
-                            targets: [],
-                            heading: 0,
-                            nextCoinTime: Date.now() - restartOffset * 1000,
-                            inHole: true,
-                        },
-                    },
+                    y: 1,
+                    contents: null,
                 },
             ],
             [
@@ -386,6 +347,9 @@ class DataStorage {
             0,
             0,
             0,
+            7000,
+            10000,
+            Date.now() - restartOffset * 1000,
         ];
         this.loaded = false;
     }
@@ -426,7 +390,7 @@ class DataStorage {
                     dat.set(key, defau[i]);
                 }
                 // comment this out to enable saving
-                dat.set(key, defau[i]);
+                // dat.set(key, defau[i]);
             }
             dat.loaded = true;
         });
@@ -521,7 +485,7 @@ function updateHoles(gameTime, deltaT, advanced) {
             let dist = Math.sqrt(
                 Math.pow(gnome.x - gnome_size / 2 - scr_x + hole_size / 2, 2) +
                     Math.pow(
-                        gnome.y - gnome_size / 2 - scr_y + hole_size / 2,
+                        gnome.y - gnome_size / 2 - scr_y - hole_size / 2,
                         2
                     )
             );
@@ -625,7 +589,6 @@ function updateGnomes(gameTime, deltaT, advanced) {
             break;
         }
     }
-    // console.log(found);
     if (found) {
         //remove j-th gnome
         gnome1.num += 1;
@@ -647,7 +610,45 @@ function updateGnomes(gameTime, deltaT, advanced) {
         gnomes.splice(j, 1);
     }
     data.set("gnomes", gnomes);
+
+    // Spawning Gnomes
+    let timeOfNextGnomeSpawn = data.get("timeOfNextGnomeSpawn");
+    if (timeOfNextGnomeSpawn < gameTime) {
+        let level = 1;
+        let x = 0;
+        let y = 0;
+        spawnGnome(level, x, y);
+        let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
+        let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
+        let gnomeSpawnInterval =
+            Math.floor(Math.random()) *
+                (msUntillForGnomeSpawnMax - msUntillForGnomeSpawnMin) +
+            msUntillForGnomeSpawnMin;
+        data.set("timeOfNextGnomeSpawn", gameTime + gnomeSpawnInterval);
+    }
+
+    // despawn gnomes if they are too far away
+
+    let breathingRoom = 100;
+    let minXPos = 0 - gnome_size - breathingRoom;
+    let maxXPos = mainCanvas.width + gnome_size + breathingRoom;
+    let minYPos = 0 - gnome_size - breathingRoom;
+    let maxYPos = mainCanvas.height + gnome_size + breathingRoom;
+
+    for (i = 0; i < gnomes.length; i++) {
+        gnome = gnomes[i];
+        if (
+            gnome.x < minXPos ||
+            gnome.x > maxXPos ||
+            gnome.y < minYPos ||
+            gnome.y > maxYPos
+        ) {
+            gnomes.splice(i, 1);
+            i--;
+        }
+    }
 }
+
 function updateCoins(gameTime, deltaT, advanced) {
     let cE = data.get("coinEntities");
     if (advanced || cE.length < 500) {
@@ -678,6 +679,74 @@ function updateCoins(gameTime, deltaT, advanced) {
         }
         data.set("coinEntities", cE);
     }
+}
+
+function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = "wander") {
+    console.log(
+        "Spawning Gnome with level: " +
+            level +
+            " at x: " +
+            xPos +
+            " y: " +
+            yPos +
+            " heading: " +
+            spawnHeading
+    );
+    let gnomes = data.get("gnomes");
+
+    if (level == undefined) {
+        console.log("level is undefined");
+        return;
+    }
+
+    let newId = Math.random();
+    for (i = 0; i < gnomes.length; i++) {
+        if (gnomes[i].id == newId) {
+            newId = Math.random() * 100;
+            i = 0;
+        }
+    }
+
+    if (xPos == undefined || yPos == undefined || spawnHeading == undefined) {
+        let minXPos = 0 - gnome_size;
+        let maxXPos = mainCanvas.width + gnome_size;
+        let minYPos = 0 - gnome_size;
+        let maxYPos = mainCanvas.height + gnome_size;
+
+        // if 1 in 2 chance
+        if (Math.random() > 0.5) {
+            // spawn on top or bottom
+            yPos = maxYPos;
+        } else {
+            yPos = minYPos;
+        }
+
+        // make x pos random between min and max
+        xPos = Math.random() * (maxXPos - minXPos) + minXPos;
+
+        // make the heading towards the center of the screen with some randomness in radians
+        spawnHeading =
+            Math.atan2(
+                mainCanvas.height / 2 - yPos,
+                mainCanvas.width / 2 - xPos
+            ) +
+            ((Math.random() - 0.5) * Math.PI) / 4;
+    }
+
+    let newGnome = {
+        x: xPos,
+        y: yPos,
+        num: level,
+        id: newId,
+        customData: {
+            ai_mode: "wander",
+            targets: [],
+            heading: spawnHeading,
+            nextCoinTime: Date.now() + 4000,
+        },
+    };
+    gnomes.push(newGnome);
+    data.set("gnomes", gnomes);
 }
 
 function render_gnomes(gnomes) {
