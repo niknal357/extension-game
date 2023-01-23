@@ -8,6 +8,12 @@ var itemHeld = null;
 
 var holePositions = [];
 
+var camera_x = 0;
+var camera_y = 0;
+
+var camera_approach_x = 0;
+var camera_approach_y = 0;
+
 hole_size = 100;
 gnome_size = 100;
 coin_size = 40;
@@ -161,11 +167,6 @@ function generateGnomeDex(data) {
     }
 }
 
-var camera_x = 0;
-var camera_y = 0;
-
-var camera_approach_x = 0;
-var camera_approach_y = 0;
 
 const checker = setInterval(() => {
     // console.log(document.getElementById("mainCanvas"));
@@ -362,6 +363,46 @@ function run_tick(gameTime, deltaT, advanced) {
         gnome.coinBoost = 1;
         gnomes.push(gnome);
     }
+    updateHoles();
+    updateGnomes();
+    updateCoins();
+}
+
+var start_chase = 0;
+
+setTimeout(() => {
+    setInterval(() => {
+        if (!data.loaded) {
+            return;
+        }
+        let tickrate = 16;
+        let p_bar = document.getElementById("catchup-bar");
+        if (Date.now() - data.get("logoffTime") > 60) {
+            start_chase = data.get("logoffTime");
+            p_bar.classList.remove("hidden");
+        } else {
+            start_chase = 0;
+            p_bar.classList.add("hidden");
+        }
+        let iterations = 0;
+        if (Date.now() - data.get("logoffTime") > 60 * 60) {
+            tickrate = 1000;
+        }
+        while (Date.now() - data.get("logoffTime") > tickrate / 2) {
+            p_bar.value =
+                (data.get("logoffTime") - start_chase) /
+                (Date.now() - start_chase);
+            run_tick(data.get("logoffTime"), tickrate, start_chase == 0);
+            data.set("logoffTime", data.get("logoffTime") + tickrate);
+            if (iterations > 10000) {
+                break;
+            }
+            iterations++;
+        }
+    }, 3);
+}, 300);
+
+function updateHoles(){
     for (i = 0; i < holes.length; i++) {
         if (holes[i].contents != null) {
             let gnome = holes[i].contents;
@@ -373,18 +414,20 @@ function run_tick(gameTime, deltaT, advanced) {
                     gnome.x = holePositions[j].xPos;
                     gnome.y = holePositions[j].yPos + gnome_size - 5;
                     gnome.coinBoost = inHoleCoinBoost;
-                    // console.log(gnome)
                     gnomes.push(gnome);
                 }
             }
         }
     }
-    // console.log(gnomes)
+}
+function updateGnomes(){
+
+    // Handle Gnome Move
+
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         while (gnome.customData.nextCoinTime < gameTime) {
             gnome.customData.nextCoinTime += coinDropInterval / gnome.coinBoost;
-            // console.log(gnome)
             dropCoin(
                 1,
                 gnome.x + gnome_size / 2 - coin_size / 2,
@@ -400,6 +443,7 @@ function run_tick(gameTime, deltaT, advanced) {
         }
     }
 
+    // Merge Gnomes
     let found = false;
     var i, j, gnome1, gnome2;
     gnomes = data.get("gnomes");
@@ -417,8 +461,6 @@ function run_tick(gameTime, deltaT, advanced) {
                 Math.abs(gnome1.x - gnome2.x) < gnome_size / 2 &&
                 Math.abs(gnome1.y - gnome2.y) < gnome_size / 2
             ) {
-                //merge
-                // gnome1.num += 1;
                 found = true;
                 break;
             }
@@ -440,12 +482,12 @@ function run_tick(gameTime, deltaT, advanced) {
         gnomes.splice(j, 1);
     }
     data.set("gnomes", gnomes);
-
+}
+function updateCoins(){
     let cE = data.get("coinEntities");
     if (advanced || cE.length < 500) {
         for (i = 0; i < cE.length; i++) {
             let coin = cE[i];
-            // console.log(coin)
             coin.xvel = coin.xvel * 0.99;
             coin.yvel = coin.yvel * 0.99;
             coin.zvel = coin.zvel * 0.99;
@@ -471,42 +513,8 @@ function run_tick(gameTime, deltaT, advanced) {
         }
         data.set("coinEntities", cE);
     }
+
 }
-
-var start_chase = 0;
-
-setTimeout(() => {
-    setInterval(() => {
-        if (!data.loaded) {
-            return;
-        }
-        let tickrate = 16;
-        let p_bar = document.getElementById("catchup-bar");
-        if (Date.now() - data.get("logoffTime") > 60) {
-            start_chase = data.get("logoffTime");
-            p_bar.classList.remove("hidden");
-        } else {
-            start_chase = 0;
-            p_bar.classList.add("hidden");
-        }
-        let iterations = 0;
-        // console.log(Date.now() - data.get("logoffTime"))
-        if (Date.now() - data.get("logoffTime") > 60 * 60) {
-            tickrate = 1000;
-        }
-        while (Date.now() - data.get("logoffTime") > tickrate / 2) {
-            p_bar.value =
-                (data.get("logoffTime") - start_chase) /
-                (Date.now() - start_chase);
-            run_tick(data.get("logoffTime"), tickrate, start_chase == 0);
-            data.set("logoffTime", data.get("logoffTime") + tickrate);
-            if (iterations > 10000) {
-                break;
-            }
-            iterations++;
-        }
-    }, 3);
-}, 300);
 
 function render_gnomes(gnomes) {
     for (i = 0; i < gnomes.length; i++) {
