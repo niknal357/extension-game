@@ -35,6 +35,11 @@ function resetProgress() {
 
 var isDown = false;
 var isMoving = false;
+var holdingitem = false;
+var itemHeld = null;
+var mouse_pos = { x: 0, y: 0 };
+var grab_offset = { x: 0, y: 0 };
+
 function ready() {
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
@@ -54,6 +59,99 @@ function ready() {
     // console.log(holePositions);
 
     generateUI();
+
+    //detect click and drag on the canvas if the mouse if over a gnome
+    document.addEventListener("mousedown", function (e) {
+        if (e.target == mainCanvas) {
+            isDown = true;
+        }
+    });
+    document.addEventListener("mouseup", function (e) {
+        if (e.target == mainCanvas) {
+            isDown = false;
+        }
+    });
+    document.addEventListener("mousemove", function (e) {
+        if (e.target == mainCanvas) {
+            isMoving = true;
+            mouse_pos = getMousePos(mainCanvas, e);
+        }
+    });
+    document.addEventListener("mouseout", function (e) {
+        if (e.target == mainCanvas) {
+            isMoving = false;
+        }
+    });
+    setInterval(() => {
+        if (start_chase != 0) {
+            return;
+        }
+        let gnomes = data.get("gnomes");
+        let gnome_collection = [];
+        let holes = data.get("holes");
+        for (let i = 0; i < gnomes.length; i++) {
+            gnome_collection.push(gnomes[i]);
+        }
+        // console.log(holes);
+        for (let i = 0; i < holes.length; i++) {
+            if (holes[i].contents != null) {
+                gnome_collection.push(holes[i].contents);
+            }
+        }
+        if (isDown && isMoving) {
+            if (!holdingitem) {
+                for (let i = 0; i < gnome_collection.length; i++) {
+                    if (
+                        mouse_pos.x > gnome_collection[i].x &&
+                        mouse_pos.x < gnome_collection[i].x + gnome_size &&
+                        mouse_pos.y < gnome_collection[i].y &&
+                        mouse_pos.y > gnome_collection[i].y - gnome_size
+                    ) {
+                        holdingitem = true;
+                        itemHeld = gnome_collection[i];
+                        itemHeld.customData.ai_mode = "disabled";
+                        // if gnome is in hole, remove it from hole and add it to gnomes
+                        if (itemHeld.customData.inHole) {
+                            gnomes.push(itemHeld);
+                            for (j = 0; j < holes.length; j++) {
+                                if (holes[j].contents == itemHeld) {
+                                    holes[j].contents = null;
+                                }
+                            }
+                            // holes[holes.indexOf(itemHeld)].contents = null;
+                            itemHeld.customData.inHole = false;
+                        }
+                        data.set("gnomes", gnomes);
+                        data.set("holes", holes);
+                        grab_offset = {
+                            x: mouse_pos.x - itemHeld.x,
+                            y: mouse_pos.y - itemHeld.y,
+                        };
+                        break;
+                    }
+                }
+            } else {
+                itemHeld.x = mouse_pos.x - grab_offset.x;
+                itemHeld.y = mouse_pos.y - grab_offset.y;
+                data.set("gnomes", gnomes);
+            }
+        } else {
+            if (holdingitem) {
+                itemHeld.customData.ai_mode = "wander";
+                data.set("gnomes", gnomes);
+            }
+            holdingitem = false;
+            itemHeld = null;
+        }
+    }, 1000 / 60);
+}
+
+function getMousePos(canvas, event) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+    };
 }
 
 function generateUI() {
@@ -167,7 +265,6 @@ function generateGnomeDex(data) {
     }
 }
 
-
 const checker = setInterval(() => {
     // console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
@@ -229,6 +326,7 @@ class DataStorage {
                         targets: [],
                         heading: 1,
                         nextCoinTime: Date.now() - restartOffset * 1000,
+                        inHole: false,
                     },
                 },
                 {
@@ -241,6 +339,7 @@ class DataStorage {
                         targets: [],
                         heading: Math.PI,
                         nextCoinTime: Date.now() - restartOffset * 1000,
+                        inHole: false,
                     },
                 },
             ],
@@ -261,6 +360,7 @@ class DataStorage {
                             targets: [],
                             heading: 0,
                             nextCoinTime: Date.now() - restartOffset * 1000,
+                            inHole: true,
                         },
                     },
                 },
@@ -355,17 +455,9 @@ setTimeout(() => {
 var resetting = false;
 
 function run_tick(gameTime, deltaT, advanced) {
-    let holes = data.get("holes");
-    let gs = data.get("gnomes");
-    let gnomes = [];
-    for (i = 0; i < gs.length; i++) {
-        let gnome = gs[i];
-        gnome.coinBoost = 1;
-        gnomes.push(gnome);
-    }
-    updateHoles(holes, gnomes);
-    updateGnomes(gnomes, gameTime, deltaT);
-    updateCoins(advanced);
+    updateHoles(gameTime, deltaT, advanced);
+    updateGnomes(gameTime, deltaT, advanced);
+    updateCoins(gameTime, deltaT, advanced);
 }
 
 var start_chase = 0;
@@ -402,7 +494,70 @@ setTimeout(() => {
     }, 3);
 }, 300);
 
-function updateHoles(holes, gnomes){
+function updateHoles(gameTime, deltaT, advanced) {
+    // Hole Suction
+    let holes = data.get("holes");
+    let gnomes = data.get("gnomes");
+
+    for (i = 0; i < holes.length; i++) {
+        let hole = holes[i];
+        for (j = 0; j < holePositions.length; j++) {
+            let pos = holePositions[j];
+            if (pos.x == hole.x && pos.y == hole.y) {
+                scr_x = pos.xPos;
+                scr_y = pos.yPos;
+            }
+        }
+        if (hole.contents != null) {
+            continue;
+        }
+        let closestGnome = null;
+        let closestGnomeDist = 10000;
+        for (j = 0; j < gnomes.length; j++) {
+            let gnome = gnomes[j];
+            if (gnome.customData.ai_mode == "disabled") {
+                continue;
+            }
+            let dist = Math.sqrt(
+                Math.pow(gnome.x - gnome_size / 2 - scr_x + hole_size / 2, 2) +
+                    Math.pow(
+                        gnome.y - gnome_size / 2 - scr_y + hole_size / 2,
+                        2
+                    )
+            );
+            if (dist < closestGnomeDist) {
+                closestGnome = gnome;
+                closestGnomeDist = dist;
+            }
+        }
+        // console.log(closestGnome);
+        // console.log(closestGnomeDist);
+        if (closestGnome == null) {
+            continue;
+        }
+        if (closestGnomeDist > gnome_size * 0.7) {
+            continue;
+        }
+        closestGnome.x = scr_x;
+        closestGnome.y = scr_y;
+        closestGnome.customData.ai_mode = "idle";
+        closestGnome.customData.inHole = true;
+        hole.contents = closestGnome;
+        gnomes.splice(gnomes.indexOf(closestGnome), 1);
+        break;
+    }
+}
+function updateGnomes(gameTime, deltaT, advanced) {
+    // Handle Gnome Move
+    let holes = data.get("holes");
+    let gs = data.get("gnomes");
+    let gnomes = [];
+    for (i = 0; i < gs.length; i++) {
+        let gnome = gs[i];
+        gnome.coinBoost = 1;
+        gnomes.push(gnome);
+    }
+
     for (i = 0; i < holes.length; i++) {
         if (holes[i].contents != null) {
             let gnome = holes[i].contents;
@@ -419,11 +574,6 @@ function updateHoles(holes, gnomes){
             }
         }
     }
-}
-function updateGnomes(gnomes, gameTime, deltaT){
-
-    // Handle Gnome Move
-
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         while (gnome.customData.nextCoinTime < gameTime) {
@@ -449,8 +599,14 @@ function updateGnomes(gnomes, gameTime, deltaT){
     gnomes = data.get("gnomes");
     for (i = 0; i < gnomes.length; i++) {
         gnome1 = gnomes[i];
+        if (gnome1.customData.ai_mode == "disabled") {
+            continue;
+        }
         for (j = 0; j < gnomes.length; j++) {
             gnome2 = gnomes[j];
+            if (gnome2.customData.ai_mode == "disabled") {
+                continue;
+            }
             if (gnome1 == gnome2) {
                 continue;
             }
@@ -469,7 +625,7 @@ function updateGnomes(gnomes, gameTime, deltaT){
             break;
         }
     }
-    console.log(found);
+    // console.log(found);
     if (found) {
         //remove j-th gnome
         gnome1.num += 1;
@@ -479,11 +635,20 @@ function updateGnomes(gnomes, gameTime, deltaT){
         );
         gnome1.x = (gnome1.x + gnome2.x) / 2;
         gnome1.y = (gnome1.y + gnome2.y) / 2;
+        vx1 = Math.cos(gnome1.customData.heading);
+        vy1 = Math.sin(gnome1.customData.heading);
+        vx2 = Math.cos(gnome2.customData.heading);
+        vy2 = Math.sin(gnome2.customData.heading);
+        if (vx1 == vx2 && vy1 == vy2) {
+            gnome1.customData.heading = Math.random() * 2 * Math.PI;
+        } else {
+            gnome1.customData.heading = Math.atan2(vy1 + vy2, vx1 + vx2);
+        }
         gnomes.splice(j, 1);
     }
     data.set("gnomes", gnomes);
 }
-function updateCoins(advanced){
+function updateCoins(gameTime, deltaT, advanced) {
     let cE = data.get("coinEntities");
     if (advanced || cE.length < 500) {
         for (i = 0; i < cE.length; i++) {
@@ -513,7 +678,6 @@ function updateCoins(advanced){
         }
         data.set("coinEntities", cE);
     }
-
 }
 
 function render_gnomes(gnomes) {
@@ -534,7 +698,7 @@ function render_gnomes(gnomes) {
             l_r = 0;
         }
         if (gnome.customData.ai_mode == "disabled") {
-            g = 0;
+            g = 1;
         } else {
             g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
         }
@@ -785,6 +949,9 @@ function line_line_intersection(
 }
 
 function handleMouseMove(e) {
+    if (!data.loaded) {
+        return;
+    }
     let posX = e.clientX + camera_x;
     let posY = e.clientY + camera_y;
     if (prev_mouse_move_pos == null) {
