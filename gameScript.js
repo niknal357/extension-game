@@ -220,15 +220,16 @@ function generateHoles(
     holePositions = newHoles;
 }
 
-function generateGnomeDex(data) {
+function generateGnomeDex(gnomeDescData) {
     // get rid of new lines in data
-    data = data.replace(/(\r\n|\n|\r)/gm, "");
+    gnomeDescData = gnomeDescData.replace(/(\r\n|\n|\r)/gm, "");
 
-    let lines = data.split(";");
+    let lines = gnomeDescData.split(";");
     const linesPerGnomeEntry = 3;
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
-    let highestGnomeDiscovered = 3; //TODO: this should pull from save.json file
+    let highestGnomeDiscovered = data.get("highestGnomeDiscovered"); 
+    console.log("asdhad872788" +highestGnomeDiscovered);
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -311,9 +312,10 @@ class DataStorage {
             "coinsInCurrentRun",
             "totalCoins",
             "totalResets",
+            "highestGnomeDiscovered",
             "msUntillForGnomeSpawnMin",
             "msUntillForGnomeSpawnMax",
-            "timeOfNextGnomeSpawn",
+            "timeOfNextGnomeSpawn"
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -347,6 +349,7 @@ class DataStorage {
             0,
             0,
             0,
+            1,
             7000,
             10000,
             Date.now() - restartOffset * 1000,
@@ -710,6 +713,11 @@ function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = "wander") {
     if (level == undefined) {
         console.log("level is undefined");
         return;
+    } else {
+        // check if level is higher than highest gnome found
+        if(level > data.get("highestGnomeDiscovered")){
+            data.set("highestGnomeDiscovered", level);
+        }
     }
 
     let newId = Math.random();
