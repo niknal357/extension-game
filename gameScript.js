@@ -83,6 +83,9 @@ function ready() {
         }
     });
     setInterval(() => {
+        if (!data.loaded) {
+            return;
+        }
         if (start_chase != 0) {
             return;
         }
@@ -228,8 +231,8 @@ function generateGnomeDex(gnomeDescData) {
     const linesPerGnomeEntry = 3;
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
-    let highestGnomeDiscovered = data.get("highestGnomeDiscovered"); 
-    console.log("asdhad872788" +highestGnomeDiscovered);
+    let highestGnomeDiscovered = data.get("highestGnomeDiscovered");
+    console.log("asdhad872788" + highestGnomeDiscovered);
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -315,7 +318,7 @@ class DataStorage {
             "highestGnomeDiscovered",
             "msUntillForGnomeSpawnMin",
             "msUntillForGnomeSpawnMax",
-            "timeOfNextGnomeSpawn"
+            "timeOfNextGnomeSpawn",
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -715,7 +718,7 @@ function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = "wander") {
         return;
     } else {
         // check if level is higher than highest gnome found
-        if(level > data.get("highestGnomeDiscovered")){
+        if (level > data.get("highestGnomeDiscovered")) {
             data.set("highestGnomeDiscovered", level);
         }
     }
