@@ -476,7 +476,6 @@ function updateGnomes(gnomes, gameTime, deltaT){
             break;
         }
     }
-    console.log(found);
     if (found) {
         //remove j-th gnome
         gnome1.num += 1;
@@ -494,6 +493,9 @@ function updateGnomes(gnomes, gameTime, deltaT){
     // Spawning Gnomes
     let timeOfNextGnomeSpawn = data.get("timeOfNextGnomeSpawn");
     if (timeOfNextGnomeSpawn < gameTime) {
+        let level = 1;
+        let x = 0;
+        let y = 0;
         spawnGnome(level, x, y);
         let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
@@ -535,11 +537,58 @@ function updateCoins(advanced){
 
 }
 
-function spawnGnome(level, x, y){
-    let gnome = {
+function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = 'wander'){
+    console.log("Spawning Gnome with level: " + level+ " at x: " + xPos + " y: " + yPos + " heading: " + spawnHeading);
+    let gnomes = data.get("gnomes");
+
+    if(level == undefined){
+        console.log("level is undefined");
+        return;
+    }
+
+    let newId = Math.random();
+    for (i = 0; i < gnomes.length; i++) {
+        if (gnomes[i].id == newId) {
+            newId = Math.random();
+            i = 0;
+        }
+    }
+
+    if (xPos == undefined || yPos == undefined || spawnHeading == undefined) {
+        let minXPos = 0 - gnome_size;
+        let maxXPos = mainCanvas.width + gnome_size;
+        let minYPos = 0 - gnome_size;
+        let maxYPos = mainCanvas.height + gnome_size;
         
+        // if 1 in 2 chance
+        if (Math.random() > 0.5) {
+            // spawn on top or bottom
+            yPos = maxYPos;
+        } else {
+            yPos = minYPos;
+        }
+
+        // make x pos random between min and max
+        xPos = Math.random() * (maxXPos - minXPos) + minXPos;
+
+        // make the heading towards the center of the screen with some randomness in radians
+        spawnHeading = Math.atan2(mainCanvas.height / 2 - yPos, mainCanvas.width / 2 - xPos) + (Math.random() - 0.5) * Math.PI / 4;
+    }
+
+    let newGnome = {
+        x: xPos,
+        y: yPos,
+        num: level,
+        id: newId,
+        customData: {
+            ai_mode: "wander", 
+            targets: [],
+            heading: spawnHeading,
+            nextCoinTime: Date.now() + 4000,
+        },
     };
-    gnomes.push(gnome);
+    gnomes.push(newGnome);
+    data.set("gnomes", gnomes);
 }
 
 function render_gnomes(gnomes) {
