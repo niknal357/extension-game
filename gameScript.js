@@ -541,9 +541,13 @@ function updateGnomes(gameTime, deltaT, advanced) {
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         while (gnome.customData.nextCoinTime < gameTime) {
-            gnome.customData.nextCoinTime += coinDropInterval / gnome.coinBoost;
+            let v = Math.pow(1.02016, 31.6206 * gnome.num - 14.0401) - 0.420455;
+            let f = Math.round(v);
+            gnome.customData.nextCoinTime +=
+                ((coinDropInterval / gnome.coinBoost) * f) / v;
+            console.log("dropping coin with valuie " + f);
             dropCoin(
-                1,
+                f,
                 gnome.x + gnome_size / 2 - coin_size / 2,
                 gnome.y - gnome_size * 0.8 - coin_size / 2
             );
@@ -1098,6 +1102,7 @@ function handleMouseMove(e) {
             )
         ) {
             coinEntities.splice(i, 1);
+            console.log(coin.amount);
             data.set(
                 "coinsInCurrentRun",
                 data.get("coinsInCurrentRun") + coin.amount
