@@ -689,11 +689,17 @@ function updateCoins(gameTime, deltaT, advanced) {
             let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
             let screenX = s_pos[0];
             let screenY = s_pos[1];
-            if (screenX < 0 || screenX + coin_size > mainCanvas.width) {
-                coin.xvel = coin.xvel * -0.7;
+            if (screenX < 0) {
+                coin.xvel += 0.5;
             }
-            if (screenY < 0 || screenY + coin_size > mainCanvas.height) {
-                coin.yvel = coin.yvel * -0.7;
+            if (screenX + coin_size > mainCanvas.width) {
+                coin.xvel -= 0.5;
+            }
+            if (screenY < 0) {
+                coin.yvel += 0.5;
+            }
+            if (screenY + coin_size > mainCanvas.height) {
+                coin.yvel -= 0.5;
             }
         }
         data.set("coinEntities", cE);
