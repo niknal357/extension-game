@@ -674,7 +674,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
 
 function updateCoins(gameTime, deltaT, advanced) {
     let cE = data.get("coinEntities");
-    if (advanced || cE.length < 500) {
+    if (advanced || cE.length < 1000) {
         for (i = 0; i < cE.length; i++) {
             let coin = cE[i];
             if (
