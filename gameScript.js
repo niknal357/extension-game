@@ -502,6 +502,22 @@ function updateGnomes(gnomes, gameTime, deltaT){
         let gnomeSpawnInterval = Math.floor(Math.random()) * (msUntillForGnomeSpawnMax - msUntillForGnomeSpawnMin) + msUntillForGnomeSpawnMin;
         data.set("timeOfNextGnomeSpawn", gameTime + gnomeSpawnInterval);
     }
+
+    // despawn gnomes if they are too far away
+
+    let breathingRoom = 100;
+    let minXPos = 0 - gnome_size - breathingRoom;
+    let maxXPos = mainCanvas.width + gnome_size + breathingRoom;
+    let minYPos = 0 - gnome_size - breathingRoom;
+    let maxYPos = mainCanvas.height + gnome_size + breathingRoom;
+
+    for (i = 0; i < gnomes.length; i++) {
+        gnome = gnomes[i];
+        if (gnome.x < minXPos || gnome.x > maxXPos || gnome.y < minYPos || gnome.y > maxYPos) {
+            gnomes.splice(i, 1);
+            i--;
+        }
+    }
 }
 
 function updateCoins(advanced){
@@ -549,7 +565,7 @@ function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = 'wander'){
     let newId = Math.random();
     for (i = 0; i < gnomes.length; i++) {
         if (gnomes[i].id == newId) {
-            newId = Math.random();
+            newId = Math.random() * 100;
             i = 0;
         }
     }
