@@ -20,9 +20,9 @@ coin_size = 40;
 wind = 0;
 gravitationalConstant = 0.4;
 
-COIN_LIMIT = 5000;
+COIN_LIMIT = 2000;
 
-coinDropInterval = 30000;
+coinDropInterval = 60000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 
@@ -446,6 +446,7 @@ setTimeout(() => {
             start_chase = 0;
             p_bar.classList.add("hidden");
         }
+        console.log(Date.now() - data.get("logoffTime"));
         let iterations = 0;
         if (Date.now() - data.get("logoffTime") > 60 * 60) {
             tickrate = 1000;
@@ -636,7 +637,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
         let level = 1;
         let x = 0;
         let y = 0;
-        spawnGnome(level, x, y);
+        spawnGnome(gameTime, level, x, y);
         let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
         let gnomeSpawnInterval =
@@ -673,6 +674,16 @@ function updateCoins(gameTime, deltaT, advanced) {
     if (advanced || cE.length < 500) {
         for (i = 0; i < cE.length; i++) {
             let coin = cE[i];
+            if (
+                coin.x + coin_size < 0 ||
+                coin.x > mainCanvas.width ||
+                coin.y + coin_size < 0 ||
+                coin.y > mainCanvas.height
+            ) {
+                cE.splice(i, 1);
+                i--;
+                continue;
+            }
             coin.xvel = coin.xvel * 0.99;
             coin.yvel = coin.yvel * 0.99;
             coin.zvel = coin.zvel * 0.99;
@@ -686,27 +697,35 @@ function updateCoins(gameTime, deltaT, advanced) {
                 coin.z = 0;
                 coin.zvel = coin.zvel * -0.4;
             }
-            // let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
-            // let screenX = s_pos[0];
-            // let screenY = s_pos[1];
-            // if (screenX < 0) {
-            //     coin.xvel += 0.5;
-            // }
-            // if (screenX + coin_size > mainCanvas.width) {
-            //     coin.xvel -= 0.5;
-            // }
-            // if (screenY < 0) {
-            //     coin.yvel += 0.5;
-            // }
-            // if (screenY + coin_size > mainCanvas.height) {
-            //     coin.yvel -= 0.5;
-            // }
+
+            let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
+            let screenX = s_pos[0];
+            let screenY = s_pos[1];
+            if (screenX < 0) {
+                coin.xvel += 0.5;
+            }
+            if (screenX + coin_size > mainCanvas.width) {
+                coin.xvel -= 0.5;
+            }
+            if (screenY < 0) {
+                coin.yvel += 0.5;
+            }
+            if (screenY + coin_size > mainCanvas.height) {
+                coin.yvel -= 0.5;
+            }
         }
         data.set("coinEntities", cE);
     }
 }
 
-function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = "wander") {
+function spawnGnome(
+    gameTime,
+    level,
+    xPos,
+    yPos,
+    spawnHeading,
+    ai_mode = "wander"
+) {
     console.log(
         "Spawning Gnome with level: " +
             level +
@@ -772,7 +791,7 @@ function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = "wander") {
             ai_mode: "wander",
             targets: [],
             heading: spawnHeading,
-            nextCoinTime: Date.now() + 4000,
+            nextCoinTime: gameTime + 4000,
         },
     };
     gnomes.push(newGnome);
@@ -893,8 +912,8 @@ function draw() {
     for (let i = 0; i < moving_coins.length; i++) {
         let coin = moving_coins[i];
         //move coin towards coin icon in the top left
-        let coin_icon_x = 25;
-        let coin_icon_y = 25;
+        let coin_icon_x = 10;
+        let coin_icon_y = 10;
         let coin_icon_size = 50;
         let coin_icon_center_x = coin_icon_x + coin_icon_size / 2;
         let coin_icon_center_y = coin_icon_y + coin_icon_size / 2;
