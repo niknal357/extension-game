@@ -363,9 +363,9 @@ function run_tick(gameTime, deltaT, advanced) {
         gnome.coinBoost = 1;
         gnomes.push(gnome);
     }
-    updateHoles();
-    updateGnomes();
-    updateCoins();
+    updateHoles(holes, gnomes);
+    updateGnomes(gnomes, gameTime, deltaT);
+    updateCoins(advanced);
 }
 
 var start_chase = 0;
@@ -402,7 +402,7 @@ setTimeout(() => {
     }, 3);
 }, 300);
 
-function updateHoles(){
+function updateHoles(holes, gnomes){
     for (i = 0; i < holes.length; i++) {
         if (holes[i].contents != null) {
             let gnome = holes[i].contents;
@@ -420,7 +420,7 @@ function updateHoles(){
         }
     }
 }
-function updateGnomes(){
+function updateGnomes(gnomes, gameTime, deltaT){
 
     // Handle Gnome Move
 
@@ -483,7 +483,7 @@ function updateGnomes(){
     }
     data.set("gnomes", gnomes);
 }
-function updateCoins(){
+function updateCoins(advanced){
     let cE = data.get("coinEntities");
     if (advanced || cE.length < 500) {
         for (i = 0; i < cE.length; i++) {
