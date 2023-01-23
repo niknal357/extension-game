@@ -22,7 +22,7 @@ gravitationalConstant = 0.4;
 
 COIN_LIMIT = 5000;
 
-coinDropInterval = 10000;
+coinDropInterval = 30000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 
