@@ -92,18 +92,18 @@ function ready() {
         let gnomes = data.get("gnomes");
         let gnome_collection = [];
         let holes = data.get("holes");
-        for (let i = 0; i < gnomes.length; i++) {
-            gnome_collection.push(gnomes[i]);
-        }
-        // console.log(holes);
         for (let i = 0; i < holes.length; i++) {
             if (holes[i].contents != null) {
                 gnome_collection.push(holes[i].contents);
             }
         }
+        for (let i = 0; i < gnomes.length; i++) {
+            gnome_collection.push(gnomes[i]);
+        }
+        // console.log(holes);
         if (isDown && isMoving) {
             if (!holdingitem) {
-                for (let i = 0; i < gnome_collection.length; i++) {
+                for (let i = gnome_collection.length-1; i >= 0; i--) {
                     if (
                         mouse_pos.x > gnome_collection[i].x &&
                         mouse_pos.x < gnome_collection[i].x + gnome_size &&
@@ -123,6 +123,9 @@ function ready() {
                             }
                             // holes[holes.indexOf(itemHeld)].contents = null;
                             itemHeld.customData.inHole = false;
+                        } else {
+                            gnomes.splice(gnomes.indexOf(itemHeld), 1);
+                            gnomes.push(itemHeld);
                         }
                         data.set("gnomes", gnomes);
                         data.set("holes", holes);
