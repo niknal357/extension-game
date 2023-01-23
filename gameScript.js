@@ -228,7 +228,7 @@ function generateGnomeDex(data) {
     const linesPerGnomeEntry = 3;
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
-    let highestGnomeDiscovered = 3; //TODO: this should pull from save.json file
+    let highestGnomeDiscovered = data.get('highestGnomeDiscovered'); //TODO: this should pull from save.json file
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -314,6 +314,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMin",
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
+            "highestGnomeDiscovered"
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -349,6 +350,7 @@ class DataStorage {
             0,
             7000,
             10000,
+            1,
             Date.now() - restartOffset * 1000,
         ];
         this.loaded = false;
@@ -697,6 +699,11 @@ function spawnGnome(level, xPos, yPos, spawnHeading, ai_mode = "wander") {
     if (level == undefined) {
         console.log("level is undefined");
         return;
+    } else {
+        // check if level is higher than highest gnome found
+        if(level > data.get("highestGnomeDiscovered")){
+            data.set("highestGnomeDiscovered", level);
+        }
     }
 
     let newId = Math.random();
