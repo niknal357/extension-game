@@ -563,8 +563,17 @@ function updateGnomes(gameTime, deltaT, advanced) {
     let found = false;
     var i, j, gnome1, gnome2;
     gnomes = data.get("gnomes");
+    all_gnomes = [];
     for (i = 0; i < gnomes.length; i++) {
-        gnome1 = gnomes[i];
+        all_gnomes.push(gnomes[i]);
+    }
+    for (i = 0; i < holes.length; i++) {
+        if (holes[i].contents != null) {
+            all_gnomes.push(holes[i].contents);
+        }
+    }
+    for (i = 0; i < all_gnomes.length; i++) {
+        gnome1 = all_gnomes[i];
         if (gnome1.customData.ai_mode == "disabled") {
             continue;
         }
