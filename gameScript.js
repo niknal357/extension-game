@@ -324,6 +324,7 @@ class DataStorage {
                     console.log("taking from default");
                     dat.set(key, defau[i]);
                 }
+                // comment this out to enable saving
                 dat.set(key, defau[i]);
             }
             dat.loaded = true;

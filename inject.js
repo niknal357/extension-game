@@ -1,3 +1,5 @@
+
+
 function init() {
     user_field = document.getElementById("fieldAccount");
     pass_field = document.getElementById("fieldPassword");
