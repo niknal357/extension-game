@@ -332,7 +332,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
         ];
-        let restartOffset = 60*60*10;
+        let restartOffset = 60*60*50;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [],
@@ -767,7 +767,7 @@ function spawnGnome(
         }
     }
 
-    let newId = Math.random();
+    let newId = Math.random() * 100;
     for (i = 0; i < gnomes.length; i++) {
         if (gnomes[i].id == newId) {
             newId = Math.random() * 100;
@@ -830,9 +830,11 @@ function render_gnomes(gnomes) {
                 Math.cos(t) *
                 (1 - Math.abs(Math.cos(gnome.customData.heading))) *
                 8;
+            s_d = 0
         } else {
             u_d = 0;
             l_r = 0;
+            s_d = 0;
         }
         if (gnome.customData.ai_mode == "disabled") {
             g = 1;
@@ -841,9 +843,9 @@ function render_gnomes(gnomes) {
         }
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
-            gnome.x + l_r - camera_x,
+            gnome.x + l_r - camera_x - s_d/2,
             gnome.y + u_d - gnome_size * g - camera_y,
-            gnome_size,
+            gnome_size + s_d,
             gnome_size * g
         );
     }
