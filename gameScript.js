@@ -236,7 +236,7 @@ function generateHoles(
 
 function generateGnomeDex(gnomeDescData) {
     // get rid of new lines in data
-    document.getElementById("gnome-dex").innerHTML = "";
+    document.getElementById("gnome-dex").innerHTML = '<h1 id="gd-title">GNOME-DEX</h1>';
     gnomeDescData = gnomeDescData.replace(/(\r\n|\n|\r)/gm, "");
 
     let lines = gnomeDescData.split(";");
@@ -332,7 +332,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
         ];
-        let restartOffset = 60*60*50;
+        let restartOffset = 0;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [],
@@ -408,7 +408,7 @@ class DataStorage {
                     dat.set(key, defau[i]);
                 }
                 // comment this out to enable saving
-                dat.set(key, defau[i]);
+                // dat.set(key, defau[i]);
             }
             dat.loaded = true;
         });
@@ -821,11 +821,13 @@ function render_gnomes(gnomes) {
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         t = Date.now() * 0.01 + gnome.id;
+        let cycle = -Math.abs(Math.sin(t))*20+5
+        u_d_s = -Math.max(0, cycle)
         if (
             gnome.customData.ai_mode == "wander" ||
             gnome.customData.ai_mode == "pathfind"
         ) {
-            u_d = -Math.abs(Math.sin(t)) * 15;
+            u_d = Math.min(0, cycle)
             l_r =
                 Math.cos(t) *
                 (1 - Math.abs(Math.cos(gnome.customData.heading))) *
@@ -838,8 +840,10 @@ function render_gnomes(gnomes) {
         }
         if (gnome.customData.ai_mode == "disabled") {
             g = 1;
+            s_d = 0
         } else {
-            g = 1 + Math.min(0, Math.abs(Math.sin(t)) - 0.5) * 0.25;
+            g = 1 + u_d_s * 0.03;
+            s_d = u_d_s * -6;
         }
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
