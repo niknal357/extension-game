@@ -656,7 +656,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
         let level = 1;
         let x = 0;
         let y = 0;
-        spawnGnome(gameTime, level, x, y);
+        spawnGnome(level, gameTime, x, y);
         let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
         let gnomeSpawnInterval =
@@ -738,8 +738,8 @@ function updateCoins(gameTime, deltaT, advanced) {
 }
 
 function spawnGnome(
-    gameTime,
     level,
+    gameTime,
     xPos,
     yPos,
     spawnHeading,
