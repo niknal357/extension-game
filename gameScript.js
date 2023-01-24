@@ -6,6 +6,9 @@ var canvas_height;
 var holdingitem = false;
 var itemHeld = null;
 
+var holdingTool = false;
+var toolHeld = null;
+
 var holePositions = [];
 
 var camera_x = 0;
@@ -25,6 +28,8 @@ COIN_LIMIT = 2000;
 coinDropInterval = 60000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
+
+ghostHoles = [];
 
 function resetProgress() {
     for (let i = 0; i < data.datapoints.length; i++) {
@@ -52,6 +57,7 @@ function ready() {
     document
         .getElementById("mainCanvas")
         .addEventListener("mousemove", handleMouseMove);
+    document.body.addEventListener("keypress", handleKeyPress);
 
     setTimeout(() => {
         setInterval(draw, 1000 / 60);
@@ -230,7 +236,6 @@ function generateHoles(
             });
         }
     }
-    // console.log(newHoles);
     holePositions = newHoles;
 }
 
@@ -1041,7 +1046,6 @@ function handleClick(e) {
 }
 
 function dropCoin(amount, xPos, yPos) {
-    // console.log("dropping coin");
     let coinEntities = data.get("coinEntities");
     if (coinEntities.length >= COIN_LIMIT) {
         return;
@@ -1176,4 +1180,37 @@ function handleMouseMove(e) {
         }
     }
     prev_mouse_move_pos = [posX, posY];
+}
+
+function handleKeyPress(e){
+    if (e.key == "Escape"){
+        if (holdingitem){
+            holdingitem = false;
+            itemHeld = null;
+        }
+    } else if (e.key == "1"){
+        toggleHoldingShovel();
+    }
+
+}
+
+function toggleHoldingShovel(){
+    if (holdingTool && toolHeld == "Shovel"){
+        holdingTool = false;
+        toolHeld = null;
+        ghostHoles = [];
+    } else {
+        holdingTool = true;
+        toolHeld = "Shovel";
+
+        let holes = data.get("holes");
+        // for hole in holePositions
+        for (let i = 0; i < holePositions.length; i++){
+            // get rid of all the holes that are already dug
+            if (holes[0].x == holePositions[i].x && holes[0].y == holePositions[i].y){
+                holes.splice(0, 1);
+            }
+        }
+        ghostHoles = holes;
+    }
 }
