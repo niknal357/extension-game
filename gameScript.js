@@ -58,7 +58,15 @@ function ready() {
     }, 10);
     // console.log(holePositions);
 
-    generateUI();
+    var loaded_detector = setInterval(() => {
+        if (data.loaded) {
+            clearInterval(loaded_detector);
+            generateUI();
+        }
+    }, 10);
+
+    // setTimeout(() => {generateUI();}, 50)
+    
 
     //detect click and drag on the canvas if the mouse if over a gnome
     document.addEventListener("mousedown", function (e) {
@@ -235,7 +243,7 @@ function generateGnomeDex(gnomeDescData) {
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
     let highestGnomeDiscovered = data.get("highestGnomeDiscovered");
-    console.log("asdhad872788" + highestGnomeDiscovered);
+    console.log("asdhad872788  " + highestGnomeDiscovered);
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -449,7 +457,7 @@ setTimeout(() => {
             start_chase = 0;
             p_bar.classList.add("hidden");
         }
-        console.log(Date.now() - data.get("logoffTime"));
+        // console.log(Date.now() - data.get("logoffTime"));
         let iterations = 0;
         if (Date.now() - data.get("logoffTime") > 60 * 60) {
             tickrate = 1000;
@@ -730,16 +738,16 @@ function spawnGnome(
     spawnHeading,
     ai_mode = "wander"
 ) {
-    console.log(
-        "Spawning Gnome with level: " +
-            level +
-            " at x: " +
-            xPos +
-            " y: " +
-            yPos +
-            " heading: " +
-            spawnHeading
-    );
+    // console.log(
+    //     "Spawning Gnome with level: " +
+    //         level +
+    //         " at x: " +
+    //         xPos +
+    //         " y: " +
+    //         yPos +
+    //         " heading: " +
+    //         spawnHeading
+    // );
     let gnomes = data.get("gnomes");
 
     if (level == undefined) {
@@ -1142,7 +1150,7 @@ function handleMouseMove(e) {
             )
         ) {
             coinEntities.splice(i, 1);
-            console.log(coin.amount);
+            // console.log(coin.amount);
             data.set(
                 "coinsInCurrentRun",
                 data.get("coinsInCurrentRun") + coin.amount
