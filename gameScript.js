@@ -58,7 +58,15 @@ function ready() {
     }, 10);
     // console.log(holePositions);
 
-    generateUI();
+    var loaded_detector = setInterval(() => {
+        if (data.loaded) {
+            clearInterval(loaded_detector);
+            generateUI();
+        }
+    }, 10);
+
+    // setTimeout(() => {generateUI();}, 50)
+    
 
     //detect click and drag on the canvas if the mouse if over a gnome
     document.addEventListener("mousedown", function (e) {
@@ -92,18 +100,18 @@ function ready() {
         let gnomes = data.get("gnomes");
         let gnome_collection = [];
         let holes = data.get("holes");
-        for (let i = 0; i < gnomes.length; i++) {
-            gnome_collection.push(gnomes[i]);
-        }
-        // console.log(holes);
         for (let i = 0; i < holes.length; i++) {
             if (holes[i].contents != null) {
                 gnome_collection.push(holes[i].contents);
             }
         }
+        for (let i = 0; i < gnomes.length; i++) {
+            gnome_collection.push(gnomes[i]);
+        }
+        // console.log(holes);
         if (isDown && isMoving) {
             if (!holdingitem) {
-                for (let i = 0; i < gnome_collection.length; i++) {
+                for (let i = gnome_collection.length-1; i >= 0; i--) {
                     if (
                         mouse_pos.x > gnome_collection[i].x &&
                         mouse_pos.x < gnome_collection[i].x + gnome_size &&
@@ -123,6 +131,9 @@ function ready() {
                             }
                             // holes[holes.indexOf(itemHeld)].contents = null;
                             itemHeld.customData.inHole = false;
+                        } else {
+                            gnomes.splice(gnomes.indexOf(itemHeld), 1);
+                            gnomes.push(itemHeld);
                         }
                         data.set("gnomes", gnomes);
                         data.set("holes", holes);
@@ -225,6 +236,7 @@ function generateHoles(
 
 function generateGnomeDex(gnomeDescData) {
     // get rid of new lines in data
+    document.getElementById("gnome-dex").innerHTML = "";
     gnomeDescData = gnomeDescData.replace(/(\r\n|\n|\r)/gm, "");
 
     let lines = gnomeDescData.split(";");
@@ -232,7 +244,7 @@ function generateGnomeDex(gnomeDescData) {
     let numGnomes = Math.floor(lines.length / linesPerGnomeEntry);
 
     let highestGnomeDiscovered = data.get("highestGnomeDiscovered");
-    console.log("asdhad872788" + highestGnomeDiscovered);
+    console.log("asdhad872788  " + highestGnomeDiscovered);
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -320,7 +332,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
         ];
-        let restartOffset = 0;
+        let restartOffset = 60*60*50;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [],
@@ -396,7 +408,7 @@ class DataStorage {
                     dat.set(key, defau[i]);
                 }
                 // comment this out to enable saving
-                // dat.set(key, defau[i]);
+                dat.set(key, defau[i]);
             }
             dat.loaded = true;
         });
@@ -409,7 +421,7 @@ class DataStorage {
 
 function coinXYZtoScreen(x, y, z) {
     let screenX = x - camera_x;
-    let screenY = y - camera_y - z * 2;
+    let screenY = y - camera_y - z * 0;
     return [screenX, screenY];
 }
 
@@ -446,7 +458,7 @@ setTimeout(() => {
             start_chase = 0;
             p_bar.classList.add("hidden");
         }
-        console.log(Date.now() - data.get("logoffTime"));
+        // console.log(Date.now() - data.get("logoffTime"));
         let iterations = 0;
         if (Date.now() - data.get("logoffTime") > 60 * 60) {
             tickrate = 1000;
@@ -511,6 +523,7 @@ function updateHoles(gameTime, deltaT, advanced) {
         }
         closestGnome.x = scr_x;
         closestGnome.y = scr_y;
+        closestGnome.customData.nextCoinTime = Math.min(closestGnome.customData.nextCoinTime, gameTime+coinDropInterval)
         closestGnome.customData.ai_mode = "idle";
         closestGnome.customData.inHole = true;
         hole.contents = closestGnome;
@@ -612,6 +625,12 @@ function updateGnomes(gameTime, deltaT, advanced) {
     if (found) {
         //remove j-th gnome
         gnome1.num += 1;
+        if (data.get("highestGnomeDiscovered") < gnome1.num) {
+            data.set("highestGnomeDiscovered", gnome1.num);
+            fetch("gnomes.txt")
+                .then((response) => response.text())
+                .then((text) => generateGnomeDex(text));
+        }
         gnome1.customData.nextCoinTime = Math.min(
             gnome1.customData.nextCoinTime,
             gnome2.customData.nextCoinTime
@@ -671,7 +690,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
 
 function updateCoins(gameTime, deltaT, advanced) {
     let cE = data.get("coinEntities");
-    if (advanced || cE.length < 500) {
+    if (advanced || cE.length < 1000) {
         for (i = 0; i < cE.length; i++) {
             let coin = cE[i];
             if (
@@ -726,16 +745,16 @@ function spawnGnome(
     spawnHeading,
     ai_mode = "wander"
 ) {
-    console.log(
-        "Spawning Gnome with level: " +
-            level +
-            " at x: " +
-            xPos +
-            " y: " +
-            yPos +
-            " heading: " +
-            spawnHeading
-    );
+    // console.log(
+    //     "Spawning Gnome with level: " +
+    //         level +
+    //         " at x: " +
+    //         xPos +
+    //         " y: " +
+    //         yPos +
+    //         " heading: " +
+    //         spawnHeading
+    // );
     let gnomes = data.get("gnomes");
 
     if (level == undefined) {
@@ -748,7 +767,7 @@ function spawnGnome(
         }
     }
 
-    let newId = Math.random();
+    let newId = Math.random() * 100;
     for (i = 0; i < gnomes.length; i++) {
         if (gnomes[i].id == newId) {
             newId = Math.random() * 100;
@@ -791,7 +810,7 @@ function spawnGnome(
             ai_mode: "wander",
             targets: [],
             heading: spawnHeading,
-            nextCoinTime: gameTime + 4000,
+            nextCoinTime: Date.now() + 4000,
         },
     };
     gnomes.push(newGnome);
@@ -811,9 +830,11 @@ function render_gnomes(gnomes) {
                 Math.cos(t) *
                 (1 - Math.abs(Math.cos(gnome.customData.heading))) *
                 8;
+            s_d = 0
         } else {
             u_d = 0;
             l_r = 0;
+            s_d = 0;
         }
         if (gnome.customData.ai_mode == "disabled") {
             g = 1;
@@ -822,9 +843,9 @@ function render_gnomes(gnomes) {
         }
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
-            gnome.x + l_r - camera_x,
+            gnome.x + l_r - camera_x - s_d/2,
             gnome.y + u_d - gnome_size * g - camera_y,
-            gnome_size,
+            gnome_size + s_d,
             gnome_size * g
         );
     }
@@ -1138,7 +1159,7 @@ function handleMouseMove(e) {
             )
         ) {
             coinEntities.splice(i, 1);
-            console.log(coin.amount);
+            // console.log(coin.amount);
             data.set(
                 "coinsInCurrentRun",
                 data.get("coinsInCurrentRun") + coin.amount
