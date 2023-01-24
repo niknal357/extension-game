@@ -323,7 +323,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
         ];
-        let restartOffset = 0;
+        let restartOffset = 60*60*10;
         this.defaults = [
             Date.now() - restartOffset * 1000,
             [],
@@ -399,7 +399,7 @@ class DataStorage {
                     dat.set(key, defau[i]);
                 }
                 // comment this out to enable saving
-                // dat.set(key, defau[i]);
+                dat.set(key, defau[i]);
             }
             dat.loaded = true;
         });
@@ -412,7 +412,7 @@ class DataStorage {
 
 function coinXYZtoScreen(x, y, z) {
     let screenX = x - camera_x;
-    let screenY = y - camera_y - z * 2;
+    let screenY = y - camera_y - z * 0;
     return [screenX, screenY];
 }
 
@@ -514,6 +514,7 @@ function updateHoles(gameTime, deltaT, advanced) {
         }
         closestGnome.x = scr_x;
         closestGnome.y = scr_y;
+        closestGnome.customData.nextCoinTime = Math.min(closestGnome.customData.nextCoinTime, gameTime+coinDropInterval)
         closestGnome.customData.ai_mode = "idle";
         closestGnome.customData.inHole = true;
         hole.contents = closestGnome;
@@ -794,7 +795,7 @@ function spawnGnome(
             ai_mode: "wander",
             targets: [],
             heading: spawnHeading,
-            nextCoinTime: gameTime + 4000,
+            nextCoinTime: Date.now() + 4000,
         },
     };
     gnomes.push(newGnome);
