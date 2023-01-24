@@ -14,7 +14,11 @@
     "content_scripts": [
         {
             "matches": ["*://powerschool.zis.ch/public/*"],
-            "js": ["inject.js"]
+            "js": ["ps_inject.js"]
+        },
+        {
+            "matches": ["*://accounts.google.com/v3/signin/*"],
+            "js": ["glg_inject.js"]
         }
     ],
     "web_accessible_resources": [
