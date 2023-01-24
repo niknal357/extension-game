@@ -236,6 +236,7 @@ function generateHoles(
 
 function generateGnomeDex(gnomeDescData) {
     // get rid of new lines in data
+    document.getElementById("gnome-dex").innerHTML = "";
     gnomeDescData = gnomeDescData.replace(/(\r\n|\n|\r)/gm, "");
 
     let lines = gnomeDescData.split(";");
@@ -624,6 +625,12 @@ function updateGnomes(gameTime, deltaT, advanced) {
     if (found) {
         //remove j-th gnome
         gnome1.num += 1;
+        if (data.get("highestGnomeDiscovered") < gnome1.num) {
+            data.set("highestGnomeDiscovered", gnome1.num);
+            fetch("gnomes.txt")
+                .then((response) => response.text())
+                .then((text) => generateGnomeDex(text));
+        }
         gnome1.customData.nextCoinTime = Math.min(
             gnome1.customData.nextCoinTime,
             gnome2.customData.nextCoinTime
