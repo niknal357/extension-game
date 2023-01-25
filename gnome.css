@@ -261,7 +261,7 @@ h3{
 .sign{
     width: 65px;
     height: 65px;
-    z-index: 999999999999999999;
+    z-index: 999;
 }
 .sign > img {
     width: 100%;
@@ -278,4 +278,36 @@ h3{
     top: 50%;
     right: 10px;
     translate: 0 -50%;
+}
+#trader{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+}
+.trader-hidden{
+    display: none;
+}   
+.trader-row{
+    display: flex;
+    gap: 5px;
+    width: 421px;
+    height: 50px;
+    align-items: center;
+    background: beige;
+    position: absolute;
+}
+#trader-row-1{
+    top: 90px;
+    right: 40px;
+}
+#trader-row-2{
+    top: 221px;
+    right: 40px;
+}
+#trader-row-3{
+    top: 348px;
+    right: 40px;
 }

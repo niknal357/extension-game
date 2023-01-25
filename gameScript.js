@@ -17,6 +17,8 @@ var camera_y = 0;
 var camera_approach_x = 0;
 var camera_approach_y = 0;
 
+var trader_items = [[], [], []];
+
 hole_size = 100;
 gnome_size = 100;
 coin_size = 40;
@@ -237,6 +239,9 @@ function generateUI() {
 
     let inventoryButton = document.getElementById("toolbar-button-5");
     inventoryButton.addEventListener("click", toggleInventory); 
+
+    let trader = document.getElementById("trader");
+    trader.addEventListener("click", toggleTraderMenu);
 
     fetch("gnomes.txt")
         .then((response) => response.text())
@@ -1161,7 +1166,14 @@ function handleClick(e) {
             }
         }
     }
-    // if clicked on a gnome / enemy / mob
+    // if clicked on trader
+    if(current_room == 'trader'){
+        if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2){
+            // open trader menu
+            debugMessage("Trader Menu Opened");
+            toggleTraderMenu();
+        }
+    }
 }
 
 function dropCoin(amount, xPos, yPos) {
@@ -1395,4 +1407,12 @@ function debugMessage(message){
             }
         }
     }, 5000);
+}
+
+function toggleTraderMenu(){
+    document.getElementById('trader').classList.toggle('trader-hidden');
+}
+
+function updateTraderItems(itemsThatMustBeIncluded){
+    let amountOfItemsPerRow = 7;
 }
