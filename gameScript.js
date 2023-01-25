@@ -1200,12 +1200,13 @@ function toggleHoldingShovel(){
         toolHeld = null;
         ghostHoles = [];
         debugMessage("Put Away Shovel");
-        document.getElementById('toolbar-button-1').classList.remove('toolbar-button-selected');
+        document.getElementById('toolbar-button-1').getElementsByClassName('button-icon')[0].classList.remove('toolbar-button-selected');
+        document.body.style.cursor = "url('./gnomes/Shovel.png'), auto"; // TODO: why this not work?
     } else {
         holdingTool = true;
         toolHeld = "Shovel";
         debugMessage("Holding Shovel");
-        document.getElementById('toolbar-button-1').classList.add('toolbar-button-selected');
+        document.getElementById('toolbar-button-1').getElementsByClassName('button-icon')[0].classList.add('toolbar-button-selected');
 
         let ghostHolePositions = holePositions;
         let holes = data.get("holes");
