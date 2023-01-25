@@ -750,21 +750,21 @@ function updateCoins(gameTime, deltaT, advanced) {
                 coin.zvel = coin.zvel * -0.4;
             }
 
-            let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
-            let screenX = s_pos[0];
-            let screenY = s_pos[1];
-            if (screenX < 0) {
-                coin.xvel += 0.5;
-            }
-            if (screenX + coin_size > mainCanvas.width) {
-                coin.xvel -= 0.5;
-            }
-            if (screenY < 0) {
-                coin.yvel += 0.5;
-            }
-            if (screenY + coin_size > mainCanvas.height) {
-                coin.yvel -= 0.5;
-            }
+            // let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
+            // let screenX = s_pos[0];
+            // let screenY = s_pos[1];
+            // if (screenX < 0) {
+            //     coin.xvel += 0.5;
+            // }
+            // if (screenX + coin_size > mainCanvas.width) {
+            //     coin.xvel -= 0.5;
+            // }
+            // if (screenY < 0) {
+            //     coin.yvel += 0.5;
+            // }
+            // if (screenY + coin_size > mainCanvas.height) {
+            //     coin.yvel -= 0.5;
+            // }
         }
         data.set("coinEntities", cE);
     }
@@ -1057,7 +1057,7 @@ function draw() {
     trader_img.src = "gnomes/trading market.png";
 
     ctx.drawImage(trader_img, getOffset('trader').x - camera_x, getOffset('trader').y - camera_y, canvas_width, canvas_height/2);
-    
+
     let coins_to_draw = [];
     let coinEntities = data.get("coinEntities");
     for (let i = 0; i < coinEntities.length; i++) {
