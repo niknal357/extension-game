@@ -125,7 +125,7 @@ function ready() {
         }
     });
 
-    document.getElementById("traderSign").addEventListener("click", set_room('trader'));
+    document.getElementById("traderSign").addEventListener("click", set_room, 'trader');
     
 
     setInterval(() => {
