@@ -51,10 +51,15 @@ var grab_offset = { x: 0, y: 0 };
 var rooms = [
     ["trader", "main"]
 ]
+var current_room = "main";
+
+var tot_room_width = rooms[0].length * canvas_width;
+var tot_room_height = rooms.length * canvas_height;
 
 function getOffset(room){
-    for (let y = 0; y < rooms.length; i++) {
-        for (let x = 0; x < rooms[y].length; i++) {
+    for (let y = 0; y < rooms.length; y++) {
+        for (let x = 0; x < rooms[y].length; x++) {
+            console.log(rooms[y][x])
             if (rooms[y][x] == room){
                 return {x: x*canvas_width, y: y*canvas_height}
             }
@@ -78,7 +83,10 @@ function ready() {
     document.getElementById('toolbar-button-1').addEventListener('click', toggleHoldingShovel);
     
     document.body.addEventListener("keypress", handleKeyPress);
-
+    camera_approach_x = getOffset(current_room).x;
+    camera_approach_y = getOffset(current_room).y;
+    camera_x = camera_approach_x;
+    camera_y = camera_approach_y;
     setTimeout(() => {
         setInterval(draw, 1000 / 60);
     }, 10);
@@ -117,7 +125,9 @@ function ready() {
         }
     });
 
-    document.getElementById("marketSign").addEventListener("click", setRoom('market'));
+    document.getElementById("traderSign").addEventListener("click", () =>{
+        set_room("trader");
+    });
     
 
     setInterval(() => {
@@ -193,8 +203,8 @@ function ready() {
 function getMousePos(canvas, event) {
     var rect = canvas.getBoundingClientRect();
     return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
+        x: event.clientX - rect.left + camera_x,
+        y: event.clientY - rect.top + camera_y,
     };
 }
 
@@ -246,8 +256,8 @@ function generateHoles(
     for (let row = 0; row < numHoleRows; row++) {
         for (let column = 0; column < numHoleCols; column++) {
             newHoles.push({
-                xPos: left_offset + column * (x_spacing + hole_size),
-                yPos: top_offset + row * (y_spacing + hole_size),
+                xPos: left_offset + column * (x_spacing + hole_size)+getOffset("main").x,
+                yPos: top_offset + row * (y_spacing + hole_size)+getOffset("main").y,
                 x: column,
                 y: row,
             });
@@ -689,10 +699,10 @@ function updateGnomes(gameTime, deltaT, advanced) {
     // despawn gnomes if they are too far away
 
     let breathingRoom = 100;
-    let minXPos = 0 - gnome_size - breathingRoom;
-    let maxXPos = mainCanvas.width + gnome_size + breathingRoom;
-    let minYPos = 0 - gnome_size - breathingRoom;
-    let maxYPos = mainCanvas.height + gnome_size + breathingRoom;
+    let minXPos = 0 - gnome_size - breathingRoom+getOffset("main").x;
+    let maxXPos = tot_room_width + gnome_size + breathingRoom+getOffset("main").x;
+    let minYPos = 0 - gnome_size - breathingRoom+getOffset("main").y;
+    let maxYPos = tot_room_height + gnome_size + breathingRoom+getOffset("main").y;
 
     for (i = 0; i < gnomes.length; i++) {
         gnome = gnomes[i];
@@ -796,10 +806,10 @@ function spawnGnome(
     }
 
     if (xPos == undefined || yPos == undefined || spawnHeading == undefined) {
-        let minXPos = 0 - gnome_size;
-        let maxXPos = mainCanvas.width + gnome_size;
-        let minYPos = 0 - gnome_size;
-        let maxYPos = mainCanvas.height + gnome_size;
+        let minXPos = getOffset(current_room).x - gnome_size;
+        let maxXPos = getOffset(current_room).x + canvas_width + gnome_size;
+        let minYPos = getOffset(current_room).y - gnome_size;
+        let maxYPos = getOffset(current_room).y + canvas_height + gnome_size;
 
         // if 1 in 2 chance
         if (Math.random() > 0.5) {
@@ -875,7 +885,13 @@ function render_gnomes(gnomes) {
     }
 }
 
+function set_room(room){
+    current_room = room;
+}
+
 function draw() {
+    camera_approach_x = getOffset(current_room).x;
+    camera_approach_y = getOffset(current_room).y;
     if (!data.loaded) {
         return;
     }
@@ -899,15 +915,19 @@ function draw() {
     mainCanvas.height = canvas_height;
 
     if (grass_blades.length == 0) {
-        var noisefn = fn === "simplex" ? noise.simplex2 : noise.perlin2;
-        for (i = 0; i < 3000; i++) {
-            let x = Math.random() * canvas_width;
-            let y = Math.random() * canvas_height;
-            grass_blades.push({
-                x: x,
-                y: y,
-                offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI,
-            });
+        let offsets = [getOffset("main"), getOffset("trader")];
+        for (let j = 0; j < offsets.length; j++) {
+            let offset = offsets[j];
+            var noisefn = fn === "simplex" ? noise.simplex2 : noise.perlin2;
+            for (i = 0; i < 3000; i++) {
+                let x = Math.random() * canvas_width+offset.x;
+                let y = Math.random() * canvas_height+offset.y;
+                grass_blades.push({
+                    x: x,
+                    y: y,
+                    offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI,
+                });
+            }
         }
     }
     ctx.fillStyle = GRASS;
@@ -1051,8 +1071,8 @@ function draw() {
 }
 
 function handleClick(e) {
-    let posX = e.clientX;
-    let posY = e.clientY;
+    let posX = e.clientX+camera_x;
+    let posY = e.clientY+camera_y;
     // if holding tool or item
     if (holdingitem) {
         if (itemHeld == "Shovel") {
