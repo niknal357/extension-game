@@ -117,7 +117,7 @@ function ready() {
         }
     });
 
-    document.getElementById("marketSign").addEventListener("click", setRoom('market'));
+    document.getElementById("marketSign").addEventListener("click", set_room('market'));
     
 
     setInterval(() => {
