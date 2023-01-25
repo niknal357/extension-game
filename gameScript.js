@@ -30,6 +30,7 @@ inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 
 ghostHoles = [];
+debugMessages = [];
 
 function resetProgress() {
     for (let i = 0; i < data.datapoints.length; i++) {
@@ -71,8 +72,8 @@ function ready() {
         }
     }, 10);
 
-    // setTimeout(() => {generateUI();}, 50)
-    
+    debugMessage("Version 0.0.1 loaded.");
+    debugMessage(Date.now());
 
     //detect click and drag on the canvas if the mouse if over a gnome
     document.addEventListener("mousedown", function (e) {
@@ -1201,9 +1202,11 @@ function toggleHoldingShovel(){
         holdingTool = false;
         toolHeld = null;
         ghostHoles = [];
+        debugMessage("Put Away Shovel");
     } else {
         holdingTool = true;
         toolHeld = "Shovel";
+        debugMessage("Holding Shovel");
 
         let holes = data.get("holes");
         // for hole in holePositions
@@ -1215,4 +1218,23 @@ function toggleHoldingShovel(){
         }
         ghostHoles = holes;
     }
+}
+
+function debugMessage(message){
+    messageDiv = document.createElement('div');
+    messageDiv.innerHTML = message;
+    messageDiv.classList.add('debugMessage');
+    let messageId = Math.random();
+    messageDiv.setAttribute('debugId', messageId);
+    document.getElementById('debug').appendChild(messageDiv);
+    debugMessages.push(messageDiv);
+    // remove the message after 5 seconds
+    setTimeout(function(){
+        // remove the message from the array
+        for(let i = 0; i < document.querySelectorAll('.debugMessage').length; i++){
+            if (document.querySelectorAll('.debugMessage')[i].getAttribute('debugId') == messageId){
+                document.querySelectorAll('.debugMessage')[i].remove();
+            }
+        }
+    }, 5000);
 }

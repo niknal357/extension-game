@@ -218,3 +218,15 @@ h3{
 .hidden {
     display: none;
 }
+#debug{
+    position: absolute;
+    top: 80px;
+    left: 2px;
+    width: 300px;
+}
+.debugMessage{
+    width: 100%;
+    text-align: left;
+    color: aqua;
+    text-shadow: 1px 1px 1px black;
+}
