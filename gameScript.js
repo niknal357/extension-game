@@ -1481,7 +1481,7 @@ function updateTraderItems(itemsThatMustBeIncluded){
     for (let i = 0; i < itemsThatMustBeIncluded.length; i++){
         mustinclude.push(itemsThatMustBeIncluded[i]);
     }
-    for (let i = 0; i < amountOfItemsPerRow * amountOfRows; ++){
+    for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++){
         if (mustinclude.length > 0){
             allitems.push(mustinclude[0]);
             mustinclude.splice(0, 1);
