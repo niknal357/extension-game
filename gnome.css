@@ -235,3 +235,21 @@ h3{
     color: aqua;
     text-shadow: 1px 1px 1px black;
 }
+
+.sign{
+    width: 65px;
+    height: 65px;
+    background: red;
+}
+.sign-left{
+    position: fixed;
+    top: 50%;
+    left: 10px;
+    translate: 0 -50%;
+}
+.sign-right{
+    position: fixed;
+    top: 50%;
+    right: 10px;
+    translate: 0 -50%;
+}

@@ -100,6 +100,10 @@ function ready() {
             isMoving = false;
         }
     });
+
+    document.getElementById("marketSign").addEventListener("click", setRoom('market'));
+    
+
     setInterval(() => {
         if (!data.loaded) {
             return;
