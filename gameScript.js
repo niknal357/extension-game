@@ -1226,7 +1226,7 @@ function debugMessage(message){
     messageDiv.classList.add('debugMessage');
     let messageId = Math.random();
     messageDiv.setAttribute('debugId', messageId);
-    document.getElementById('debug').appendChild(messageDiv);
+    document.getElementById('debug').prepend(messageDiv);
     debugMessages.push(messageDiv);
     // remove the message after 5 seconds
     setTimeout(function(){
