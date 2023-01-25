@@ -239,7 +239,7 @@ h3{
 .sign{
     width: 65px;
     height: 65px;
-    z-index: 999999999999999999;
+    z-index: 999;
 }
 .sign > img {
     width: 100%;
