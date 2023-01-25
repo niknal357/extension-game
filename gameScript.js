@@ -59,7 +59,7 @@ var tot_room_height = rooms.length * canvas_height;
 function getOffset(room){
     for (let y = 0; y < rooms.length; y++) {
         for (let x = 0; x < rooms[y].length; x++) {
-            console.log(rooms[y][x])
+            // console.log(rooms[y][x])
             if (rooms[y][x] == room){
                 return {x: x*canvas_width, y: y*canvas_height}
             }
@@ -893,6 +893,8 @@ function set_room(room){
 }
 
 function draw() {
+    document.getElementById('traderSign').style.transform = "translate("+(getOffset('main').x-camera_x) + 'px, ' + (getOffset('main').y-camera_y) + 'px)';
+    document.getElementById('mainAreaSign').style.transform = "translate("+(getOffset('trader').x-camera_x) + 'px, ' + (getOffset('trader').y-camera_y) + 'px)';
     camera_approach_x = getOffset(current_room).x;
     camera_approach_y = getOffset(current_room).y;
     if (!data.loaded) {
