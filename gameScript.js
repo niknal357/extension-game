@@ -58,6 +58,9 @@ function ready() {
     document
         .getElementById("mainCanvas")
         .addEventListener("mousemove", handleMouseMove);
+    
+    document.getElementById('toolbar-button-1').addEventListener('click', toggleHoldingShovel);
+    
     document.body.addEventListener("keypress", handleKeyPress);
 
     setTimeout(() => {
@@ -199,14 +202,7 @@ function generateUI() {
     });
 
     let inventoryButton = document.getElementById("toolbar-button-5");
-    inventoryButton.addEventListener("click", function () {
-        document
-            .getElementById("inventory")
-            .classList.toggle("inventory-hidden");
-        inventoryButton
-            .getElementsByClassName("button-icon")[0]
-            .classList.toggle("inventory-icon-toggled");
-    });
+    inventoryButton.addEventListener("click", toggleInventory); 
 
     fetch("gnomes.txt")
         .then((response) => response.text())
@@ -519,8 +515,6 @@ function updateHoles(gameTime, deltaT, advanced) {
                 closestGnomeDist = dist;
             }
         }
-        // console.log(closestGnome);
-        // console.log(closestGnomeDist);
         if (closestGnome == null) {
             continue;
         }
@@ -1194,6 +1188,9 @@ function handleKeyPress(e){
     } else if (e.key == "1"){
         toggleHoldingShovel();
     }
+    else if (e.key == "5"){
+        toggleInventory();
+    }
 
 }
 
@@ -1203,20 +1200,48 @@ function toggleHoldingShovel(){
         toolHeld = null;
         ghostHoles = [];
         debugMessage("Put Away Shovel");
+        document.getElementById('toolbar-button-1').classList.remove('toolbar-button-selected');
     } else {
         holdingTool = true;
         toolHeld = "Shovel";
         debugMessage("Holding Shovel");
+        document.getElementById('toolbar-button-1').classList.add('toolbar-button-selected');
 
+        let ghostHolePositions = holePositions;
         let holes = data.get("holes");
         // for hole in holePositions
-        for (let i = 0; i < holePositions.length; i++){
+        for (let i = 0; i < ghostHolePositions.length; i++){
             // get rid of all the holes that are already dug
-            if (holes[0].x == holePositions[i].x && holes[0].y == holePositions[i].y){
-                holes.splice(0, 1);
+            if (holes.length > 0 && holes[0].x == ghostHolePositions[i].x && holes[0].y == ghostHolePositions[i].y){
+                ghostHolePositions.splice(0, 1);
             }
         }
-        ghostHoles = holes;
+        console.log(ghostHolePositions);
+    }
+}
+
+function toggleInventory(){
+    let inventoryOpen = !(document.getElementById('inventory').classList.contains('inventory-hidden'));
+    if (inventoryOpen){
+        debugMessage('close inventory');
+        document
+            .getElementById("inventory")
+            .classList.add("inventory-hidden");
+        let inventoryButton = document.getElementById("toolbar-button-5");
+        inventoryButton
+            .getElementsByClassName("button-icon")[0]
+            .classList.remove("inventory-icon-toggled");
+        
+    } else {
+        
+        debugMessage('open inventory');
+        document
+            .getElementById("inventory")
+            .classList.remove("inventory-hidden");
+        let inventoryButton = document.getElementById("toolbar-button-5");
+        inventoryButton
+            .getElementsByClassName("button-icon")[0]
+            .classList.add("inventory-icon-toggled");
     }
 }
 

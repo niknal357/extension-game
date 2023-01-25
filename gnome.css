@@ -166,6 +166,9 @@ h3{
     background-size: cover;
     z-index: -1;
 }
+.toolbar-button-selected{
+    filter: invert(0.9) grayscale(1);
+}
 
 .button-icon{
     position: absolute;
@@ -222,7 +225,9 @@ h3{
     position: absolute;
     top: 80px;
     left: 2px;
-    width: 300px;
+    max-width: 300px;
+    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.135);
 }
 .debugMessage{
     width: 100%;
