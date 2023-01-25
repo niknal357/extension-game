@@ -124,6 +124,10 @@ function ready() {
             isMoving = false;
         }
     });
+
+    document.getElementById("marketSign").addEventListener("click", set_room('market'));
+    
+
     setInterval(() => {
         if (!data.loaded) {
             return;
