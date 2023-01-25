@@ -751,7 +751,7 @@ function updateCoins(gameTime, deltaT, advanced) {
             }
 
             // let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
-            // let screenX = s_pos[0];
+            // let screenX = s_p os[0];
             // let screenY = s_pos[1];
             // if (screenX < 0) {
             //     coin.xvel += 0.5;
