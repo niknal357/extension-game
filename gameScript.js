@@ -343,8 +343,11 @@ hole_img.src = "gnomes/Hole.png";
 hole_front_img = document.createElement("img");
 hole_front_img.src = "gnomes/Hole Front.png";
 
-coin_img = document.createElement("img");
-coin_img.src = "gnomes/Coin.png";
+coin_img0 = document.createElement("img");
+coin_img0.src = "gnomes/Coin.png";
+coin_img1 = document.createElement("img");
+coin_img1.src = "gnomes/Big Money.png";
+coin_imgs = [coin_img0, coin_img1];
 
 gnome_imgs = [];
 for (i = 1; i <= 16; i++) {
@@ -917,6 +920,14 @@ function hidePriceTag(){
     document.getElementById("price-tag").style.display = "none";
 }
 
+function coinImgFromValue(value){
+    if (value < 10){
+        return coin_imgs[0];
+    } else {
+        return coin_imgs[1];
+    }
+}
+
 function draw() {
     camera_approach_x = getOffset(current_room).x;
     camera_approach_y = getOffset(current_room).y;
@@ -1124,6 +1135,7 @@ function draw() {
         coins_to_draw.push({
             x: coinEntities[i].x - camera_x,
             y: coinEntities[i].y - camera_y - coinEntities[i].z,
+            amount: coinEntities[i].amount,
         });
     }
     for (let i = 0; i < moving_coins.length; i++) {
@@ -1134,7 +1146,7 @@ function draw() {
     }
     for (let i = 0; i < coins_to_draw.length; i++) {
         let coin = coins_to_draw[i];
-        ctx.drawImage(coin_img, coin.x, coin.y, coin_size, coin_size);
+        ctx.drawImage(coinImgFromValue(coin.amount), coin.x, coin.y, coin_size, coin_size);
     }
 }
 
