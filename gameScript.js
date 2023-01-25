@@ -197,6 +197,7 @@ function ready() {
         } else {
             if (holdingitem) {
                 itemHeld.customData.ai_mode = "wander";
+                itemHeld.customData.heading = Math.random() * 2*Math.PI;
                 data.set("gnomes", gnomes);
             }
             holdingitem = false;
@@ -733,9 +734,9 @@ function updateCoins(gameTime, deltaT, advanced) {
             let coin = cE[i];
             if (
                 coin.x + coin_size < 0 ||
-                coin.x > mainCanvas.width ||
+                coin.x > tot_room_width ||
                 coin.y + coin_size < 0 ||
-                coin.y > mainCanvas.height
+                coin.y > tot_room_height
             ) {
                 cE.splice(i, 1);
                 i--;
@@ -756,7 +757,7 @@ function updateCoins(gameTime, deltaT, advanced) {
             }
 
             // let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
-            // let screenX = s_pos[0];
+            // let screenX = s_p os[0];
             // let screenY = s_pos[1];
             // if (screenX < 0) {
             //     coin.xvel += 0.5;
@@ -1157,8 +1158,8 @@ function handleMouseMove(e) {
     if (!data.loaded) {
         return;
     }
-    let posX = e.clientX + camera_x;
-    let posY = e.clientY + camera_y;
+    let posX = e.clientX;
+    let posY = e.clientY;
     if (prev_mouse_move_pos == null) {
         prev_mouse_move_pos = [posX, posY];
         return;
