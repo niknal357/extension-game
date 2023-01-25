@@ -1183,10 +1183,12 @@ function handleMouseMove(e) {
 }
 
 function handleKeyPress(e){
-    if (e.key == "Escape"){
+    if (e.key == "0"){
         if (holdingitem){
             holdingitem = false;
-            itemHeld = null;
+            if(itemHeld == 'Shovel'){
+                toggleHoldingShovel();
+            }
         }
     } else if (e.key == "1"){
         toggleHoldingShovel();
