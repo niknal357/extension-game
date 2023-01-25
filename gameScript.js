@@ -1052,6 +1052,12 @@ function draw() {
         gnomes.push(gnome);
     }
     render_gnomes(gnomes);
+
+    trader_img = document.createElement("img");
+    trader_img.src = "gnomes/trading market.png";
+
+    ctx.drawImage(trader_img, getOffset('trader').x - camera_x, getOffset('trader').y - camera_y, canvas_width, canvas_height/2);
+    
     let coins_to_draw = [];
     let coinEntities = data.get("coinEntities");
     for (let i = 0; i < coinEntities.length; i++) {
@@ -1070,11 +1076,6 @@ function draw() {
         let coin = coins_to_draw[i];
         ctx.drawImage(coin_img, coin.x, coin.y, coin_size, coin_size);
     }
-
-    trader_img = document.createElement("img");
-    trader_img.src = "gnomes/trading market.png";
-
-    ctx.drawImage(trader_img, getOffset('trader').x - camera_x, getOffset('trader').y - camera_y, canvas_width, canvas_height/2);
 }
 
 function handleClick(e) {
