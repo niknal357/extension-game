@@ -17,7 +17,7 @@ var camera_y = 0;
 var camera_approach_x = 0;
 var camera_approach_y = 0;
 
-var store_items = [[], [], []];
+var trader_items = [[], [], []];
 
 hole_size = 100;
 gnome_size = 100;
@@ -240,8 +240,8 @@ function generateUI() {
     let inventoryButton = document.getElementById("toolbar-button-5");
     inventoryButton.addEventListener("click", toggleInventory); 
 
-    let store = document.getElementById("store");
-    store.addEventListener("click", toggleTraderMenu);
+    let trader = document.getElementById("trader");
+    trader.addEventListener("click", toggleTraderMenu);
 
     fetch("gnomes.txt")
         .then((response) => response.text())
@@ -1336,9 +1336,9 @@ function debugMessage(message){
 }
 
 function toggleTraderMenu(){
-    document.getElementById('store').classList.toggle('store-hidden');
+    document.getElementById('trader').classList.toggle('trader-hidden');
 }
 
-function updateStoreitems(itemsThatMustBeIncluded){
+function updateTraderItems(itemsThatMustBeIncluded){
     let amountOfItemsPerRow = 7;
 }
