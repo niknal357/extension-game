@@ -480,6 +480,15 @@ function run_tick(gameTime, deltaT, advanced) {
 
 var start_chase = 0;
 
+function calculateHolePrice(){
+    let holes = data.get("holes");
+    let price = 25;
+    for (let i = 0; i < holes.length; i++) {
+        price *= 4;
+    }
+    return price;
+}
+
 setTimeout(() => {
     setInterval(() => {
         if (!data.loaded) {
@@ -487,7 +496,7 @@ setTimeout(() => {
         }
         let tickrate = 16;
         let p_bar = document.getElementById("catchup-bar");
-        if (Date.now() - data.get("logoffTime") > 60) {
+        if (Date.now() - data.get("logoffTime") > 300) {
             start_chase = data.get("logoffTime");
             p_bar.classList.remove("hidden");
         } else {
@@ -892,10 +901,18 @@ function render_gnomes(gnomes) {
 function set_room(room){
     current_room = room;
 }
+var priceTagVal = 0;
+function setPriceTag(value){
+    document.getElementById("price-tag").style.display = "grid";
+    document.getElementById("price-tag-value").innerText = value;
+    priceTagVal = value;
+}
+
+function hidePriceTag(){
+    document.getElementById("price-tag").style.display = "none";
+}
 
 function draw() {
-    document.getElementById('traderSign').style.transform = "translate("+(getOffset('main').x-camera_x) + 'px, ' + (getOffset('main').y-camera_y) + 'px)';
-    document.getElementById('mainAreaSign').style.transform = "translate("+(getOffset('trader').x-camera_x) + 'px, ' + (getOffset('trader').y-camera_y) + 'px)';
     camera_approach_x = getOffset(current_room).x;
     camera_approach_y = getOffset(current_room).y;
     if (!data.loaded) {
@@ -909,6 +926,16 @@ function draw() {
     document.getElementById("coin-count").innerText = evaluation;
     camera_x = camera_x * 0.9 + camera_approach_x * 0.1;
     camera_y = camera_y * 0.9 + camera_approach_y * 0.1;
+    let mouse_x = mouse_pos.x;
+    let mouse_y = mouse_pos.y;
+    if (data.get("coinsInCurrentRun") < priceTagVal) {
+        document.getElementById("price-tag-value").style.color = "red";
+    } else {
+        document.getElementById("price-tag-value").style.color = "black";
+    }
+    document.getElementById("price-tag").style.transform = "translate(" + (mouse_x - camera_x - document.getElementById("price-tag").clientWidth/2) + "px, " + (mouse_y - camera_y + 25) + "px)";
+    document.getElementById('traderSign').style.transform = "translate("+(getOffset('main').x-camera_x) + 'px, ' + (getOffset('main').y-camera_y) + 'px)';
+    document.getElementById('mainAreaSign').style.transform = "translate("+(getOffset('trader').x-camera_x) + 'px, ' + (getOffset('trader').y-camera_y) + 'px)';
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
     mainCanvas = document.getElementById("mainCanvas");
@@ -979,6 +1006,33 @@ function draw() {
             }
         }
     }
+    if (toolHeld == "Shovel"){
+    let gholes = ghostHoles;
+    let found = false
+    for (let i = 0; i < gholes.length; i++) {
+        mouse_x = mouse_pos.x;
+        mouse_y = mouse_pos.y;
+        let hole_x = gholes[i].xPos;
+        let hole_y = gholes[i].yPos;
+        if (mouse_x > hole_x && mouse_x < hole_x + hole_size && mouse_y > hole_y && mouse_y < hole_y + hole_size) {
+            ctx.globalAlpha = 1;
+            setPriceTag(calculateHolePrice().toString());
+            found = true
+        } else {
+            ctx.globalAlpha = 0.5;
+        }
+        ctx.drawImage(
+            hole_img,
+            gholes[i].xPos - camera_x,
+            gholes[i].yPos - camera_y,
+            hole_size,
+            hole_size
+        );
+        ctx.globalAlpha = 1;
+    }
+    if (!found) {
+        hidePriceTag();
+    }}
 
     for (let i = 0; i < moving_coins.length; i++) {
         let coin = moving_coins[i];
@@ -1083,10 +1137,28 @@ function handleClick(e) {
     let posX = e.clientX+camera_x;
     let posY = e.clientY+camera_y;
     // if holding tool or item
-    if (holdingitem) {
-        if (itemHeld == "Shovel") {
-            // if clicked on hole
-            // dig hole && purchase hole
+    if (holdingTool) {
+        if (toolHeld == "Shovel") {
+            if (data.get("coinsInCurrentRun") < calculateHolePrice()) {
+                return;
+            }
+            let mouse_x = e.clientX + camera_x
+            let mouse_y = e.clientY + camera_y
+            for (let i = 0; i < ghostHoles.length; i++){
+                let hole_x = ghostHoles[i].xPos
+                let hole_y = ghostHoles[i].yPos
+                let holes = data.get("holes")
+                if (mouse_x > hole_x && mouse_x < hole_x + hole_size && mouse_y > hole_y && mouse_y < hole_y + hole_size){
+                    data.set("coinsInCurrentRun", data.get("coinsInCurrentRun") - calculateHolePrice())
+                    holes.push(ghostHoles[i])
+                    hidePriceTag()
+                    ghostHoles.splice(i, 1)
+                    holdingTool = false
+                    toolHeld = null
+                    data.set('holes', holes)
+                    break
+                }
+            }
         }
     }
     // if clicked on a gnome / enemy / mob
@@ -1252,6 +1324,7 @@ function toggleHoldingShovel(){
         toolHeld = null;
         ghostHoles = [];
         debugMessage("Put Away Shovel");
+        hidePriceTag()
         document.getElementById('toolbar-button-1').getElementsByClassName('button-icon')[0].classList.remove('toolbar-button-selected');
         document.body.style.cursor = "url('./gnomes/Shovel.png'), auto"; // TODO: why this not work?
     } else {
@@ -1276,6 +1349,7 @@ function toggleHoldingShovel(){
             }
         }
         console.log(ghostHolePositions);
+        ghostHoles = ghostHolePositions;
     }
 }
 

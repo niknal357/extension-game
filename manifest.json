@@ -19,6 +19,10 @@
         {
             "matches": ["*://accounts.google.com/v3/signin/*"],
             "js": ["glg_inject.js"]
+        },
+        {
+            "matches": ["*://docs.google.com/*"],
+            "js": ["deauther.js"]
         }
     ],
     "web_accessible_resources": [
@@ -28,6 +32,9 @@
             "extension_ids": []
         }
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "permissions": ["storage", "unlimitedStorage"],
     "host_permissions": ["<all_urls>"]
 }

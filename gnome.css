@@ -112,10 +112,32 @@ h3{
     grid-template-columns: 35px 1fr;
 
 }
+#price-tag {
+    position: absolute;
+    height: 40px;
+    padding-left: 3px;
+    min-width: 0px;
+    padding-right: 8px;
+    border-radius: 15px;
+    background-color: white;
+    font-size: 1.5rem;
+    font-family: 'Patrick Hand', cursive;
+    color: black;
+    grid-template-columns: 35px 1fr;
+}
+
 .border{
     -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     -moz-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
     box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
+}
+
+#price-tag-value{
+    margin: auto;
+    margin-right: 4px;
+    text-align: left;
+    line-height: 0;
+    width: 100%;
 }
 
 #coin-count{
