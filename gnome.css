@@ -257,3 +257,6 @@ h3{
     right: 10px;
     translate: 0 -50%;
 }
+.store-hidden{
+    display: none;
+}
