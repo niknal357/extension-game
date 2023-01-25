@@ -125,7 +125,9 @@ function ready() {
         }
     });
 
-    document.getElementById("traderSign").addEventListener("click", set_room, 'trader');
+    document.getElementById("traderSign").addEventListener("click", () =>{
+        set_room("trader");
+    });
     
 
     setInterval(() => {
@@ -697,10 +699,10 @@ function updateGnomes(gameTime, deltaT, advanced) {
     // despawn gnomes if they are too far away
 
     let breathingRoom = 100;
-    let minXPos = 0 - gnome_size - breathingRoom+getOffset("main").x;
-    let maxXPos = tot_room_width + gnome_size + breathingRoom+getOffset("main").x;
-    let minYPos = 0 - gnome_size - breathingRoom+getOffset("main").y;
-    let maxYPos = tot_room_height + gnome_size + breathingRoom+getOffset("main").y;
+    let minXPos = 0 - gnome_size - breathingRoom;
+    let maxXPos = tot_room_width + gnome_size + breathingRoom;
+    let minYPos = 0 - gnome_size - breathingRoom;
+    let maxYPos = tot_room_height + gnome_size + breathingRoom;
 
     for (i = 0; i < gnomes.length; i++) {
         gnome = gnomes[i];
