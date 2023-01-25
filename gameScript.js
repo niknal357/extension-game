@@ -23,6 +23,9 @@ coin_size = 40;
 wind = 0;
 gravitationalConstant = 0.4;
 
+var canvas_width = 750;
+var canvas_height = 550;
+
 COIN_LIMIT = 2000;
 
 coinDropInterval = 60000;
@@ -45,12 +48,25 @@ var holdingitem = false;
 var itemHeld = null;
 var mouse_pos = { x: 0, y: 0 };
 var grab_offset = { x: 0, y: 0 };
+var rooms = [
+    ["trader", "main"]
+]
+
+function getOffset(room){
+    for (let y = 0; y < rooms.length; i++) {
+        for (let x = 0; x < rooms[y].length; i++) {
+            if (rooms[y][x] == room){
+                return {x: x*canvas_width, y: y*canvas_height}
+            }
+        }
+    }
+}
+
+var starting_room = "main";
 
 function ready() {
     mainCanvas = document.getElementById("mainCanvas");
     ctx = mainCanvas.getContext("2d");
-    canvas_width = mainCanvas.clientWidth;
-    canvas_height = mainCanvas.clientHeight;
     generateHoles();
     document
         .getElementById("mainCanvas")
@@ -875,8 +891,8 @@ function draw() {
     GRASS = "#82d479";
     GRASS_BLADE_1 = "#519645";
     GRASS_BLADE_2 = "#419633";
-    mainCanvas.width = mainCanvas.clientWidth;
-    mainCanvas.height = mainCanvas.clientHeight;
+    mainCanvas.width = canvas_width;
+    mainCanvas.height = canvas_height;
 
     if (grass_blades.length == 0) {
         var noisefn = fn === "simplex" ? noise.simplex2 : noise.perlin2;
@@ -1025,6 +1041,9 @@ function draw() {
         let coin = coins_to_draw[i];
         ctx.drawImage(coin_img, coin.x, coin.y, coin_size, coin_size);
     }
+    //draw square 200x200 at 0 0 for testing
+    // ctx.fillStyle = "red";
+    // ctx.fillRect(0, 0, 200, 200);
 }
 
 function handleClick(e) {
@@ -1208,13 +1227,19 @@ function toggleHoldingShovel(){
         debugMessage("Holding Shovel");
         document.getElementById('toolbar-button-1').getElementsByClassName('button-icon')[0].classList.add('toolbar-button-selected');
 
-        let ghostHolePositions = holePositions;
         let holes = data.get("holes");
+        let ghostHolePositions = [];
+        for (let i = 0; i < holePositions.length; i++){
+            let hole = holePositions[i];
+            ghostHolePositions.push(hole);
+        }
         // for hole in holePositions
         for (let i = 0; i < ghostHolePositions.length; i++){
             // get rid of all the holes that are already dug
-            if (holes.length > 0 && holes[0].x == ghostHolePositions[i].x && holes[0].y == ghostHolePositions[i].y){
-                ghostHolePositions.splice(0, 1);
+            for (let j = 0; j < holes.length; j++){
+                if (holes[j].x == ghostHolePositions[i].x && holes[j].y == ghostHolePositions[i].y){
+                    ghostHolePositions.splice(i, 1);
+                }
             }
         }
         console.log(ghostHolePositions);
