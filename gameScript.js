@@ -128,6 +128,9 @@ function ready() {
     document.getElementById("traderSign").addEventListener("click", () =>{
         set_room("trader");
     });
+    document.getElementById("mainAreaSign").addEventListener("click", () =>{
+        set_room("main");
+    });
     
 
     setInterval(() => {
@@ -1065,9 +1068,11 @@ function draw() {
         let coin = coins_to_draw[i];
         ctx.drawImage(coin_img, coin.x, coin.y, coin_size, coin_size);
     }
-    //draw square 200x200 at 0 0 for testing
-    // ctx.fillStyle = "red";
-    // ctx.fillRect(0, 0, 200, 200);
+
+    trader_img = document.createElement("img");
+    trader_img.src = "gnomes/trading market.png";
+
+    ctx.drawImage(trader_img, getOffset('trader').x - camera_x, getOffset('trader').y - camera_y, canvas_width, canvas_height/2);
 }
 
 function handleClick(e) {
