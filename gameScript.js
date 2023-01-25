@@ -1425,6 +1425,92 @@ function toggleTraderMenu(){
     document.getElementById('trader').classList.toggle('trader-hidden');
 }
 
+let itemOptions = {
+    "Seed 1": {
+        price: [20, 40],
+        image: "./gnomes/Seeds Level 1.png",
+        rarity: 1,
+    },
+    "Seed 2": {
+        price: [200, 600],
+        image: "./gnomes/Seeds Level 2.png",
+        rarity: 2,
+    },
+    "Seed 3": {
+        price: [5000, 13000],
+        image: "./gnomes/Seeds Level 3.png",
+        rarity: 3,
+    },
+    "Seed 4": {
+        price: [70000, 240000],
+        image: "./gnomes/Seeds Level 4.png",
+        rarity: 4,
+    },
+    "Seed 5": {
+        price: [1000000, 5000000],
+        image: "./gnomes/Seeds Level 5.png",
+        rarity: 5,
+    },
+    "Coin Collector": {
+        price: [10000, 50000],
+        image: "./gnomes/Coin Collector.png",
+        rarity: 4,
+    },
+    "Lootbox 1": {
+        price: [100, 500],
+        image: "./gnomes/Lootbox 1.png",
+        rarity: 2,
+    },
+    "Lootbox 2": {
+        price: [1000, 5000],
+        image: "./gnomes/Lootbox 2.png",
+        rarity: 3,
+    },
+    "Lootbox 3": {
+        price: [10000, 50000],
+        image: "./gnomes/Lootbox 3.png",
+        rarity: 4,
+    },
+}
+
 function updateTraderItems(itemsThatMustBeIncluded){
     let amountOfItemsPerRow = 7;
+    let amountOfRows = 3;
+    let allitems = [];
+    let mustinclude = []
+    for (let i = 0; i < itemsThatMustBeIncluded.length; i++){
+        mustinclude.push(itemsThatMustBeIncluded[i]);
+    }
+    for (let i = 0; i < amountOfItemsPerRow * amountOfRows; ++){
+        if (mustinclude.length > 0){
+            allitems.push(mustinclude[0]);
+            mustinclude.splice(0, 1);
+            continue;
+        }
+        let weighted = [];
+        for (let j = 0; j < itemOptions.length; j++){
+            let rarity = itemOptions[j].rarity;
+            let count = Math.floor(100/rarity)
+            for (let k = 0; k < count; k++){
+                weighted.push(j);
+            }
+        }
+        let randomItem = itemOptions[weighted[Math.floor(Math.random() * weighted.length)]];
+        let item = {
+            name: randomItem.name,
+            price: Math.floor(Math.random() * (randomItem.price[1] - randomItem.price[0] + 1) + randomItem.price[0]),
+            image: randomItem.image,
+        }
+        allitems.push(item);
+    }
+    //shuffle the items
+    for (let i = allitems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allitems[i], allitems[j]] = [allitems[j], allitems[i]];
+    }
+    let rows = [];
+    for (let i = 0; i < amountOfRows; i++){
+        rows.push(allitems.splice(0, amountOfItemsPerRow));
+    }
+    return rows;
 }
