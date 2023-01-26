@@ -343,8 +343,11 @@ hole_img.src = "gnomes/Hole.png";
 hole_front_img = document.createElement("img");
 hole_front_img.src = "gnomes/Hole Front.png";
 
-coin_img = document.createElement("img");
-coin_img.src = "gnomes/Coin.png";
+coin_img0 = document.createElement("img");
+coin_img0.src = "gnomes/Coin.png";
+coin_img1 = document.createElement("img");
+coin_img1.src = "gnomes/Big Money.png";
+coin_imgs = [coin_img0, coin_img1];
 
 gnome_imgs = [];
 for (i = 1; i <= 16; i++) {
@@ -937,6 +940,14 @@ function hidePriceTag(){
     document.getElementById("price-tag").style.display = "none";
 }
 
+function coinImgFromValue(value){
+    if (value < 10){
+        return coin_imgs[0];
+    } else {
+        return coin_imgs[1];
+    }
+}
+
 function draw() {
     camera_approach_x = getOffset(current_room).x;
     camera_approach_y = getOffset(current_room).y;
@@ -1144,6 +1155,7 @@ function draw() {
         coins_to_draw.push({
             x: coinEntities[i].x - camera_x,
             y: coinEntities[i].y - camera_y - coinEntities[i].z,
+            amount: coinEntities[i].amount,
         });
     }
     for (let i = 0; i < moving_coins.length; i++) {
@@ -1154,7 +1166,7 @@ function draw() {
     }
     for (let i = 0; i < coins_to_draw.length; i++) {
         let coin = coins_to_draw[i];
-        ctx.drawImage(coin_img, coin.x, coin.y, coin_size, coin_size);
+        ctx.drawImage(coinImgFromValue(coin.amount), coin.x, coin.y, coin_size, coin_size);
     }
 }
 
@@ -1434,37 +1446,140 @@ function toggleTraderMenu(){
     updateTraderItems();
 }
 
+let itemOptions = {
+    "Seed 1": {
+        price: [20, 40],
+        image: "./gnomes/Seeds Level 1.png",
+        rarity: 1,
+    },
+    "Seed 2": {
+        price: [200, 600],
+        image: "./gnomes/Seeds Level 2.png",
+        rarity: 2,
+    },
+    "Seed 3": {
+        price: [5000, 13000],
+        image: "./gnomes/Seeds Level 3.png",
+        rarity: 3,
+    },
+    "Seed 4": {
+        price: [70000, 240000],
+        image: "./gnomes/Seeds Level 4.png",
+        rarity: 4,
+    },
+    "Seed 5": {
+        price: [1000000, 5000000],
+        image: "./gnomes/Seeds Level 5.png",
+        rarity: 5,
+    },
+    "Coin Collector": {
+        price: [10000, 50000],
+        image: "./gnomes/Coin Collector.png",
+        rarity: 4,
+    },
+    "Lootbox 1": {
+        price: [100, 500],
+        image: "./gnomes/Lootbox 1.png",
+        rarity: 2,
+    },
+    "Lootbox 2": {
+        price: [1000, 5000],
+        image: "./gnomes/Lootbox 2.png",
+        rarity: 3,
+    },
+    "Lootbox 3": {
+        price: [10000, 50000],
+        image: "./gnomes/Lootbox 3.png",
+        rarity: 4,
+    },
+}
+
+let itemOptions = {
+    "Seed 1": {
+        price: [20, 40],
+        image: "./gnomes/Seeds Level 1.png",
+        rarity: 1,
+    },
+    "Seed 2": {
+        price: [200, 600],
+        image: "./gnomes/Seeds Level 2.png",
+        rarity: 2,
+    },
+    "Seed 3": {
+        price: [5000, 13000],
+        image: "./gnomes/Seeds Level 3.png",
+        rarity: 3,
+    },
+    "Seed 4": {
+        price: [70000, 240000],
+        image: "./gnomes/Seeds Level 4.png",
+        rarity: 4,
+    },
+    "Seed 5": {
+        price: [1000000, 5000000],
+        image: "./gnomes/Seeds Level 5.png",
+        rarity: 5,
+    },
+    "Coin Collector": {
+        price: [10000, 50000],
+        image: "./gnomes/Coin Collector.png",
+        rarity: 4,
+    },
+    "Lootbox 1": {
+        price: [100, 500],
+        image: "./gnomes/Lootbox 1.png",
+        rarity: 2,
+    },
+    "Lootbox 2": {
+        price: [1000, 5000],
+        image: "./gnomes/Lootbox 2.png",
+        rarity: 3,
+    },
+    "Lootbox 3": {
+        price: [10000, 50000],
+        image: "./gnomes/Lootbox 3.png",
+        rarity: 4,
+    },
+}
+
 function updateTraderItems(itemsThatMustBeIncluded){
+    let amountOfItemsPerRow = 7;
     let amountOfRows = 3;
-    let amountOfItemsPerRow = 5;
-
-    let trader_items = data.get('inventory').filter(item => item.discovered);
-
-    for (let j = 0 ; j < amountOfRows; j++){
-        let row = document.getElementById('trader-row-' + (j + 1));
-        row.innerHTML = '';
-        for (let i = 0; i < amountOfItemsPerRow ; i++){
-            let item = document.createElement('div');
-            item.classList.add('trader-item');
-
-            if (Math.random() < 0.5){
-                let randomItem = trader_items[Math.floor(Math.random() * trader_items.length)];
-                item.style.backgroundImage = "url('./gnomes/" + randomItem.image + "')";
-
-                let priceTag = document.createElement('div');
-                priceTag.classList.add('price-tag-store');
-                let coinImg = document.createElement('img');
-                coinImg.src = './gnomes/Coin.png';
-                coinImg.classList.add('coin-img-store');
-                let priceText = document.createElement('div');
-                priceText.classList.add('price-tag-store-text');
-                priceText.innerHTML = randomItem.price;
-                
-                priceTag.appendChild(coinImg);
-                priceTag.appendChild(priceText);
-                item.appendChild(priceTag);
-            } 
-            row.appendChild(item);
-        }
+    let allitems = [];
+    let mustinclude = []
+    for (let i = 0; i < itemsThatMustBeIncluded.length; i++){
+        mustinclude.push(itemsThatMustBeIncluded[i]);
     }
+    for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++){
+        if (mustinclude.length > 0){
+            allitems.push(mustinclude[0]);
+            mustinclude.splice(0, 1);
+            continue;
+        }
+        let weighted = [];
+        for (let j = 0; j < itemOptions.length; j++){
+            let rarity = itemOptions[j].rarity;
+            let count = Math.floor(100/rarity)
+            for (let k = 0; k < count; k++){
+                weighted.push(j);
+            }
+        }
+        let randomItem = itemOptions[weighted[Math.floor(Math.random() * weighted.length)]];
+        let item = {
+            name: randomItem.name,
+            price: Math.floor(Math.random() * (randomItem.price[1] - randomItem.price[0] + 1) + randomItem.price[0]),
+            image: randomItem.image,
+        }
+        allitems.push(item);
+    }
+    //shuffle the items
+    for (let i = allitems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allitems[i], allitems[j]] = [allitems[j], allitems[i]];
+    }
+    let rows = [];
+    for (let i = 0; i < amountOfRows; i++){
+        rows.push(allitems.splice(0, amountOfItemsPerRow));
+    }
+    return rows;
 }
