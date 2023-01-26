@@ -125,6 +125,28 @@ h3{
     color: black;
     grid-template-columns: 35px 1fr;
 }
+.price-tag-store{
+    position: absolute;
+    bottom: -21px;
+    display: grid;
+    height: 20px;
+    width: 70px;
+    border-radius: 5px;
+    background-color: white;
+    border: 1px solid black;
+    grid-template-columns: 20px 1fr;
+}
+.coin-img-store{
+    width: 18px;
+    margin: auto;
+}
+.price-tag-store-text{
+    font-size: 1.5rem;
+    font-family: 'Patrick Hand', cursive;
+    color: black;
+    margin: 0;
+    line-height: 0.85;
+}
 
 .border{
     -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
@@ -294,9 +316,8 @@ h3{
     display: flex;
     gap: 5px;
     width: 421px;
-    height: 50px;
+    height: 75px;
     align-items: center;
-    background: beige;
     position: absolute;
 }
 #trader-row-1{
@@ -310,4 +331,12 @@ h3{
 #trader-row-3{
     top: 348px;
     right: 40px;
+}
+.trader-item{
+    width: 75px;
+    height: 75px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }

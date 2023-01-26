@@ -17,7 +17,6 @@ var camera_y = 0;
 var camera_approach_x = 0;
 var camera_approach_y = 0;
 
-var trader_items = [[], [], []];
 
 hole_size = 100;
 gnome_size = 100;
@@ -36,6 +35,7 @@ enchantedCoinBoost = 3;
 
 ghostHoles = [];
 debugMessages = [];
+
 
 function resetProgress() {
     for (let i = 0; i < data.datapoints.length; i++) {
@@ -389,16 +389,36 @@ class DataStorage {
                     name: "Seed 1",
                     amount: 1,
                     discovered: true,
+                    price: 10,
+                    image: "Seeds Level 1.png",
                 },
                 {
                     name: "Seed 2",
                     amount: 148,
                     discovered: true,
+                    price: 200,
+                    image: "Seeds Level 2.png",
                 },
                 {
                     name: "Seed 3",
                     amount: 0,
                     discovered: false,
+                    price: 1000,
+                    image: "Seeds Level 3.png",
+                },
+                {
+                    name: "Seed 4",
+                    amount: 0,
+                    discovered: false,
+                    price: 10000,
+                    image: "Seeds Level 4.png",
+                },
+                {
+                    name: "Seed 5",
+                    amount: 0,
+                    discovered: false,
+                    price: 100000,
+                    image: "Seeds Level 5.png",
                 },
             ],
             [],
@@ -1411,8 +1431,40 @@ function debugMessage(message){
 
 function toggleTraderMenu(){
     document.getElementById('trader').classList.toggle('trader-hidden');
+    updateTraderItems();
 }
 
 function updateTraderItems(itemsThatMustBeIncluded){
-    let amountOfItemsPerRow = 7;
+    let amountOfRows = 3;
+    let amountOfItemsPerRow = 5;
+
+    let trader_items = data.get('inventory').filter(item => item.discovered);
+
+    for (let j = 0 ; j < amountOfRows; j++){
+        let row = document.getElementById('trader-row-' + (j + 1));
+        row.innerHTML = '';
+        for (let i = 0; i < amountOfItemsPerRow ; i++){
+            let item = document.createElement('div');
+            item.classList.add('trader-item');
+
+            if (Math.random() < 0.5){
+                let randomItem = trader_items[Math.floor(Math.random() * trader_items.length)];
+                item.style.backgroundImage = "url('./gnomes/" + randomItem.image + "')";
+
+                let priceTag = document.createElement('div');
+                priceTag.classList.add('price-tag-store');
+                let coinImg = document.createElement('img');
+                coinImg.src = './gnomes/Coin.png';
+                coinImg.classList.add('coin-img-store');
+                let priceText = document.createElement('div');
+                priceText.classList.add('price-tag-store-text');
+                priceText.innerHTML = randomItem.price;
+                
+                priceTag.appendChild(coinImg);
+                priceTag.appendChild(priceText);
+                item.appendChild(priceTag);
+            } 
+            row.appendChild(item);
+        }
+    }
 }
