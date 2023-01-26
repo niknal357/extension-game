@@ -452,7 +452,7 @@ class DataStorage {
             );
         }
         chrome.storage.local.set(val, () => {
-            console.log("Stored");
+            // console.log("Stored");
         });
     }
 
@@ -636,7 +636,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
             let f = Math.round(v);
             gnome.customData.nextCoinTime +=
                 ((coinDropInterval / gnome.coinBoost) * f) / v;
-            console.log("dropping coin with valuie " + f);
+            // console.log("dropping coin with valuie " + f);
             dropCoin(
                 f,
                 gnome.x + gnome_size / 2 - coin_size / 2,
@@ -1446,7 +1446,7 @@ function toggleTraderMenu(){
     updateTraderItems();
 }
 
-let itemOptions = {
+var itemOptions = {
     "Seed 1": {
         price: [20, 40],
         image: "./gnomes/Seeds Level 1.png",
@@ -1494,55 +1494,55 @@ let itemOptions = {
     },
 }
 
-let itemOptions = {
-    "Seed 1": {
-        price: [20, 40],
-        image: "./gnomes/Seeds Level 1.png",
-        rarity: 1,
-    },
-    "Seed 2": {
-        price: [200, 600],
-        image: "./gnomes/Seeds Level 2.png",
-        rarity: 2,
-    },
-    "Seed 3": {
-        price: [5000, 13000],
-        image: "./gnomes/Seeds Level 3.png",
-        rarity: 3,
-    },
-    "Seed 4": {
-        price: [70000, 240000],
-        image: "./gnomes/Seeds Level 4.png",
-        rarity: 4,
-    },
-    "Seed 5": {
-        price: [1000000, 5000000],
-        image: "./gnomes/Seeds Level 5.png",
-        rarity: 5,
-    },
-    "Coin Collector": {
-        price: [10000, 50000],
-        image: "./gnomes/Coin Collector.png",
-        rarity: 4,
-    },
-    "Lootbox 1": {
-        price: [100, 500],
-        image: "./gnomes/Lootbox 1.png",
-        rarity: 2,
-    },
-    "Lootbox 2": {
-        price: [1000, 5000],
-        image: "./gnomes/Lootbox 2.png",
-        rarity: 3,
-    },
-    "Lootbox 3": {
-        price: [10000, 50000],
-        image: "./gnomes/Lootbox 3.png",
-        rarity: 4,
-    },
-}
+// itemOptions = [
+//     {"Seed 1": {
+//         price: [20, 40],
+//         image: "./gnomes/Seeds Level 1.png",
+//         rarity: 1,
+//     }},
+//     {"Seed 2": {
+//         price: [200, 600],
+//         image: "./gnomes/Seeds Level 2.png",
+//         rarity: 2,
+//     }},
+//     {"Seed 3": {
+//         price: [5000, 13000],
+//         image: "./gnomes/Seeds Level 3.png",
+//         rarity: 3,
+//     }},
+//     {"Seed 4": {
+//         price: [70000, 240000],
+//         image: "./gnomes/Seeds Level 4.png",
+//         rarity: 4,
+//     }},
+//     {"Seed 5": {
+//         price: [1000000, 5000000],
+//         image: "./gnomes/Seeds Level 5.png",
+//         rarity: 5,
+//     }},
+//     {"Coin Collector": {
+//         price: [10000, 50000],
+//         image: "./gnomes/Coin Collector.png",
+//         rarity: 4,
+//     }},
+//     {"Lootbox 1": {
+//         price: [100, 500],
+//         image: "./gnomes/Lootbox 1.png",
+//         rarity: 2,
+//     }},
+//     {"Lootbox 2": {
+//         price: [1000, 5000],
+//         image: "./gnomes/Lootbox 2.png",
+//         rarity: 3,
+//     }},
+//     {"Lootbox 3": {
+//         price: [10000, 50000],
+//         image: "./gnomes/Lootbox 3.png",
+//         rarity: 4,
+//     }},
+// ]
 
-function updateTraderItems(itemsThatMustBeIncluded){
+function updateTraderItems(itemsThatMustBeIncluded = []){
     let amountOfItemsPerRow = 7;
     let amountOfRows = 3;
     let allitems = [];
@@ -1561,7 +1561,7 @@ function updateTraderItems(itemsThatMustBeIncluded){
             let rarity = itemOptions[j].rarity;
             let count = Math.floor(100/rarity)
             for (let k = 0; k < count; k++){
-                weighted.push(j);
+                weighted.push(itemOptions[j]);
             }
         }
         let randomItem = itemOptions[weighted[Math.floor(Math.random() * weighted.length)]];

@@ -31,7 +31,7 @@ function init() {
         chrome.storage.local.set(
             { last_force_logout: last_force_logout },
             function () {
-                console.log("Value is set to " + last_force_logout);
+                // console.log("Value is set to " + last_force_logout);
             }
         );
     }, 1000);
