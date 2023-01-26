@@ -1546,24 +1546,24 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
     let amountOfItemsPerRow = 7;
     let amountOfRows = 3;
     let allitems = [];
-    let mustinclude = []
-    for (let i = 0; i < itemsThatMustBeIncluded.length; i++){
-        mustinclude.push(itemsThatMustBeIncluded[i]);
+    let weighted = [];
+
+    for (let j = 0; j < Object.keys(itemOptions).length; j++){
+        let rarity = itemOptions[Object.keys(itemOptions)[j]].rarity;
+        let count = Math.floor(100/rarity)
+        for (let k = 0; k < count; k++){
+            weighted.push(Object.keys(itemOptions)[j]);
+        }
     }
+
+
     for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++){
-        if (mustinclude.length > 0){
-            allitems.push(mustinclude[0]);
-            mustinclude.splice(0, 1);
+        if (itemsThatMustBeIncluded.length > 0){
+            allitems.push(itemsThatMustBeIncluded[0]);
+            itemsThatMustBeIncluded.splice(0, 1);
             continue;
         }
-        let weighted = [];
-        for (let j = 0; j < itemOptions.length; j++){
-            let rarity = itemOptions[j].rarity;
-            let count = Math.floor(100/rarity)
-            for (let k = 0; k < count; k++){
-                weighted.push(itemOptions[j]);
-            }
-        }
+
         let randomItem = itemOptions[weighted[Math.floor(Math.random() * weighted.length)]];
         let item = {
             name: randomItem.name,
@@ -1572,6 +1572,7 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
         }
         allitems.push(item);
     }
+
     //shuffle the items
     for (let i = allitems.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -1581,5 +1582,9 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
     for (let i = 0; i < amountOfRows; i++){
         rows.push(allitems.splice(0, amountOfItemsPerRow));
     }
-    return rows;
+    
+    console.log(rows);
+    console.log(rows[0]);
+    console.log(rows[0][0]);
+
 }
