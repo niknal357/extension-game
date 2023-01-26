@@ -1449,101 +1449,53 @@ function toggleTraderMenu(){
 var itemOptions = {
     "Seed 1": {
         price: [20, 40],
-        image: "./gnomes/Seeds Level 1.png",
+        image: "Seeds Level 1.png",
         rarity: 1,
     },
     "Seed 2": {
         price: [200, 600],
-        image: "./gnomes/Seeds Level 2.png",
+        image: "Seeds Level 2.png",
         rarity: 2,
     },
     "Seed 3": {
         price: [5000, 13000],
-        image: "./gnomes/Seeds Level 3.png",
+        image: "Seeds Level 3.png",
         rarity: 3,
     },
     "Seed 4": {
         price: [70000, 240000],
-        image: "./gnomes/Seeds Level 4.png",
+        image: "Seeds Level 4.png",
         rarity: 4,
     },
     "Seed 5": {
         price: [1000000, 5000000],
-        image: "./gnomes/Seeds Level 5.png",
+        image: "Seeds Level 5.png",
         rarity: 5,
     },
     "Coin Collector": {
         price: [10000, 50000],
-        image: "./gnomes/Coin Collector.png",
+        image: "Coin Collector.png",
         rarity: 4,
     },
     "Lootbox 1": {
         price: [100, 500],
-        image: "./gnomes/Lootbox 1.png",
+        image: "Lootbox 1.png",
         rarity: 2,
     },
     "Lootbox 2": {
         price: [1000, 5000],
-        image: "./gnomes/Lootbox 2.png",
+        image: "Lootbox 2.png",
         rarity: 3,
     },
     "Lootbox 3": {
         price: [10000, 50000],
-        image: "./gnomes/Lootbox 3.png",
+        image: "Lootbox 3.png",
         rarity: 4,
     },
 }
 
-// itemOptions = [
-//     {"Seed 1": {
-//         price: [20, 40],
-//         image: "./gnomes/Seeds Level 1.png",
-//         rarity: 1,
-//     }},
-//     {"Seed 2": {
-//         price: [200, 600],
-//         image: "./gnomes/Seeds Level 2.png",
-//         rarity: 2,
-//     }},
-//     {"Seed 3": {
-//         price: [5000, 13000],
-//         image: "./gnomes/Seeds Level 3.png",
-//         rarity: 3,
-//     }},
-//     {"Seed 4": {
-//         price: [70000, 240000],
-//         image: "./gnomes/Seeds Level 4.png",
-//         rarity: 4,
-//     }},
-//     {"Seed 5": {
-//         price: [1000000, 5000000],
-//         image: "./gnomes/Seeds Level 5.png",
-//         rarity: 5,
-//     }},
-//     {"Coin Collector": {
-//         price: [10000, 50000],
-//         image: "./gnomes/Coin Collector.png",
-//         rarity: 4,
-//     }},
-//     {"Lootbox 1": {
-//         price: [100, 500],
-//         image: "./gnomes/Lootbox 1.png",
-//         rarity: 2,
-//     }},
-//     {"Lootbox 2": {
-//         price: [1000, 5000],
-//         image: "./gnomes/Lootbox 2.png",
-//         rarity: 3,
-//     }},
-//     {"Lootbox 3": {
-//         price: [10000, 50000],
-//         image: "./gnomes/Lootbox 3.png",
-//         rarity: 4,
-//     }},
-// ]
-
 function updateTraderItems(itemsThatMustBeIncluded = []){
-    let amountOfItemsPerRow = 7;
+    let amountOfItemsPerRow = 5;
     let amountOfRows = 3;
     let allitems = [];
     let weighted = [];
@@ -1583,8 +1535,28 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
         rows.push(allitems.splice(0, amountOfItemsPerRow));
     }
     
-    console.log(rows);
-    console.log(rows[0]);
-    console.log(rows[0][0]);
+    // update the UI
+    for (let j = 0 ; j < amountOfRows; j++){
+        let row = document.getElementById('trader-row-' + (j + 1));
+        row.innerHTML = '';
+        for (let i = 0; i < amountOfItemsPerRow ; i++){
+            let item = document.createElement('div');
+            item.classList.add('trader-item');
+            item.style.backgroundImage = "url('./gnomes/" + rows[j][i].image + "')";
+            let priceTag = document.createElement('div');
+            priceTag.classList.add('price-tag-store');
+            let coinImg = document.createElement('img');
+            coinImg.src = './gnomes/Coin.png';
+            coinImg.classList.add('coin-img-store');
+            let priceText = document.createElement('div');
+            priceText.classList.add('price-tag-store-text');
+            priceText.innerHTML = rows[j][i].price;
+            
+            priceTag.appendChild(coinImg);
+            priceTag.appendChild(priceText);
+            item.appendChild(priceTag);
+            row.appendChild(item);
+        } 
+    }
 
 }
