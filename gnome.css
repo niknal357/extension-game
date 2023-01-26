@@ -141,10 +141,11 @@ h3{
     margin: auto;
 }
 .price-tag-store-text{
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-family: 'Patrick Hand', cursive;
     color: black;
-    margin: 0;
+    margin: auto;
+    margin-left: 2px;
     line-height: 0.85;
 }
 
