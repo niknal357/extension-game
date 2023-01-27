@@ -737,7 +737,6 @@ function updateGnomes(gameTime, deltaT, advanced) {
             if (collided) {
                 // console.log("collided")
                 gnome.customData.heading += Math.PI;
-                data.set("gnomes", gnomes);
             }
         }
     }
@@ -1252,6 +1251,7 @@ function draw() {
         coins_to_draw.push({
             x: moving_coins[i].scr_x,
             y: moving_coins[i].scr_y,
+            amount: moving_coins[i].amount,
         });
     }
     for (let i = 0; i < coins_to_draw.length; i++) {
