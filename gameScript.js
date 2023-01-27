@@ -70,6 +70,13 @@ function getOffset(room){
     }
 }
 
+var gnome_colliders = [
+    {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y},
+    {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x, y2: getOffset("trader").y + canvas_height/2},
+    {x1: getOffset("trader").x+canvas_width, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y + canvas_height/2},
+    
+]
+
 var starting_room = "main";
 
 function ready() {
