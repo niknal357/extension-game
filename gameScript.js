@@ -394,36 +394,26 @@ class DataStorage {
                 {
                     name: "Seed 1",
                     amount: 1,
-                    discovered: true,
-                    price: 10,
                     image: "Seeds Level 1.png",
                 },
                 {
                     name: "Seed 2",
                     amount: 148,
-                    discovered: true,
-                    price: 200,
                     image: "Seeds Level 2.png",
                 },
                 {
                     name: "Seed 3",
                     amount: 0,
-                    discovered: false,
-                    price: 1000,
                     image: "Seeds Level 3.png",
                 },
                 {
                     name: "Seed 4",
                     amount: 0,
-                    discovered: false,
-                    price: 10000,
                     image: "Seeds Level 4.png",
                 },
                 {
                     name: "Seed 5",
                     amount: 0,
-                    discovered: false,
-                    price: 100000,
                     image: "Seeds Level 5.png",
                 },
             ],
@@ -850,10 +840,10 @@ function spawnGnome(
     }
 
     if (xPos == undefined || yPos == undefined || spawnHeading == undefined) {
-        let minXPos = getOffset(current_room).x - gnome_size;
-        let maxXPos = getOffset(current_room).x + canvas_width + gnome_size;
-        let minYPos = getOffset(current_room).y - gnome_size;
-        let maxYPos = getOffset(current_room).y + canvas_height + gnome_size;
+        let minXPos = getOffset("main").x - gnome_size;
+        let maxXPos = getOffset("main").x + canvas_width + gnome_size;
+        let minYPos = getOffset("main").y - gnome_size;
+        let maxYPos = getOffset("main").y + canvas_height + gnome_size;
 
         // if 1 in 2 chance
         if (Math.random() > 0.5) {
@@ -1518,10 +1508,10 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             itemsThatMustBeIncluded.splice(0, 1);
             continue;
         }
-
-        let randomItem = itemOptions[weighted[Math.floor(Math.random() * weighted.length)]];
+        let name = weighted[Math.floor(Math.random() * weighted.length)]
+        let randomItem = itemOptions[name];
         let item = {
-            name: randomItem.name,
+            name: name,
             price: Math.floor(Math.random() * (randomItem.price[1] - randomItem.price[0] + 1) + randomItem.price[0]),
             image: randomItem.image,
         }
@@ -1554,7 +1544,9 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             let priceText = document.createElement('div');
             priceText.classList.add('price-tag-store-text');
             priceText.innerHTML = rows[j][i].price;
-            
+            item.onclick = function(){
+                attemptPurchase(rows[j][i]);
+            }
             priceTag.appendChild(coinImg);
             priceTag.appendChild(priceText);
             item.appendChild(priceTag);
@@ -1562,4 +1554,42 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
         } 
     }
 
+}
+
+function attemptPurchase(item){
+    let price = item.price;
+    let name = item.name;
+    if (price > data.get('coinsInCurrentRun')){
+        // not enough coins
+        return;
+    }
+    data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
+    let inv = data.get('inventory');
+    let found = false;
+    for (let i = 0; i < inv.length; i++){
+        if (inv[i].name == name){
+            if (inv[i].amount == undefined){
+                continue
+            }
+            found = true
+            inv[i].amount += 1;
+        }
+    }
+    if (!found){
+        if (name.includes('Seed') || name.includes('Lootbox')){
+            inv.push({
+                name: name,
+                amount: 1,
+                image: item.image,
+            })
+        } else {
+            inv.push({
+                name: name,
+                amount: undefined,
+                image: item.image,
+            })
+        }
+    }
+
+    data.set('inventory', inv);
 }
