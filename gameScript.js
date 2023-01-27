@@ -70,6 +70,13 @@ function getOffset(room){
     }
 }
 
+var gnome_colliders = [
+    {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y},
+    {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x, y2: getOffset("trader").y + canvas_height/2},
+    {x1: getOffset("trader").x+canvas_width, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y + canvas_height/2},
+    
+]
+
 var starting_room = "main";
 
 function ready() {
@@ -102,7 +109,7 @@ function ready() {
         }
     }, 10);
 
-    debugMessage("Version 0.0.1 loaded.");
+    debugMessage("Version 0.0.2 loaded.");
     debugMessage(Date.now());
 
     //detect click and drag on the canvas if the mouse if over a gnome
@@ -1193,7 +1200,7 @@ function handleClick(e) {
     }
     // if clicked on trader
     if(current_room == 'trader'){
-        if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2){
+        if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2 - 70){
             // open trader menu
             debugMessage("Trader Menu Opened");
             toggleTraderMenu();
@@ -1391,29 +1398,45 @@ function toggleHoldingShovel(){
 }
 
 function toggleInventory(){
+
+    updateInventory();
+    let inventoryDiv = document.getElementById('inventory');
+    let offsetTime = 500;
     let inventoryOpen = !(document.getElementById('inventory').classList.contains('inventory-hidden'));
+
     if (inventoryOpen){
         debugMessage('close inventory');
-        document
-            .getElementById("inventory")
-            .classList.add("inventory-hidden");
+        inventoryDiv.classList.add("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
         inventoryButton
             .getElementsByClassName("button-icon")[0]
             .classList.remove("inventory-icon-toggled");
+
+        for (let i = 0; i < inventoryDiv.children.length; i++){
+            let child = inventoryDiv.children[i];
+            setTimeout(function(){
+                child.classList.remove(className);
+            }, offsetTime * i);
+        }
         
     } else {
         
         debugMessage('open inventory');
-        document
-            .getElementById("inventory")
-            .classList.remove("inventory-hidden");
+        inventoryDiv.classList.remove("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
         inventoryButton
             .getElementsByClassName("button-icon")[0]
             .classList.add("inventory-icon-toggled");
+
+        for (let i = 0; i < inventoryDiv.children.length; i++){
+            let child = inventoryDiv.children[i];
+            setTimeout(function(){
+                child.remove();
+            }, offsetTime * i);
+        }
     }
 }
+
 
 function debugMessage(message){
     messageDiv = document.createElement('div');
@@ -1501,7 +1524,6 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
         }
     }
 
-
     for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++){
         if (itemsThatMustBeIncluded.length > 0){
             allitems.push(itemsThatMustBeIncluded[0]);
@@ -1553,7 +1575,57 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             row.appendChild(item);
         } 
     }
+}
 
+function updateInventory(){
+    let inven = data.get('inventory');
+    let inventoryDiv = document.getElementById('inventory');
+    inventoryDiv.innerHTML = '';
+    console.log(inven);
+    for(let i = 0; i < inven.length; i++){
+        let item = document.createElement('div');
+        item.classList.add('inventory-item');
+        item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
+        inventoryDiv.appendChild(item);
+    }
+}
+
+function attemptPurchase(item){
+    let price = item.price;
+    let name = item.name;
+    if (price > data.get('coinsInCurrentRun')){
+        // not enough coins
+        return;
+    }
+    data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
+    let inv = data.get('inventory');
+    let found = false;
+    for (let i = 0; i < inv.length; i++){
+        if (inv[i].name == name){
+            if (inv[i].amount == undefined){
+                continue
+            }
+            found = true
+            inv[i].amount += 1;
+        }
+    }
+    if (!found){
+        if (name.includes('Seed') || name.includes('Lootbox')){
+            inv.push({
+                name: name,
+                amount: 1,
+                image: item.image,
+            })
+        } else {
+            inv.push({
+                name: name,
+                amount: undefined,
+                image: item.image,
+            })
+        }
+    }
+
+    data.set('inventory', inv);
 }
 
 function attemptPurchase(item){
