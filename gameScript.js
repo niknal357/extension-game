@@ -261,8 +261,11 @@ function generateUI() {
         .then((response) => response.text())
         .then((text) => generateGnomeDex(text));
 
+    
     if(data.get('traderInventory') == null){
         updateTraderItems();
+    } else {
+        updateTrader();
     }
 }
 
@@ -1637,15 +1640,25 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
     for (let i = 0; i < amountOfRows; i++){
         rows.push(allitems.splice(0, amountOfItemsPerRow));
     }
-    
+
+    data.set('traderInventory', rows);
+    updateTrader();
+}
+
+function updateTrader(){
+
+    let tInv = data.get('traderInventory');
+    let amountOfRows = tInv.length;
+
     // update the UI
     for (let j = 0 ; j < amountOfRows; j++){
         let row = document.getElementById('trader-row-' + (j + 1));
         row.innerHTML = '';
+        let amountOfItemsPerRow = tInv[j].length;
         for (let i = 0; i < amountOfItemsPerRow ; i++){
             let item = document.createElement('div');
             item.classList.add('trader-item');
-            item.style.backgroundImage = "url('./gnomes/" + rows[j][i].image + "')";
+            item.style.backgroundImage = "url('./gnomes/" + tInv[j][i].image + "')";
             let priceTag = document.createElement('div');
             priceTag.classList.add('price-tag-store');
             let coinImg = document.createElement('img');
@@ -1653,10 +1666,11 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             coinImg.classList.add('coin-img-store');
             let priceText = document.createElement('div');
             priceText.classList.add('price-tag-store-text');
-            priceText.innerHTML = rows[j][i].price;
+            priceText.innerHTML = tInv[j][i].price;
             item.onclick = function(){
                 event.stopPropagation();
-                attemptPurchase(rows[j][i]);
+                console.log(tInv[j][i]);
+                attemptPurchase(tInv[j][i]);
                 this.remove();
             }
             priceTag.appendChild(coinImg);
@@ -1692,8 +1706,22 @@ function updateInventory(){
 function attemptPurchase(item){
     let price = item.price;
     let name = item.name;
+
+    // remove from traderInven
+    let ti = data.get('traderInventory');
+    console.log(ti);
+    for (let row = 0; row < ti.length; row++){
+        for (let rowItem = 0; rowItem < ti[row].length; rowItem++){
+            if(ti[row][rowItem] == item){
+                ti[row][rowItem] = null;
+            }
+        }
+    }
+    console.log(ti);
+    data.set('traderInventory', ti);
+
+
     if (price > data.get('coinsInCurrentRun')){
-        // not enough coins
         return;
     }
     data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
