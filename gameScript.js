@@ -1585,6 +1585,16 @@ function updateInventory(){
         let item = document.createElement('div');
         item.classList.add('inventory-item');
         item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
+
+        if(inven[i].amount <= 0){
+            item.classList.add('inventory-item-disabled');
+        } else {
+            let amountTxt = document.createElement('div');
+            amountTxt.classList.add('inventory-item-amount');
+            amountTxt.innerHTML = inven[i].amount;
+            item.appendChild(amountTxt);
+        }
+
         inventoryDiv.appendChild(item);
     }
 }

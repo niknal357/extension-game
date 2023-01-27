@@ -195,6 +195,7 @@ h3{
     transition: 0.2s all ease-in;
 }
 .inventory-item{
+    position: relative;
     display: auto;
     width: 45px;
     height: 45px;
@@ -203,6 +204,9 @@ h3{
     background-color: transparent;
     cursor: pointer;
     animation: 0.3s cubic-bezier(0.54, 1.37, 1, 1) 0s itemAppear paused;
+}
+.inventory-item-disabled{
+    filter: contrast(0);
 }
 .inventory-item-hidden{
     display: none;
@@ -280,6 +284,18 @@ h3{
 .inventory-icon-toggled{
     background-image: url('./gnomes/Inventory2.png') !important;
 }
+.inventory-item-amount{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    font-size: 10px;
+    border-radius: 5px;
+    padding-inline: 2px;
+    background-color: white;
+    border: 1px solid black;
+}
+
 .undiscovered{
     filter: brightness(0) !important;
 }
