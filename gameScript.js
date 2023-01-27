@@ -1773,4 +1773,5 @@ function attemptPurchase(item){
     }
 
     data.set('inventory', inv);
+    updateInventory();
 }
