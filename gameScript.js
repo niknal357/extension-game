@@ -1674,7 +1674,6 @@ function updateTrader(){
             priceText.innerHTML = tInv[j][i].price;
             item.onclick = function(){
                 event.stopPropagation();
-                console.log(tInv[j][i]);
                 attemptPurchase(tInv[j][i]);
                 this.remove();
             }
@@ -1712,6 +1711,9 @@ function attemptPurchase(item){
     let price = item.price;
     let name = item.name;
 
+    if (price > data.get('coinsInCurrentRun')){
+        return;
+    }
     // remove from traderInven
     let ti = data.get('traderInventory');
     console.log(ti);
@@ -1726,9 +1728,6 @@ function attemptPurchase(item){
     data.set('traderInventory', ti);
 
 
-    if (price > data.get('coinsInCurrentRun')){
-        return;
-    }
     data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
     let inv = data.get('inventory');
     let found = false;
