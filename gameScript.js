@@ -1501,7 +1501,7 @@ function toggleInventory(){
 
     updateInventory();
     let inventoryDiv = document.getElementById('inventory');
-    let offsetTime = 500;
+    let offsetTime = 25;
     let inventoryOpen = !(document.getElementById('inventory').classList.contains('inventory-hidden'));
 
     if (inventoryOpen){
@@ -1514,9 +1514,7 @@ function toggleInventory(){
 
         for (let i = 0; i < inventoryDiv.children.length; i++){
             let child = inventoryDiv.children[i];
-            setTimeout(function(){
-                child.classList.remove(className);
-            }, offsetTime * i);
+            child.classList.add('inventory-item-hidden');
         }
         
     } else {
@@ -1531,7 +1529,8 @@ function toggleInventory(){
         for (let i = 0; i < inventoryDiv.children.length; i++){
             let child = inventoryDiv.children[i];
             setTimeout(function(){
-                child.remove();
+                child.classList.remove('inventory-item-hidden');
+                child.style.animationPlayState = 'running';
             }, offsetTime * i);
         }
     }
@@ -1681,11 +1680,20 @@ function updateInventory(){
     let inven = data.get('inventory');
     let inventoryDiv = document.getElementById('inventory');
     inventoryDiv.innerHTML = '';
-    console.log(inven);
     for(let i = 0; i < inven.length; i++){
         let item = document.createElement('div');
         item.classList.add('inventory-item');
         item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
+
+        if(inven[i].amount <= 0){
+            item.classList.add('inventory-item-disabled');
+        } else {
+            let amountTxt = document.createElement('div');
+            amountTxt.classList.add('inventory-item-amount');
+            amountTxt.innerHTML = inven[i].amount;
+            item.appendChild(amountTxt);
+        }
+
         inventoryDiv.appendChild(item);
     }
 }
@@ -1726,6 +1734,7 @@ function attemptPurchase(item){
     }
 
     data.set('inventory', inv);
+    updateInventory();
 }
 
 function attemptPurchase(item){
