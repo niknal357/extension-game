@@ -74,7 +74,10 @@ var gnome_colliders = [
     {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y},
     {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x, y2: getOffset("trader").y + canvas_height/2},
     {x1: getOffset("trader").x+canvas_width, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y + canvas_height/2},
-    
+    {x1: getOffset("trader").x, y1: getOffset("trader").y + canvas_height/2, x2: getOffset("trader").x + canvas_width*0.34, y2: getOffset("trader").y + canvas_height*0.37},
+    {x1: getOffset("trader").x+canvas_width, y1: getOffset("trader").y + canvas_height/2, x2: getOffset("trader").x + canvas_width*0.66, y2: getOffset("trader").y + canvas_height*0.37},
+    {x1: getOffset("trader").x + canvas_width*0.66, y1: getOffset("trader").y + canvas_height*0.37, x2: getOffset("trader").x + canvas_width*0.34, y2: getOffset("trader").y + canvas_height*0.37},
+
 ]
 
 var starting_room = "main";
@@ -649,6 +652,93 @@ function updateGnomes(gameTime, deltaT, advanced) {
             let vy = Math.sin(gnome.customData.heading) * 0.03125;
             gnome.x += vx * deltaT;
             gnome.y += vy * deltaT;
+            // Check for collisions
+            let collided = false;
+            let g_topleft = {
+                x: gnome.x,
+                y: gnome.y,
+            };
+            let g_bottomright = {
+                x: gnome.x + gnome_size,
+                y: gnome.y - gnome_size,
+            };
+            let g_topright = {
+                x: gnome.x + gnome_size,
+                y: gnome.y,
+            };
+            let g_bottomleft = {
+                x: gnome.x,
+                y: gnome.y - gnome_size,
+            };
+            for (j = 0; j < gnome_colliders.length; j++) {
+                let collider = gnome_colliders[j];
+                if (g_bottomright.x < Math.min(collider.x1, collider.x2)) {
+                    continue;
+                }
+                if (g_bottomright.y > Math.max(collider.y1, collider.y2)) {
+                    continue;
+                }
+                if (g_topleft.x > Math.max(collider.x1, collider.x2)) {
+                    continue;
+                }
+                if (g_topleft.y < Math.min(collider.y1, collider.y2)) {
+                    continue;
+                }
+                //check line intersection
+                if (line_line_intersection(
+                    g_topleft.x,
+                    g_topleft.y,
+                    g_bottomleft.x,
+                    g_bottomleft.y,
+                    collider.x1,
+                    collider.y1,
+                    collider.x2,
+                    collider.y2
+                )){
+                    collided = true;
+                }
+                if (line_line_intersection(
+                    g_topleft.x,
+                    g_topleft.y,
+                    g_topright.x,
+                    g_topright.y,
+                    collider.x1,
+                    collider.y1,
+                    collider.x2,
+                    collider.y2
+                )){
+                    collided = true;
+                }
+                if (line_line_intersection(
+                    g_bottomleft.x,
+                    g_bottomleft.y,
+                    g_bottomright.x,
+                    g_bottomright.y,
+                    collider.x1,
+                    collider.y1,
+                    collider.x2,
+                    collider.y2
+                )){
+                    collided = true;
+                }
+                if (line_line_intersection(
+                    g_topright.x,
+                    g_topright.y,
+                    g_bottomright.x,
+                    g_bottomright.y,
+                    collider.x1,
+                    collider.y1,
+                    collider.x2,
+                    collider.y2
+                )){
+                    collided = true;
+                }
+            }
+            if (collided) {
+                // console.log("collided")
+                gnome.customData.heading += Math.PI;
+                data.set("gnomes", gnomes);
+            }
         }
     }
 
@@ -1168,6 +1258,16 @@ function draw() {
         let coin = coins_to_draw[i];
         ctx.drawImage(coinImgFromValue(coin.amount), coin.x, coin.y, coin_size, coin_size);
     }
+
+    // for (let i = 0; i < gnome_colliders.length; i++) {
+    //     // console.log(gnome_colliders[i])
+    //     //draw lines
+    //     ctx.beginPath();
+    //     ctx.moveTo(gnome_colliders[i].x1 - camera_x, gnome_colliders[i].y1 - camera_y);
+    //     ctx.lineTo(gnome_colliders[i].x2 - camera_x, gnome_colliders[i].y2 - camera_y);
+    //     ctx.strokeStyle = "blue";
+    //     ctx.stroke();
+    // }
 }
 
 function handleClick(e) {
