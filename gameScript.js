@@ -21,6 +21,7 @@ var camera_approach_y = 0;
 hole_size = 100;
 gnome_size = 100;
 coin_size = 40;
+coin_collection_size = 60
 wind = 0;
 gravitationalConstant = 0.4;
 
@@ -129,12 +130,14 @@ function ready() {
 
     document.getElementById("traderSign").addEventListener("click", () =>{
         set_room("trader");
+        isMoving = false;
     });
     document.getElementById("mainAreaSign").addEventListener("click", () =>{
         set_room("main");
+        isMoving = false;
     });
     
-
+    
     setInterval(() => {
         if (!data.loaded) {
             return;
@@ -837,10 +840,10 @@ function spawnGnome(
     }
 
     if (xPos == undefined || yPos == undefined || spawnHeading == undefined) {
-        let minXPos = getOffset(current_room).x - gnome_size;
-        let maxXPos = getOffset(current_room).x + canvas_width + gnome_size;
-        let minYPos = getOffset(current_room).y - gnome_size;
-        let maxYPos = getOffset(current_room).y + canvas_height + gnome_size;
+        let minXPos = getOffset("main").x - gnome_size;
+        let maxXPos = getOffset("main").x + canvas_width + gnome_size;
+        let minYPos = getOffset("main").y - gnome_size;
+        let maxYPos = getOffset("main").y + canvas_height + gnome_size;
 
         // if 1 in 2 chance
         if (Math.random() > 0.5) {
@@ -984,7 +987,7 @@ function draw() {
                 grass_blades.push({
                     x: x,
                     y: y,
-                    offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI,
+                    offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI+Math.random()*2,
                 });
             }
         }
@@ -1272,10 +1275,10 @@ function handleMouseMove(e) {
         start_y = prev_mouse_move_pos[1];
         end_x = posX;
         end_y = posY;
-        coin_start_x = coin_screen_x;
-        coin_start_y = coin_screen_y;
-        coin_width = coin_size;
-        coin_height = coin_size;
+        coin_start_x = coin_screen_x+coin_size/2-coin_collection_size/2;
+        coin_start_y = coin_screen_y+coin_size/2-coin_collection_size/2;
+        coin_width = coin_size+coin_collection_size/2;
+        coin_height = coin_size+coin_collection_size/2;
         // check for line/rect intersection
         if (
             line_line_intersection(
@@ -1520,10 +1523,10 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             itemsThatMustBeIncluded.splice(0, 1);
             continue;
         }
-
-        let randomItem = itemOptions[weighted[Math.floor(Math.random() * weighted.length)]];
+        let name = weighted[Math.floor(Math.random() * weighted.length)]
+        let randomItem = itemOptions[name];
         let item = {
-            name: randomItem.name,
+            name: name,
             price: Math.floor(Math.random() * (randomItem.price[1] - randomItem.price[0] + 1) + randomItem.price[0]),
             image: randomItem.image,
         }
@@ -1556,7 +1559,9 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             let priceText = document.createElement('div');
             priceText.classList.add('price-tag-store-text');
             priceText.innerHTML = rows[j][i].price;
-            
+            item.onclick = function(){
+                attemptPurchase(rows[j][i]);
+            }
             priceTag.appendChild(coinImg);
             priceTag.appendChild(priceText);
             item.appendChild(priceTag);
@@ -1576,4 +1581,80 @@ function updateInventory(){
         item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
         inventoryDiv.appendChild(item);
     }
+}
+
+function attemptPurchase(item){
+    let price = item.price;
+    let name = item.name;
+    if (price > data.get('coinsInCurrentRun')){
+        // not enough coins
+        return;
+    }
+    data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
+    let inv = data.get('inventory');
+    let found = false;
+    for (let i = 0; i < inv.length; i++){
+        if (inv[i].name == name){
+            if (inv[i].amount == undefined){
+                continue
+            }
+            found = true
+            inv[i].amount += 1;
+        }
+    }
+    if (!found){
+        if (name.includes('Seed') || name.includes('Lootbox')){
+            inv.push({
+                name: name,
+                amount: 1,
+                image: item.image,
+            })
+        } else {
+            inv.push({
+                name: name,
+                amount: undefined,
+                image: item.image,
+            })
+        }
+    }
+
+    data.set('inventory', inv);
+}
+
+function attemptPurchase(item){
+    let price = item.price;
+    let name = item.name;
+    if (price > data.get('coinsInCurrentRun')){
+        // not enough coins
+        return;
+    }
+    data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
+    let inv = data.get('inventory');
+    let found = false;
+    for (let i = 0; i < inv.length; i++){
+        if (inv[i].name == name){
+            if (inv[i].amount == undefined){
+                continue
+            }
+            found = true
+            inv[i].amount += 1;
+        }
+    }
+    if (!found){
+        if (name.includes('Seed') || name.includes('Lootbox')){
+            inv.push({
+                name: name,
+                amount: 1,
+                image: item.image,
+            })
+        } else {
+            inv.push({
+                name: name,
+                amount: undefined,
+                image: item.image,
+            })
+        }
+    }
+
+    data.set('inventory', inv);
 }
