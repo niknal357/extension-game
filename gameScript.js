@@ -33,7 +33,7 @@ COIN_LIMIT = 2000;
 coinDropInterval = 60000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
-traderRefreshTimer = 14400;
+traderRefreshTimer = 14400000;
 
 ghostHoles = [];
 debugMessages = [];
@@ -260,6 +260,10 @@ function generateUI() {
     fetch("gnomes.txt")
         .then((response) => response.text())
         .then((text) => generateGnomeDex(text));
+
+    if(data.get('traderInventory') == null){
+        updateTraderItems();
+    }
 }
 
 function generateHoles(
@@ -390,6 +394,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
             "timeOfNextTraderRefresh",
+            "traderInventory",
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -438,6 +443,7 @@ class DataStorage {
             10000,
             Date.now() - restartOffset * 1000,
             Date.now() + traderRefreshTimer,
+            null
         ];
         this.loaded = false;
     }
@@ -515,6 +521,7 @@ function run_tick(gameTime, deltaT, advanced) {
         updateTraderItems();
         data.set("timeOfNextTraderRefresh", Date.now() + traderRefreshTimer);
     }
+    document.getElementById('trader-timer').innerHTML = data.get("timeOfNextTraderRefresh") - Date.now();
 }
 
 var start_chase = 0;
@@ -898,16 +905,6 @@ function spawnGnome(
     spawnHeading,
     ai_mode = "wander"
 ) {
-    // console.log(
-    //     "Spawning Gnome with level: " +
-    //         level +
-    //         " at x: " +
-    //         xPos +
-    //         " y: " +
-    //         yPos +
-    //         " heading: " +
-    //         spawnHeading
-    // );
     let gnomes = data.get("gnomes");
 
     if (level == undefined) {
@@ -1658,7 +1655,9 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             priceText.classList.add('price-tag-store-text');
             priceText.innerHTML = rows[j][i].price;
             item.onclick = function(){
+                event.stopPropagation();
                 attemptPurchase(rows[j][i]);
+                this.remove();
             }
             priceTag.appendChild(coinImg);
             priceTag.appendChild(priceText);
