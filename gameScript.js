@@ -101,7 +101,7 @@ function ready() {
         }
     }, 10);
 
-    debugMessage("Version 0.0.1 loaded.");
+    debugMessage("Version 0.0.2 loaded.");
     debugMessage(Date.now());
 
     //detect click and drag on the canvas if the mouse if over a gnome
@@ -391,36 +391,26 @@ class DataStorage {
                 {
                     name: "Seed 1",
                     amount: 1,
-                    discovered: true,
-                    price: 10,
                     image: "Seeds Level 1.png",
                 },
                 {
                     name: "Seed 2",
                     amount: 148,
-                    discovered: true,
-                    price: 200,
                     image: "Seeds Level 2.png",
                 },
                 {
                     name: "Seed 3",
                     amount: 0,
-                    discovered: false,
-                    price: 1000,
                     image: "Seeds Level 3.png",
                 },
                 {
                     name: "Seed 4",
                     amount: 0,
-                    discovered: false,
-                    price: 10000,
                     image: "Seeds Level 4.png",
                 },
                 {
                     name: "Seed 5",
                     amount: 0,
-                    discovered: false,
-                    price: 100000,
                     image: "Seeds Level 5.png",
                 },
             ],
@@ -1200,7 +1190,7 @@ function handleClick(e) {
     }
     // if clicked on trader
     if(current_room == 'trader'){
-        if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2){
+        if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2 - 70){
             // open trader menu
             debugMessage("Trader Menu Opened");
             toggleTraderMenu();
@@ -1398,29 +1388,45 @@ function toggleHoldingShovel(){
 }
 
 function toggleInventory(){
+
+    updateInventory();
+    let inventoryDiv = document.getElementById('inventory');
+    let offsetTime = 500;
     let inventoryOpen = !(document.getElementById('inventory').classList.contains('inventory-hidden'));
+
     if (inventoryOpen){
         debugMessage('close inventory');
-        document
-            .getElementById("inventory")
-            .classList.add("inventory-hidden");
+        inventoryDiv.classList.add("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
         inventoryButton
             .getElementsByClassName("button-icon")[0]
             .classList.remove("inventory-icon-toggled");
+
+        for (let i = 0; i < inventoryDiv.children.length; i++){
+            let child = inventoryDiv.children[i];
+            setTimeout(function(){
+                child.classList.remove(className);
+            }, offsetTime * i);
+        }
         
     } else {
         
         debugMessage('open inventory');
-        document
-            .getElementById("inventory")
-            .classList.remove("inventory-hidden");
+        inventoryDiv.classList.remove("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
         inventoryButton
             .getElementsByClassName("button-icon")[0]
             .classList.add("inventory-icon-toggled");
+
+        for (let i = 0; i < inventoryDiv.children.length; i++){
+            let child = inventoryDiv.children[i];
+            setTimeout(function(){
+                child.remove();
+            }, offsetTime * i);
+        }
     }
 }
+
 
 function debugMessage(message){
     messageDiv = document.createElement('div');
@@ -1508,7 +1514,6 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
         }
     }
 
-
     for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++){
         if (itemsThatMustBeIncluded.length > 0){
             allitems.push(itemsThatMustBeIncluded[0]);
@@ -1558,5 +1563,17 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
             row.appendChild(item);
         } 
     }
+}
 
+function updateInventory(){
+    let inven = data.get('inventory');
+    let inventoryDiv = document.getElementById('inventory');
+    inventoryDiv.innerHTML = '';
+    console.log(inven);
+    for(let i = 0; i < inven.length; i++){
+        let item = document.createElement('div');
+        item.classList.add('inventory-item');
+        item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
+        inventoryDiv.appendChild(item);
+    }
 }
