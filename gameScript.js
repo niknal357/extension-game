@@ -21,6 +21,7 @@ var camera_approach_y = 0;
 hole_size = 100;
 gnome_size = 100;
 coin_size = 40;
+coin_collection_size = 60
 wind = 0;
 gravitationalConstant = 0.4;
 
@@ -129,12 +130,14 @@ function ready() {
 
     document.getElementById("traderSign").addEventListener("click", () =>{
         set_room("trader");
+        isMoving = false;
     });
     document.getElementById("mainAreaSign").addEventListener("click", () =>{
         set_room("main");
+        isMoving = false;
     });
     
-
+    
     setInterval(() => {
         if (!data.loaded) {
             return;
@@ -994,7 +997,7 @@ function draw() {
                 grass_blades.push({
                     x: x,
                     y: y,
-                    offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI,
+                    offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI+Math.random()*2,
                 });
             }
         }
@@ -1282,10 +1285,10 @@ function handleMouseMove(e) {
         start_y = prev_mouse_move_pos[1];
         end_x = posX;
         end_y = posY;
-        coin_start_x = coin_screen_x;
-        coin_start_y = coin_screen_y;
-        coin_width = coin_size;
-        coin_height = coin_size;
+        coin_start_x = coin_screen_x+coin_size/2-coin_collection_size/2;
+        coin_start_y = coin_screen_y+coin_size/2-coin_collection_size/2;
+        coin_width = coin_size+coin_collection_size/2;
+        coin_height = coin_size+coin_collection_size/2;
         // check for line/rect intersection
         if (
             line_line_intersection(
