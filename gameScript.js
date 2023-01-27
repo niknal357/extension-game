@@ -1580,7 +1580,6 @@ function updateInventory(){
     let inven = data.get('inventory');
     let inventoryDiv = document.getElementById('inventory');
     inventoryDiv.innerHTML = '';
-    console.log(inven);
     for(let i = 0; i < inven.length; i++){
         let item = document.createElement('div');
         item.classList.add('inventory-item');
@@ -1635,6 +1634,7 @@ function attemptPurchase(item){
     }
 
     data.set('inventory', inv);
+    updateInventory();
 }
 
 function attemptPurchase(item){
