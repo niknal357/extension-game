@@ -33,6 +33,7 @@ COIN_LIMIT = 2000;
 coinDropInterval = 60000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
+traderRefreshTimer = 14400;
 
 ghostHoles = [];
 debugMessages = [];
@@ -388,6 +389,7 @@ class DataStorage {
             "msUntillForGnomeSpawnMin",
             "msUntillForGnomeSpawnMax",
             "timeOfNextGnomeSpawn",
+            "timeOfNextTraderRefresh",
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -435,6 +437,7 @@ class DataStorage {
             7000,
             10000,
             Date.now() - restartOffset * 1000,
+            Date.now() + traderRefreshTimer,
         ];
         this.loaded = false;
     }
@@ -507,6 +510,11 @@ function run_tick(gameTime, deltaT, advanced) {
     updateHoles(gameTime, deltaT, advanced);
     updateGnomes(gameTime, deltaT, advanced);
     updateCoins(gameTime, deltaT, advanced);
+
+    if(data.get("timeOfNextTraderRefresh") < Date.now()){
+        updateTraderItems();
+        data.set("timeOfNextTraderRefresh", Date.now() + traderRefreshTimer);
+    }
 }
 
 var start_chase = 0;
@@ -877,21 +885,6 @@ function updateCoins(gameTime, deltaT, advanced) {
                 coin.zvel = coin.zvel * -0.4;
             }
 
-            // let s_pos = coinXYZtoScreen(coin.x, coin.y, coin.z);
-            // let screenX = s_p os[0];
-            // let screenY = s_pos[1];
-            // if (screenX < 0) {
-            //     coin.xvel += 0.5;
-            // }
-            // if (screenX + coin_size > mainCanvas.width) {
-            //     coin.xvel -= 0.5;
-            // }
-            // if (screenY < 0) {
-            //     coin.yvel += 0.5;
-            // }
-            // if (screenY + coin_size > mainCanvas.height) {
-            //     coin.yvel -= 0.5;
-            // }
         }
         data.set("coinEntities", cE);
     }
@@ -1301,8 +1294,6 @@ function handleClick(e) {
     // if clicked on trader
     if(current_room == 'trader'){
         if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2 - 70){
-            // open trader menu
-            debugMessage("Trader Menu Opened");
             toggleTraderMenu();
         }
     }
@@ -1518,7 +1509,6 @@ function toggleInventory(){
         }
         
     } else {
-        
         debugMessage('open inventory');
         inventoryDiv.classList.remove("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
@@ -1558,7 +1548,9 @@ function debugMessage(message){
 
 function toggleTraderMenu(){
     document.getElementById('trader').classList.toggle('trader-hidden');
-    updateTraderItems();
+    if(!document.getElementById('inventory').classList.contains('inventory-hidden')){
+        toggleInventory();
+    }
 }
 
 var itemOptions = {
