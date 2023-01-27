@@ -1394,7 +1394,7 @@ function toggleInventory(){
 
     updateInventory();
     let inventoryDiv = document.getElementById('inventory');
-    let offsetTime = 500;
+    let offsetTime = 25;
     let inventoryOpen = !(document.getElementById('inventory').classList.contains('inventory-hidden'));
 
     if (inventoryOpen){
@@ -1407,9 +1407,7 @@ function toggleInventory(){
 
         for (let i = 0; i < inventoryDiv.children.length; i++){
             let child = inventoryDiv.children[i];
-            setTimeout(function(){
-                child.classList.remove(className);
-            }, offsetTime * i);
+            child.classList.add('inventory-item-hidden');
         }
         
     } else {
@@ -1424,7 +1422,8 @@ function toggleInventory(){
         for (let i = 0; i < inventoryDiv.children.length; i++){
             let child = inventoryDiv.children[i];
             setTimeout(function(){
-                child.remove();
+                child.classList.remove('inventory-item-hidden');
+                child.style.animationPlayState = 'running';
             }, offsetTime * i);
         }
     }

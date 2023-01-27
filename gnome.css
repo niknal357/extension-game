@@ -195,17 +195,18 @@ h3{
     transition: 0.2s all ease-in;
 }
 .inventory-item{
+    display: auto;
     width: 45px;
     height: 45px;
     margin: auto;
     background-size: cover;
     background-color: transparent;
     cursor: pointer;
-    animation: 0.3s cubic-bezier(0.54, 1.37, 1, 1) 0s itemAppear;
+    animation: 0.3s cubic-bezier(0.54, 1.37, 1, 1) 0s itemAppear paused;
 }
 .inventory-item-hidden{
     display: none;
-    animation: 0.3s cubic-bezier(0.54, 1.37, 1, 1) 0s itemAppear reverse;
+    animation: 0.3s ease-in 0s itemAppear reverse paused;
 }
 @keyframes itemAppear{
     0%{
