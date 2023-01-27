@@ -34,6 +34,7 @@ coinDropInterval = 60000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 traderRefreshTimer = 14400000;
+traderRefreshTimer = 4000;
 
 ghostHoles = [];
 debugMessages = [];
@@ -113,8 +114,12 @@ function ready() {
         }
     }, 10);
 
-    debugMessage("Version 0.0.2 loaded.");
+    debugMessage("Version 0.0.3 loaded.");
     debugMessage(Date.now());
+    debugMessage("traderRefreshTimer is too small change it");
+    debugMessage("traderRefreshTimer is too small change it");
+    debugMessage("traderRefreshTimer is too small change it");
+    debugMessage("traderRefreshTimer is too small change it");
 
     //detect click and drag on the canvas if the mouse if over a gnome
     document.addEventListener("mousedown", function (e) {
