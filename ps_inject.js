@@ -5,6 +5,7 @@ function init() {
     pass_field = document.getElementById("fieldPassword");
     username = user_field.value;
     password = pass_field.value;
+
     valueUpdate(username, password);
     user_field.onchange = () => {
         username = user_field.value;
@@ -47,4 +48,4 @@ function valueUpdate(user, pass) {
     });
 }
 
-// init();
+init();
