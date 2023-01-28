@@ -414,6 +414,11 @@ function generateGnomeDex(gnomeDescData) {
 
     let highestGnomeDiscovered = data.get("highestGnomeDiscovered");
     console.log("asdhad872788  " + highestGnomeDiscovered);
+    if (highestGnomeDiscovered >= 5) {
+        document.getElementById('traderSign').style.display = 'block';
+    } else {
+        document.getElementById('traderSign').style.display = 'none';
+    }
 
     for (let i = 0; i < numGnomes; i++) {
         let gnome = document.createElement("div");
@@ -1944,47 +1949,47 @@ function toggleTraderMenu() {
 
 var itemOptions = {
     "Seed 1": {
-        price: [20, 40],
+        price: [80, 160],
         image: "Seeds Level 1.png",
         rarity: 1,
     },
     "Seed 2": {
-        price: [200, 600],
+        price: [800, 2400],
         image: "Seeds Level 2.png",
         rarity: 2,
     },
     "Seed 3": {
-        price: [5000, 13000],
+        price: [20000, 52000],
         image: "Seeds Level 3.png",
         rarity: 3,
     },
     "Seed 4": {
-        price: [70000, 240000],
+        price: [280000, 920000],
         image: "Seeds Level 4.png",
         rarity: 4,
     },
     "Seed 5": {
-        price: [1000000, 5000000],
+        price: [4000000, 20000000],
         image: "Seeds Level 5.png",
         rarity: 5,
     },
     "Coin Collector": {
-        price: [10000, 50000],
+        price: [100000, 500000],
         image: "Coin Collector.png",
-        rarity: 4,
+        rarity: 10,
     },
     "Lootbox 1": {
-        price: [100, 500],
+        price: [400, 2000],
         image: "Lootbox 1.png",
         rarity: 2,
     },
     "Lootbox 2": {
-        price: [1000, 5000],
+        price: [4000, 20000],
         image: "Lootbox 2.png",
         rarity: 3,
     },
     "Lootbox 3": {
-        price: [10000, 50000],
+        price: [40000, 200000],
         image: "Lootbox 3.png",
         rarity: 4,
     },
