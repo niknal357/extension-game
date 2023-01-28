@@ -1682,7 +1682,7 @@ function updateTrader(){
     }
 }
 
-function updateInventory(){
+function updateInventory(skipAnimation = false){
     let inven = data.get('inventory');
     let inventoryDiv = document.getElementById('inventory');
     inventoryDiv.innerHTML = '';
@@ -1713,10 +1713,16 @@ function updateInventory(){
                     }
                 }
                 data.set('inventory', inventory);
-                updateInventory();
-                toggleInventory();
+                updateInventory(true);
             }
 
+        }
+
+        if(skipAnimation){
+            setTimeout(function(){
+                item.classList.remove('inventory-item-hidden');
+                item.style.animationPlayState = 'running';
+            }, 100);
         }
 
         inventoryDiv.appendChild(item);
