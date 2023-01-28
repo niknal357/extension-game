@@ -35,7 +35,7 @@ inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 traderRefreshTimer = 14400000;
 traderRefreshTimer = 4000;
-flowerSpawnTimer = 60000;
+flowerSpawnTimer = 20000;
 
 ghostHoles = [];
 debugMessages = [];
@@ -1471,6 +1471,62 @@ function draw() {
             coin_size
         );
     }
+    if (holdingTool && toolHeld == "Seed 1"){
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+            flowerImgs[0],
+            mouse_x - flower_size / 2 - camera_x,
+            mouse_y - flower_size - camera_y,
+            flower_size,
+            flower_size
+        );
+        ctx.globalAlpha = 1;
+    }
+    if (holdingTool && toolHeld == "Seed 2"){
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+            flowerImgs[1],
+            mouse_x - flower_size / 2 - camera_x,
+            mouse_y - flower_size - camera_y,
+            flower_size,
+            flower_size
+        );
+        ctx.globalAlpha = 1;
+    }
+    if (holdingTool && toolHeld == "Seed 3"){
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+            flowerImgs[2],
+            mouse_x - flower_size / 2 - camera_x,
+            mouse_y - flower_size - camera_y,
+            flower_size,
+            flower_size
+        );
+        ctx.globalAlpha = 1;
+    }
+    if (holdingTool && toolHeld == "Seed 4"){
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+            flowerImgs[3],
+            mouse_x - flower_size / 2 - camera_x,
+            mouse_y - flower_size - camera_y,
+            flower_size,
+            flower_size
+        );
+        ctx.globalAlpha = 1;
+    }
+    if (holdingTool && toolHeld == "Seed 5"){
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+            flowerImgs[4],
+            mouse_x - flower_size / 2 - camera_x,
+            mouse_y - flower_size - camera_y,
+            flower_size,
+            flower_size
+        );
+        ctx.globalAlpha = 1;
+    }
+
 
     // for (let i = 0; i < gnome_colliders.length; i++) {
     //     // console.log(gnome_colliders[i])
@@ -1533,6 +1589,86 @@ function handleClick(e) {
                     break;
                 }
             }
+        }
+        if (toolHeld == "Seed 1"){
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            let flowers = data.get("flowers");
+            flowers.push({
+                x: mouse_x,
+                y: mouse_y,
+                num: 1,
+                decompose: Date.now() + 60000,
+                nextSpawn: Date.now(),
+                touchdown: Date.now()+500,
+            });
+            data.set("flowers", flowers);
+            holdingTool = false;
+            toolHeld = null;
+        }
+        if (toolHeld == "Seed 2"){
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            let flowers = data.get("flowers");
+            flowers.push({
+                x: mouse_x,
+                y: mouse_y,
+                num: 2,
+                decompose: Date.now() + 60000,
+                nextSpawn: Date.now(),
+                touchdown: Date.now()+500,
+            });
+            data.set("flowers", flowers);
+            holdingTool = false;
+            toolHeld = null;
+        }
+        if (toolHeld == "Seed 3"){
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            let flowers = data.get("flowers");
+            flowers.push({
+                x: mouse_x,
+                y: mouse_y,
+                num: 3,
+                decompose: Date.now() + 60000,
+                nextSpawn: Date.now(),
+                touchdown: Date.now()+500,
+            });
+            data.set("flowers", flowers);
+            holdingTool = false;
+            toolHeld = null;
+        }
+        if (toolHeld == "Seed 4"){
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            let flowers = data.get("flowers");
+            flowers.push({
+                x: mouse_x,
+                y: mouse_y,
+                num: 4,
+                decompose: Date.now() + 60000,
+                nextSpawn: Date.now(),
+                touchdown: Date.now()+500,
+            });
+            data.set("flowers", flowers);
+            holdingTool = false;
+            toolHeld = null;
+        }
+        if (toolHeld == "Seed 5"){
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            let flowers = data.get("flowers");
+            flowers.push({
+                x: mouse_x,
+                y: mouse_y,
+                num: 5,
+                decompose: Date.now() + 60000,
+                nextSpawn: Date.now(),
+                touchdown: Date.now()+500,
+            });
+            data.set("flowers", flowers);
+            holdingTool = false;
+            toolHeld = null;
         }
     }
     // if clicked on trader
@@ -1986,9 +2122,28 @@ function updateInventory(skipAnimation = false) {
             }
 
         }
-
+        if (inven[i].name.includes("Seed") && inven[i].amount > 0) {
+            item.onclick = function () {
+                event.stopPropagation();
+                plantSeed(inven[i].name.match(/\d+/)[0]);
+                let inventory = data.get("inventory");
+                for (let item = 0; item < inventory.length; item++) {
+                    if (inventory[item].name == "Seed 1") {
+                        inventory[item].amount--;
+                    }
+                }
+                data.set("inventory", inventory);
+                updateInventory();
+                toggleInventory();
+            };
+        };
         inventoryDiv.appendChild(item);
     }
+}
+
+function plantSeed(seed) {
+    toolHeld = "Seed " + seed;
+    holdingTool = true;
 }
 
 function attemptPurchase(item, itemDiv) {
