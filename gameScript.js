@@ -522,33 +522,7 @@ class DataStorage {
                     contents: null,
                 },
             ],
-            [
-                {
-                    name: "Seed 1",
-                    amount: 1,
-                    image: "Seeds Level 1.png",
-                },
-                {
-                    name: "Seed 2",
-                    amount: 148,
-                    image: "Seeds Level 2.png",
-                },
-                {
-                    name: "Seed 3",
-                    amount: 0,
-                    image: "Seeds Level 3.png",
-                },
-                {
-                    name: "Seed 4",
-                    amount: 0,
-                    image: "Seeds Level 4.png",
-                },
-                {
-                    name: "Seed 5",
-                    amount: 0,
-                    image: "Seeds Level 5.png",
-                },
-            ],
+            [],
             [],
             0,
             0,
@@ -559,15 +533,7 @@ class DataStorage {
             Date.now() - restartOffset * 1000,
             Date.now() + traderRefreshTimer,
             null,
-            [
-                {
-                    num: 1,
-                    x: 1000,
-                    y: 300,
-                    decompose: Date.now() + 60000,
-                    nextSpawn: Date.now(),
-                },
-            ],
+            [],
         ];
         this.loaded = false;
     }
