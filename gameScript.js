@@ -17,11 +17,11 @@ var camera_y = 0;
 var camera_approach_x = 0;
 var camera_approach_y = 0;
 
-
 hole_size = 100;
 gnome_size = 100;
 coin_size = 40;
-coin_collection_size = 60
+flower_size = 120;
+coin_collection_size = 60;
 wind = 0;
 gravitationalConstant = 0.4;
 
@@ -35,10 +35,10 @@ inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 traderRefreshTimer = 14400000;
 traderRefreshTimer = 4000;
+flowerSpawnTimer = 20000;
 
 ghostHoles = [];
 debugMessages = [];
-
 
 function resetProgress() {
     for (let i = 0; i < data.datapoints.length; i++) {
@@ -47,40 +47,135 @@ function resetProgress() {
     data.save();
 }
 
+function flower_prob_1(x) {
+    return Math.round(
+        -41.9296 * x * x * x * x * x +
+            95.6499 * x * x * x * x -
+            54.6928 * x * x * x +
+            1.35786 * x * x +
+            6.53499 * x +
+            0.905404
+    );
+}
+//round(-41.9296xxxxx + 95.6499xxxx - 54.6928xxx + 1.35786xx + 6.53499x + 0.905404)
+
+function flower_prob_2(x) {
+    return Math.round(
+        -257.358 * x * x * x * x * x +
+            620.305 * x * x * x * x -
+            487.694 * x * x * x +
+            130.806 * x * x +
+            0.371213 * x +
+            2.69662
+    );
+}
+//round(-257.358xxxxx + 620.305xxxx - 487.694xxx + 130.806xx + 0.371213x + 2.69662)
+
+function flower_prob_3(x) {
+    return Math.round(
+        -371.755 * x * x * x * x * x +
+            1008.58 * x * x * x * x -
+            946.173 * x * x * x +
+            356.661 * x * x -
+            42.2152 * x +
+            5.59973
+    );
+}
+//round(-371.755xxxxx + 1008.58xxxx - 946.173xxx + 356.661xx - 42.2152x + 5.59973)
+
+function flower_prob_4(x) {
+    return Math.round(
+        75.3325 * x * x * x * x * x -
+            206.142 * x * x * x * x +
+            254.2 * x * x * x -
+            163.257 * x * x +
+            49.3637 * x +
+            4.38775
+    );
+}
+//round(75.3325xxxxx - 206.142xxxx + 254.2xxx - 163.257xx + 49.3637x + 4.38775)
+
+function flower_prob_5(x) {
+    return Math.round(
+        48.2798 * x * x * x * x * x -
+            124.572 * x * x * x * x +
+            113.094 * x * x * x -
+            40.7922 * x * x +
+            7.28838 * x +
+            10.8208
+    );
+}
+//round(48.2798xxxxx -124.572xxxx + 113.094xxx - 40.7922xx + 7.28838x + 10.8208)
+
+var flower_probablity_functions = [
+    flower_prob_1,
+    flower_prob_2,
+    flower_prob_3,
+    flower_prob_4,
+    flower_prob_5,
+];
+
 var isDown = false;
 var isMoving = false;
 var holdingitem = false;
 var itemHeld = null;
 var mouse_pos = { x: 0, y: 0 };
 var grab_offset = { x: 0, y: 0 };
-var rooms = [
-    ["trader", "main"]
-]
+var rooms = [["trader", "main"]];
 var current_room = "main";
 
 var tot_room_width = rooms[0].length * canvas_width;
 var tot_room_height = rooms.length * canvas_height;
 
-function getOffset(room){
+function getOffset(room) {
     for (let y = 0; y < rooms.length; y++) {
         for (let x = 0; x < rooms[y].length; x++) {
             // console.log(rooms[y][x])
-            if (rooms[y][x] == room){
-                return {x: x*canvas_width, y: y*canvas_height}
+            if (rooms[y][x] == room) {
+                return { x: x * canvas_width, y: y * canvas_height };
             }
         }
     }
 }
 
 var gnome_colliders = [
-    {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y},
-    {x1: getOffset("trader").x, y1: getOffset("trader").y, x2: getOffset("trader").x, y2: getOffset("trader").y + canvas_height/2},
-    {x1: getOffset("trader").x+canvas_width, y1: getOffset("trader").y, x2: getOffset("trader").x + canvas_width, y2: getOffset("trader").y + canvas_height/2},
-    {x1: getOffset("trader").x, y1: getOffset("trader").y + canvas_height/2, x2: getOffset("trader").x + canvas_width*0.34, y2: getOffset("trader").y + canvas_height*0.37},
-    {x1: getOffset("trader").x+canvas_width, y1: getOffset("trader").y + canvas_height/2, x2: getOffset("trader").x + canvas_width*0.66, y2: getOffset("trader").y + canvas_height*0.37},
-    {x1: getOffset("trader").x + canvas_width*0.66, y1: getOffset("trader").y + canvas_height*0.37, x2: getOffset("trader").x + canvas_width*0.34, y2: getOffset("trader").y + canvas_height*0.37},
-
-]
+    {
+        x1: getOffset("trader").x,
+        y1: getOffset("trader").y,
+        x2: getOffset("trader").x + canvas_width,
+        y2: getOffset("trader").y,
+    },
+    {
+        x1: getOffset("trader").x,
+        y1: getOffset("trader").y,
+        x2: getOffset("trader").x,
+        y2: getOffset("trader").y + canvas_height / 2,
+    },
+    {
+        x1: getOffset("trader").x + canvas_width,
+        y1: getOffset("trader").y,
+        x2: getOffset("trader").x + canvas_width,
+        y2: getOffset("trader").y + canvas_height / 2,
+    },
+    {
+        x1: getOffset("trader").x,
+        y1: getOffset("trader").y + canvas_height / 2,
+        x2: getOffset("trader").x + canvas_width * 0.34,
+        y2: getOffset("trader").y + canvas_height * 0.37,
+    },
+    {
+        x1: getOffset("trader").x + canvas_width,
+        y1: getOffset("trader").y + canvas_height / 2,
+        x2: getOffset("trader").x + canvas_width * 0.66,
+        y2: getOffset("trader").y + canvas_height * 0.37,
+    },
+    {
+        x1: getOffset("trader").x + canvas_width * 0.66,
+        y1: getOffset("trader").y + canvas_height * 0.37,
+        x2: getOffset("trader").x + canvas_width * 0.34,
+        y2: getOffset("trader").y + canvas_height * 0.37,
+    },
+];
 
 var starting_room = "main";
 
@@ -94,9 +189,11 @@ function ready() {
     document
         .getElementById("mainCanvas")
         .addEventListener("mousemove", handleMouseMove);
-    
-    document.getElementById('toolbar-button-1').addEventListener('click', toggleHoldingShovel);
-    
+
+    document
+        .getElementById("toolbar-button-1")
+        .addEventListener("click", toggleHoldingShovel);
+
     document.body.addEventListener("keypress", handleKeyPress);
     camera_approach_x = getOffset(current_room).x;
     camera_approach_y = getOffset(current_room).y;
@@ -144,16 +241,15 @@ function ready() {
         }
     });
 
-    document.getElementById("traderSign").addEventListener("click", () =>{
+    document.getElementById("traderSign").addEventListener("click", () => {
         set_room("trader");
         isMoving = false;
     });
-    document.getElementById("mainAreaSign").addEventListener("click", () =>{
+    document.getElementById("mainAreaSign").addEventListener("click", () => {
         set_room("main");
         isMoving = false;
     });
-    
-    
+
     setInterval(() => {
         if (!data.loaded) {
             return;
@@ -175,7 +271,7 @@ function ready() {
         // console.log(holes);
         if (isDown && isMoving) {
             if (!holdingitem) {
-                for (let i = gnome_collection.length-1; i >= 0; i--) {
+                for (let i = gnome_collection.length - 1; i >= 0; i--) {
                     if (
                         mouse_pos.x > gnome_collection[i].x &&
                         mouse_pos.x < gnome_collection[i].x + gnome_size &&
@@ -216,7 +312,7 @@ function ready() {
         } else {
             if (holdingitem) {
                 itemHeld.customData.ai_mode = "wander";
-                itemHeld.customData.heading = Math.random() * 2*Math.PI;
+                itemHeld.customData.heading = Math.random() * 2 * Math.PI;
                 data.set("gnomes", gnomes);
             }
             holdingitem = false;
@@ -257,7 +353,7 @@ function generateUI() {
     });
 
     let inventoryButton = document.getElementById("toolbar-button-5");
-    inventoryButton.addEventListener("click", toggleInventory); 
+    inventoryButton.addEventListener("click", toggleInventory);
 
     let trader = document.getElementById("trader");
     trader.addEventListener("click", toggleTraderMenu);
@@ -266,8 +362,7 @@ function generateUI() {
         .then((response) => response.text())
         .then((text) => generateGnomeDex(text));
 
-    
-    if(data.get('traderInventory') == null){
+    if (data.get("traderInventory") == null) {
         updateTraderItems();
     } else {
         updateTrader();
@@ -291,8 +386,14 @@ function generateHoles(
     for (let row = 0; row < numHoleRows; row++) {
         for (let column = 0; column < numHoleCols; column++) {
             newHoles.push({
-                xPos: left_offset + column * (x_spacing + hole_size)+getOffset("main").x,
-                yPos: top_offset + row * (y_spacing + hole_size)+getOffset("main").y,
+                xPos:
+                    left_offset +
+                    column * (x_spacing + hole_size) +
+                    getOffset("main").x,
+                yPos:
+                    top_offset +
+                    row * (y_spacing + hole_size) +
+                    getOffset("main").y,
                 x: column,
                 y: row,
             });
@@ -303,7 +404,8 @@ function generateHoles(
 
 function generateGnomeDex(gnomeDescData) {
     // get rid of new lines in data
-    document.getElementById("gnome-dex").innerHTML = '<h1 id="gd-title">GNOME-DEX</h1>';
+    document.getElementById("gnome-dex").innerHTML =
+        '<h1 id="gd-title">GNOME-DEX</h1>';
     gnomeDescData = gnomeDescData.replace(/(\r\n|\n|\r)/gm, "");
 
     let lines = gnomeDescData.split(";");
@@ -380,6 +482,12 @@ for (i = 1; i <= 16; i++) {
     gnome_imgs.push(document.createElement("img"));
     gnome_imgs[i - 1].src = "gnomes/Level " + i + ".png";
 }
+flowerImgs = [];
+for (i = 1; i <= 5; i++) {
+    flowerImgs.push(document.createElement("img"));
+    flowerImgs[i - 1].src = "gnomes/Flower Level " + i + ".png";
+}
+
 console.log(gnome_imgs);
 
 moving_coins = [];
@@ -403,6 +511,7 @@ class DataStorage {
             "timeOfNextGnomeSpawn",
             "timeOfNextTraderRefresh",
             "traderInventory",
+            "flowers",
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -451,7 +560,16 @@ class DataStorage {
             10000,
             Date.now() - restartOffset * 1000,
             Date.now() + traderRefreshTimer,
-            null
+            null,
+            [
+                {
+                    num: 1,
+                    x: 1000,
+                    y: 300,
+                    decompose: Date.now() + 60000,
+                    nextSpawn: Date.now(),
+                },
+            ],
         ];
         this.loaded = false;
     }
@@ -524,17 +642,65 @@ function run_tick(gameTime, deltaT, advanced) {
     updateHoles(gameTime, deltaT, advanced);
     updateGnomes(gameTime, deltaT, advanced);
     updateCoins(gameTime, deltaT, advanced);
+    updateFlowers(gameTime, deltaT, advanced);
 
-    if(data.get("timeOfNextTraderRefresh") < Date.now()){
+    if (data.get("timeOfNextTraderRefresh") < Date.now()) {
         updateTraderItems();
         data.set("timeOfNextTraderRefresh", Date.now() + traderRefreshTimer);
     }
-    document.getElementById('trader-timer').innerHTML = data.get("timeOfNextTraderRefresh") - Date.now();
+    document.getElementById("trader-timer").innerHTML =
+        data.get("timeOfNextTraderRefresh") - Date.now();
 }
 
 var start_chase = 0;
 
-function calculateHolePrice(){
+function updateFlowers(gameTime, deltaT, advanced) {
+    let flowers = data.get("flowers");
+    for (let i = 0; i < flowers.length; i++) {
+        let flower = flowers[i];
+        if (flower.decompose < gameTime) {
+            let flowerIndex = flowers.indexOf(flower);
+            flowers.splice(flowerIndex, 1);
+            i--;
+        }
+    }
+    for (let i = 0; i < flowers.length; i++) {
+        let flower = flowers[i];
+        if (flower.nextSpawn < gameTime) {
+            //spawn gnome
+            let target_x = flower.x;
+            let target_y = flower.y;
+            let out_heading = (Math.random() - 0.5) * Math.PI;
+            let start_x = target_x;
+            let start_y = target_y;
+            while (
+                start_x < getOffset("main").x + canvas_width &&
+                !(start_y < getOffset("main").y - gnome_size) &&
+                !(start_y > getOffset("main").y + canvas_height + gnome_size)
+            ) {
+                start_x += Math.cos(out_heading) * 5;
+                start_y += Math.sin(out_heading) * 5;
+            }
+            let heading = out_heading + Math.PI;
+            spawnGnome(
+                parseInt(
+                    flower_probablity_functions[flower.num - 1](Math.random())
+                ),
+                gameTime,
+                start_x,
+                start_y,
+                heading
+            );
+            //add time to next spawn
+            flower.nextSpawn = gameTime + flowerSpawnTimer;
+            console.log("flower spawned gnome");
+        }
+    }
+    data.set("flowers", flowers);
+    data.set("gnomes", data.get("gnomes"));
+}
+
+function calculateHolePrice() {
     let holes = data.get("holes");
     let price = 25;
     for (let i = 0; i < holes.length; i++) {
@@ -620,7 +786,10 @@ function updateHoles(gameTime, deltaT, advanced) {
         }
         closestGnome.x = scr_x;
         closestGnome.y = scr_y;
-        closestGnome.customData.nextCoinTime = Math.min(closestGnome.customData.nextCoinTime, gameTime+coinDropInterval)
+        closestGnome.customData.nextCoinTime = Math.min(
+            closestGnome.customData.nextCoinTime,
+            gameTime + coinDropInterval
+        );
         closestGnome.customData.ai_mode = "idle";
         closestGnome.customData.inHole = true;
         hole.contents = closestGnome;
@@ -708,52 +877,60 @@ function updateGnomes(gameTime, deltaT, advanced) {
                     continue;
                 }
                 //check line intersection
-                if (line_line_intersection(
-                    g_topleft.x,
-                    g_topleft.y,
-                    g_bottomleft.x,
-                    g_bottomleft.y,
-                    collider.x1,
-                    collider.y1,
-                    collider.x2,
-                    collider.y2
-                )){
+                if (
+                    line_line_intersection(
+                        g_topleft.x,
+                        g_topleft.y,
+                        g_bottomleft.x,
+                        g_bottomleft.y,
+                        collider.x1,
+                        collider.y1,
+                        collider.x2,
+                        collider.y2
+                    )
+                ) {
                     collided = true;
                 }
-                if (line_line_intersection(
-                    g_topleft.x,
-                    g_topleft.y,
-                    g_topright.x,
-                    g_topright.y,
-                    collider.x1,
-                    collider.y1,
-                    collider.x2,
-                    collider.y2
-                )){
+                if (
+                    line_line_intersection(
+                        g_topleft.x,
+                        g_topleft.y,
+                        g_topright.x,
+                        g_topright.y,
+                        collider.x1,
+                        collider.y1,
+                        collider.x2,
+                        collider.y2
+                    )
+                ) {
                     collided = true;
                 }
-                if (line_line_intersection(
-                    g_bottomleft.x,
-                    g_bottomleft.y,
-                    g_bottomright.x,
-                    g_bottomright.y,
-                    collider.x1,
-                    collider.y1,
-                    collider.x2,
-                    collider.y2
-                )){
+                if (
+                    line_line_intersection(
+                        g_bottomleft.x,
+                        g_bottomleft.y,
+                        g_bottomright.x,
+                        g_bottomright.y,
+                        collider.x1,
+                        collider.y1,
+                        collider.x2,
+                        collider.y2
+                    )
+                ) {
                     collided = true;
                 }
-                if (line_line_intersection(
-                    g_topright.x,
-                    g_topright.y,
-                    g_bottomright.x,
-                    g_bottomright.y,
-                    collider.x1,
-                    collider.y1,
-                    collider.x2,
-                    collider.y2
-                )){
+                if (
+                    line_line_intersection(
+                        g_topright.x,
+                        g_topright.y,
+                        g_bottomright.x,
+                        g_bottomright.y,
+                        collider.x1,
+                        collider.y1,
+                        collider.x2,
+                        collider.y2
+                    )
+                ) {
                     collided = true;
                 }
             }
@@ -780,6 +957,9 @@ function updateGnomes(gameTime, deltaT, advanced) {
     for (i = 0; i < all_gnomes.length; i++) {
         gnome1 = all_gnomes[i];
         if (gnome1.customData.ai_mode == "disabled") {
+            continue;
+        }
+        if (gnome1.num == 16) {
             continue;
         }
         for (j = 0; j < gnomes.length; j++) {
@@ -899,7 +1079,6 @@ function updateCoins(gameTime, deltaT, advanced) {
                 coin.z = 0;
                 coin.zvel = coin.zvel * -0.4;
             }
-
         }
         data.set("coinEntities", cE);
     }
@@ -979,18 +1158,18 @@ function render_gnomes(gnomes) {
     for (i = 0; i < gnomes.length; i++) {
         let gnome = gnomes[i];
         t = Date.now() * 0.01 + gnome.id;
-        let cycle = -Math.abs(Math.sin(t))*20+5
-        u_d_s = -Math.max(0, cycle)
+        let cycle = -Math.abs(Math.sin(t)) * 20 + 5;
+        u_d_s = -Math.max(0, cycle);
         if (
             gnome.customData.ai_mode == "wander" ||
             gnome.customData.ai_mode == "pathfind"
         ) {
-            u_d = Math.min(0, cycle)
+            u_d = Math.min(0, cycle);
             l_r =
                 Math.cos(t) *
                 (1 - Math.abs(Math.cos(gnome.customData.heading))) *
                 8;
-            s_d = 0
+            s_d = 0;
         } else {
             u_d = 0;
             l_r = 0;
@@ -998,14 +1177,15 @@ function render_gnomes(gnomes) {
         }
         if (gnome.customData.ai_mode == "disabled") {
             g = 1;
-            s_d = 0
+            s_d = 0;
         } else {
             g = 1 + u_d_s * 0.03;
             s_d = u_d_s * -6;
         }
+        // console.log(gnome.num);
         ctx.drawImage(
             gnome_imgs[gnome.num - 1],
-            gnome.x + l_r - camera_x - s_d/2,
+            gnome.x + l_r - camera_x - s_d / 2,
             gnome.y + u_d - gnome_size * g - camera_y,
             gnome_size + s_d,
             gnome_size * g
@@ -1013,22 +1193,22 @@ function render_gnomes(gnomes) {
     }
 }
 
-function set_room(room){
+function set_room(room) {
     current_room = room;
 }
 var priceTagVal = 0;
-function setPriceTag(value){
+function setPriceTag(value) {
     document.getElementById("price-tag").style.display = "grid";
     document.getElementById("price-tag-value").innerText = value;
     priceTagVal = value;
 }
 
-function hidePriceTag(){
+function hidePriceTag() {
     document.getElementById("price-tag").style.display = "none";
 }
 
-function coinImgFromValue(value){
-    if (value < 10){
+function coinImgFromValue(value) {
+    if (value < 10) {
         return coin_imgs[0];
     } else {
         return coin_imgs[1];
@@ -1056,9 +1236,26 @@ function draw() {
     } else {
         document.getElementById("price-tag-value").style.color = "black";
     }
-    document.getElementById("price-tag").style.transform = "translate(" + (mouse_x - camera_x - document.getElementById("price-tag").clientWidth/2) + "px, " + (mouse_y - camera_y + 25) + "px)";
-    document.getElementById('traderSign').style.transform = "translate("+(getOffset('main').x-camera_x) + 'px, ' + (getOffset('main').y-camera_y) + 'px)';
-    document.getElementById('mainAreaSign').style.transform = "translate("+(getOffset('trader').x-camera_x) + 'px, ' + (getOffset('trader').y-camera_y) + 'px)';
+    document.getElementById("price-tag").style.transform =
+        "translate(" +
+        (mouse_x -
+            camera_x -
+            document.getElementById("price-tag").clientWidth / 2) +
+        "px, " +
+        (mouse_y - camera_y + 25) +
+        "px)";
+    document.getElementById("traderSign").style.transform =
+        "translate(" +
+        (getOffset("main").x - camera_x) +
+        "px, " +
+        (getOffset("main").y - camera_y) +
+        "px)";
+    document.getElementById("mainAreaSign").style.transform =
+        "translate(" +
+        (getOffset("trader").x - camera_x) +
+        "px, " +
+        (getOffset("trader").y - camera_y) +
+        "px)";
     wind = wind + (Math.random() - 0.5) * 0.01;
     wind = wind * 0.999;
     mainCanvas = document.getElementById("mainCanvas");
@@ -1076,12 +1273,15 @@ function draw() {
             let offset = offsets[j];
             var noisefn = fn === "simplex" ? noise.simplex2 : noise.perlin2;
             for (i = 0; i < 3000; i++) {
-                let x = Math.random() * canvas_width+offset.x;
-                let y = Math.random() * canvas_height+offset.y;
+                let x = Math.random() * canvas_width + offset.x;
+                let y = Math.random() * canvas_height + offset.y;
                 grass_blades.push({
                     x: x,
                     y: y,
-                    offset: noisefn(x / 350, y / 350) * Math.PI + Math.PI+Math.random()*2,
+                    offset:
+                        noisefn(x / 350, y / 350) * Math.PI +
+                        Math.PI +
+                        Math.random() * 2,
                 });
             }
         }
@@ -1129,33 +1329,39 @@ function draw() {
             }
         }
     }
-    if (toolHeld == "Shovel"){
-    let gholes = ghostHoles;
-    let found = false
-    for (let i = 0; i < gholes.length; i++) {
-        mouse_x = mouse_pos.x;
-        mouse_y = mouse_pos.y;
-        let hole_x = gholes[i].xPos;
-        let hole_y = gholes[i].yPos;
-        if (mouse_x > hole_x && mouse_x < hole_x + hole_size && mouse_y > hole_y && mouse_y < hole_y + hole_size) {
+    if (toolHeld == "Shovel") {
+        let gholes = ghostHoles;
+        let found = false;
+        for (let i = 0; i < gholes.length; i++) {
+            mouse_x = mouse_pos.x;
+            mouse_y = mouse_pos.y;
+            let hole_x = gholes[i].xPos;
+            let hole_y = gholes[i].yPos;
+            if (
+                mouse_x > hole_x &&
+                mouse_x < hole_x + hole_size &&
+                mouse_y > hole_y &&
+                mouse_y < hole_y + hole_size
+            ) {
+                ctx.globalAlpha = 1;
+                setPriceTag(calculateHolePrice().toString());
+                found = true;
+            } else {
+                ctx.globalAlpha = 0.5;
+            }
+            ctx.drawImage(
+                hole_img,
+                gholes[i].xPos - camera_x,
+                gholes[i].yPos - camera_y,
+                hole_size,
+                hole_size
+            );
             ctx.globalAlpha = 1;
-            setPriceTag(calculateHolePrice().toString());
-            found = true
-        } else {
-            ctx.globalAlpha = 0.5;
         }
-        ctx.drawImage(
-            hole_img,
-            gholes[i].xPos - camera_x,
-            gholes[i].yPos - camera_y,
-            hole_size,
-            hole_size
-        );
-        ctx.globalAlpha = 1;
+        if (!found) {
+            hidePriceTag();
+        }
     }
-    if (!found) {
-        hidePriceTag();
-    }}
 
     for (let i = 0; i < moving_coins.length; i++) {
         let coin = moving_coins[i];
@@ -1231,10 +1437,18 @@ function draw() {
     }
     render_gnomes(gnomes);
 
+    render_flowers();
+
     trader_img = document.createElement("img");
     trader_img.src = "gnomes/trading market.png";
 
-    ctx.drawImage(trader_img, getOffset('trader').x - camera_x, getOffset('trader').y - camera_y, canvas_width, canvas_height/2);
+    ctx.drawImage(
+        trader_img,
+        getOffset("trader").x - camera_x,
+        getOffset("trader").y - camera_y,
+        canvas_width,
+        canvas_height / 2
+    );
 
     let coins_to_draw = [];
     let coinEntities = data.get("coinEntities");
@@ -1254,7 +1468,13 @@ function draw() {
     }
     for (let i = 0; i < coins_to_draw.length; i++) {
         let coin = coins_to_draw[i];
-        ctx.drawImage(coinImgFromValue(coin.amount), coin.x, coin.y, coin_size, coin_size);
+        ctx.drawImage(
+            coinImgFromValue(coin.amount),
+            coin.x,
+            coin.y,
+            coin_size,
+            coin_size
+        );
     }
 
     // for (let i = 0; i < gnome_colliders.length; i++) {
@@ -1268,37 +1488,66 @@ function draw() {
     // }
 }
 
+function render_flowers() {
+    let flowers = data.get("flowers");
+    for (let i = 0; i < flowers.length; i++) {
+        let flower = flowers[i];
+        let flower_img = flowerImgs[flower.num - 1];
+        let v_offset = Math.min(0, Date.now() - flower.touchdown) * 2;
+        ctx.drawImage(
+            flower_img,
+            flower.x - camera_x - flower_size / 2,
+            flower.y - camera_y - flower_size + v_offset,
+            flower_size,
+            flower_size
+        );
+    }
+}
+
 function handleClick(e) {
-    let posX = e.clientX+camera_x;
-    let posY = e.clientY+camera_y;
+    let posX = e.clientX + camera_x;
+    let posY = e.clientY + camera_y;
     // if holding tool or item
     if (holdingTool) {
         if (toolHeld == "Shovel") {
             if (data.get("coinsInCurrentRun") < calculateHolePrice()) {
                 return;
             }
-            let mouse_x = e.clientX + camera_x
-            let mouse_y = e.clientY + camera_y
-            for (let i = 0; i < ghostHoles.length; i++){
-                let hole_x = ghostHoles[i].xPos
-                let hole_y = ghostHoles[i].yPos
-                let holes = data.get("holes")
-                if (mouse_x > hole_x && mouse_x < hole_x + hole_size && mouse_y > hole_y && mouse_y < hole_y + hole_size){
-                    data.set("coinsInCurrentRun", data.get("coinsInCurrentRun") - calculateHolePrice())
-                    holes.push(ghostHoles[i])
-                    hidePriceTag()
-                    ghostHoles.splice(i, 1)
-                    holdingTool = false
-                    toolHeld = null
-                    data.set('holes', holes)
-                    break
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            for (let i = 0; i < ghostHoles.length; i++) {
+                let hole_x = ghostHoles[i].xPos;
+                let hole_y = ghostHoles[i].yPos;
+                let holes = data.get("holes");
+                if (
+                    mouse_x > hole_x &&
+                    mouse_x < hole_x + hole_size &&
+                    mouse_y > hole_y &&
+                    mouse_y < hole_y + hole_size
+                ) {
+                    data.set(
+                        "coinsInCurrentRun",
+                        data.get("coinsInCurrentRun") - calculateHolePrice()
+                    );
+                    holes.push(ghostHoles[i]);
+                    hidePriceTag();
+                    ghostHoles.splice(i, 1);
+                    holdingTool = false;
+                    toolHeld = null;
+                    data.set("holes", holes);
+                    break;
                 }
             }
         }
     }
     // if clicked on trader
-    if(current_room == 'trader'){
-        if(posX > getOffset('trader').x && posX < getOffset('trader').x + canvas_width && posY > getOffset('trader').y && posY < getOffset('trader').y + canvas_height/2 - 70){
+    if (current_room == "trader") {
+        if (
+            posX > getOffset("trader").x &&
+            posX < getOffset("trader").x + canvas_width &&
+            posY > getOffset("trader").y &&
+            posY < getOffset("trader").y + canvas_height / 2 - 70
+        ) {
             toggleTraderMenu();
         }
     }
@@ -1378,10 +1627,10 @@ function handleMouseMove(e) {
         start_y = prev_mouse_move_pos[1];
         end_x = posX;
         end_y = posY;
-        coin_start_x = coin_screen_x+coin_size/2-coin_collection_size/2;
-        coin_start_y = coin_screen_y+coin_size/2-coin_collection_size/2;
-        coin_width = coin_size+coin_collection_size/2;
-        coin_height = coin_size+coin_collection_size/2;
+        coin_start_x = coin_screen_x + coin_size / 2 - coin_collection_size / 2;
+        coin_start_y = coin_screen_y + coin_size / 2 - coin_collection_size / 2;
+        coin_width = coin_size + coin_collection_size / 2;
+        coin_height = coin_size + coin_collection_size / 2;
         // check for line/rect intersection
         if (
             line_line_intersection(
@@ -1441,49 +1690,56 @@ function handleMouseMove(e) {
     prev_mouse_move_pos = [posX, posY];
 }
 
-function handleKeyPress(e){
-    if (e.key == "0"){
-        if (holdingitem){
+function handleKeyPress(e) {
+    if (e.key == "0") {
+        if (holdingitem) {
             holdingitem = false;
-            if(itemHeld == 'Shovel'){
+            if (itemHeld == "Shovel") {
                 toggleHoldingShovel();
             }
         }
-    } else if (e.key == "1"){
+    } else if (e.key == "1") {
         toggleHoldingShovel();
-    }
-    else if (e.key == "5"){
+    } else if (e.key == "5") {
         toggleInventory();
     }
-
 }
 
-function toggleHoldingShovel(){
-    if (holdingTool && toolHeld == "Shovel"){
+function toggleHoldingShovel() {
+    if (holdingTool && toolHeld == "Shovel") {
         holdingTool = false;
         toolHeld = null;
         ghostHoles = [];
         debugMessage("Put Away Shovel");
-        hidePriceTag()
-        document.getElementById('toolbar-button-1').getElementsByClassName('button-icon')[0].classList.remove('toolbar-button-selected');
+        hidePriceTag();
+        document
+            .getElementById("toolbar-button-1")
+            .getElementsByClassName("button-icon")[0]
+            .classList.remove("toolbar-button-selected");
         document.body.style.cursor = "url('./gnomes/Shovel.png'), auto"; // TODO: why this not work?
     } else {
         holdingTool = true;
         toolHeld = "Shovel";
         debugMessage("Holding Shovel");
-        document.getElementById('toolbar-button-1').getElementsByClassName('button-icon')[0].classList.add('toolbar-button-selected');
+        document
+            .getElementById("toolbar-button-1")
+            .getElementsByClassName("button-icon")[0]
+            .classList.add("toolbar-button-selected");
 
         let holes = data.get("holes");
         let ghostHolePositions = [];
-        for (let i = 0; i < holePositions.length; i++){
+        for (let i = 0; i < holePositions.length; i++) {
             let hole = holePositions[i];
             ghostHolePositions.push(hole);
         }
         // for hole in holePositions
-        for (let i = 0; i < ghostHolePositions.length; i++){
+        for (let i = 0; i < ghostHolePositions.length; i++) {
             // get rid of all the holes that are already dug
-            for (let j = 0; j < holes.length; j++){
-                if (holes[j].x == ghostHolePositions[i].x && holes[j].y == ghostHolePositions[i].y){
+            for (let j = 0; j < holes.length; j++) {
+                if (
+                    holes[j].x == ghostHolePositions[i].x &&
+                    holes[j].y == ghostHolePositions[i].y
+                ) {
                     ghostHolePositions.splice(i, 1);
                 }
             }
@@ -1493,67 +1749,78 @@ function toggleHoldingShovel(){
     }
 }
 
-function toggleInventory(){
-
+function toggleInventory() {
     updateInventory();
-    let inventoryDiv = document.getElementById('inventory');
+    let inventoryDiv = document.getElementById("inventory");
     let offsetTime = 25;
-    let inventoryOpen = !(document.getElementById('inventory').classList.contains('inventory-hidden'));
+    let inventoryOpen = !document
+        .getElementById("inventory")
+        .classList.contains("inventory-hidden");
 
-    if (inventoryOpen){
-        debugMessage('close inventory');
+    if (inventoryOpen) {
+        debugMessage("close inventory");
         inventoryDiv.classList.add("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
         inventoryButton
             .getElementsByClassName("button-icon")[0]
             .classList.remove("inventory-icon-toggled");
 
-        for (let i = 0; i < inventoryDiv.children.length; i++){
+        for (let i = 0; i < inventoryDiv.children.length; i++) {
             let child = inventoryDiv.children[i];
-            child.classList.add('inventory-item-hidden');
+            child.classList.add("inventory-item-hidden");
         }
-        
     } else {
-        debugMessage('open inventory');
+        debugMessage("open inventory");
         inventoryDiv.classList.remove("inventory-hidden");
         let inventoryButton = document.getElementById("toolbar-button-5");
         inventoryButton
             .getElementsByClassName("button-icon")[0]
             .classList.add("inventory-icon-toggled");
 
-        for (let i = 0; i < inventoryDiv.children.length; i++){
+        for (let i = 0; i < inventoryDiv.children.length; i++) {
             let child = inventoryDiv.children[i];
-            setTimeout(function(){
-                child.classList.remove('inventory-item-hidden');
-                child.style.animationPlayState = 'running';
+            setTimeout(function () {
+                child.classList.remove("inventory-item-hidden");
+                child.style.animationPlayState = "running";
             }, offsetTime * i);
         }
     }
 }
 
-
-function debugMessage(message){
-    messageDiv = document.createElement('div');
+function debugMessage(message) {
+    messageDiv = document.createElement("div");
     messageDiv.innerHTML = message;
-    messageDiv.classList.add('debugMessage');
+    messageDiv.classList.add("debugMessage");
     let messageId = Math.random();
-    messageDiv.setAttribute('debugId', messageId);
-    document.getElementById('debug').prepend(messageDiv);
+    messageDiv.setAttribute("debugId", messageId);
+    document.getElementById("debug").prepend(messageDiv);
     debugMessages.push(messageDiv);
     // remove the message after 5 seconds
-    setTimeout(function(){
+    setTimeout(function () {
         // remove the message from the array
-        for(let i = 0; i < document.querySelectorAll('.debugMessage').length; i++){
-            if (document.querySelectorAll('.debugMessage')[i].getAttribute('debugId') == messageId){
-                document.querySelectorAll('.debugMessage')[i].remove();
+        for (
+            let i = 0;
+            i < document.querySelectorAll(".debugMessage").length;
+            i++
+        ) {
+            if (
+                document
+                    .querySelectorAll(".debugMessage")
+                    [i].getAttribute("debugId") == messageId
+            ) {
+                document.querySelectorAll(".debugMessage")[i].remove();
             }
         }
     }, 5000);
 }
 
-function toggleTraderMenu(){
-    document.getElementById('trader').classList.toggle('trader-hidden');
-    if(!document.getElementById('inventory').classList.contains('inventory-hidden')){
+function toggleTraderMenu() {
+    document.getElementById("trader").classList.toggle("trader-hidden");
+    if (
+        !document
+            .getElementById("inventory")
+            .classList.contains("inventory-hidden")
+    ) {
         toggleInventory();
     }
 }
@@ -1604,35 +1871,39 @@ var itemOptions = {
         image: "Lootbox 3.png",
         rarity: 4,
     },
-}
+};
 
-function updateTraderItems(itemsThatMustBeIncluded = []){
+function updateTraderItems(itemsThatMustBeIncluded = []) {
     let amountOfItemsPerRow = 5;
     let amountOfRows = 3;
     let allitems = [];
     let weighted = [];
 
-    for (let j = 0; j < Object.keys(itemOptions).length; j++){
+    for (let j = 0; j < Object.keys(itemOptions).length; j++) {
         let rarity = itemOptions[Object.keys(itemOptions)[j]].rarity;
-        let count = Math.floor(100/rarity)
-        for (let k = 0; k < count; k++){
+        let count = Math.floor(100 / rarity);
+        for (let k = 0; k < count; k++) {
             weighted.push(Object.keys(itemOptions)[j]);
         }
     }
 
-    for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++){
-        if (itemsThatMustBeIncluded.length > 0){
+    for (let i = 0; i < amountOfItemsPerRow * amountOfRows; i++) {
+        if (itemsThatMustBeIncluded.length > 0) {
             allitems.push(itemsThatMustBeIncluded[0]);
             itemsThatMustBeIncluded.splice(0, 1);
             continue;
         }
-        let name = weighted[Math.floor(Math.random() * weighted.length)]
+        let name = weighted[Math.floor(Math.random() * weighted.length)];
         let randomItem = itemOptions[name];
         let item = {
             name: name,
-            price: Math.floor(Math.random() * (randomItem.price[1] - randomItem.price[0] + 1) + randomItem.price[0]),
+            price: Math.floor(
+                Math.random() *
+                    (randomItem.price[1] - randomItem.price[0] + 1) +
+                    randomItem.price[0]
+            ),
             image: randomItem.image,
-        }
+        };
         allitems.push(item);
     }
 
@@ -1642,63 +1913,63 @@ function updateTraderItems(itemsThatMustBeIncluded = []){
         [allitems[i], allitems[j]] = [allitems[j], allitems[i]];
     }
     let rows = [];
-    for (let i = 0; i < amountOfRows; i++){
+    for (let i = 0; i < amountOfRows; i++) {
         rows.push(allitems.splice(0, amountOfItemsPerRow));
     }
 
-    data.set('traderInventory', rows);
+    data.set("traderInventory", rows);
     updateTrader();
 }
 
-function updateTrader(){
-
-    let tInv = data.get('traderInventory');
+function updateTrader() {
+    let tInv = data.get("traderInventory");
     let amountOfRows = tInv.length;
 
     // update the UI
-    for (let j = 0 ; j < amountOfRows; j++){
-        let row = document.getElementById('trader-row-' + (j + 1));
-        row.innerHTML = '';
+    for (let j = 0; j < amountOfRows; j++) {
+        let row = document.getElementById("trader-row-" + (j + 1));
+        row.innerHTML = "";
         let amountOfItemsPerRow = tInv[j].length;
-        for (let i = 0; i < amountOfItemsPerRow ; i++){
-            let item = document.createElement('div');
-            item.classList.add('trader-item');
-            item.style.backgroundImage = "url('./gnomes/" + tInv[j][i].image + "')";
-            let priceTag = document.createElement('div');
-            priceTag.classList.add('price-tag-store');
-            let coinImg = document.createElement('img');
-            coinImg.src = './gnomes/Coin.png';
-            coinImg.classList.add('coin-img-store');
-            let priceText = document.createElement('div');
-            priceText.classList.add('price-tag-store-text');
+        for (let i = 0; i < amountOfItemsPerRow; i++) {
+            let item = document.createElement("div");
+            item.classList.add("trader-item");
+            item.style.backgroundImage =
+                "url('./gnomes/" + tInv[j][i].image + "')";
+            let priceTag = document.createElement("div");
+            priceTag.classList.add("price-tag-store");
+            let coinImg = document.createElement("img");
+            coinImg.src = "./gnomes/Coin.png";
+            coinImg.classList.add("coin-img-store");
+            let priceText = document.createElement("div");
+            priceText.classList.add("price-tag-store-text");
             priceText.innerHTML = tInv[j][i].price;
-            item.onclick = function(){
+            item.onclick = function () {
                 event.stopPropagation();
                 attemptPurchase(tInv[j][i], this);
-            }
+            };
             priceTag.appendChild(coinImg);
             priceTag.appendChild(priceText);
             item.appendChild(priceTag);
             row.appendChild(item);
-        } 
+        }
     }
 }
 
-function updateInventory(){
-    let inven = data.get('inventory');
-    let inventoryDiv = document.getElementById('inventory');
-    inventoryDiv.innerHTML = '';
-    for(let i = 0; i < inven.length; i++){
-        let item = document.createElement('div');
-        item.classList.add('inventory-item');
+function updateInventory() {
+    let inven = data.get("inventory");
+    let inventoryDiv = document.getElementById("inventory");
+    inventoryDiv.innerHTML = "";
+    for (let i = 0; i < inven.length; i++) {
+        let item = document.createElement("div");
+        item.classList.add("inventory-item");
         item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
 
-        if(inven[i].amount <= 0){
-            item.classList.add('inventory-item-disabled');
+        if (inven[i].amount <= 0) {
+            item.classList.add("inventory-item-disabled");
         } else {
-            item.classList.remove('inventory-item-disabled');   
-            let amountTxt = document.createElement('div');
-            amountTxt.classList.add('inventory-item-amount');
+            item.classList.remove("inventory-item-disabled");
+            let amountTxt = document.createElement("div");
+            amountTxt.classList.add("inventory-item-amount");
             amountTxt.innerHTML = inven[i].amount;
             item.appendChild(amountTxt);
         }
@@ -1707,59 +1978,58 @@ function updateInventory(){
     }
 }
 
-function attemptPurchase(item, itemDiv){
+function attemptPurchase(item, itemDiv) {
     let price = item.price;
     let name = item.name;
 
-    console.log('PRICE: +' + price);
-    console.log('COINS: ' + data.get('coinsInCurrentRun'));
-    console.log(price > data.get('coinsInCurrentRun'));
-    if (price > data.get('coinsInCurrentRun')){
+    console.log("PRICE: +" + price);
+    console.log("COINS: " + data.get("coinsInCurrentRun"));
+    console.log(price > data.get("coinsInCurrentRun"));
+    if (price > data.get("coinsInCurrentRun")) {
         return;
     }
     // remove from traderInven
-    let ti = data.get('traderInventory');
+    let ti = data.get("traderInventory");
     console.log(ti);
-    for (let row = 0; row < ti.length; row++){
-        for (let rowItem = 0; rowItem < ti[row].length; rowItem++){
-            if(ti[row][rowItem] == item){
+    for (let row = 0; row < ti.length; row++) {
+        for (let rowItem = 0; rowItem < ti[row].length; rowItem++) {
+            if (ti[row][rowItem] == item) {
                 ti[row][rowItem] = null;
             }
         }
     }
     console.log(ti);
-    data.set('traderInventory', ti);
+    data.set("traderInventory", ti);
 
-
-    data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
-    let inv = data.get('inventory');
+    data.set("coinsInCurrentRun", data.get("coinsInCurrentRun") - price);
+    let inv = data.get("inventory");
     let found = false;
-    for (let i = 0; i < inv.length; i++){
-        if (inv[i].name == name){
-            if (inv[i].amount == undefined){
-                continue
+    for (let i = 0; i < inv.length; i++) {
+        if (inv[i].name == name) {
+            if (inv[i].amount == undefined) {
+                continue;
             }
-            found = true
+            found = true;
             inv[i].amount += 1;
         }
     }
-    if (!found){
-        if (name.includes('Seed') || name.includes('Lootbox')){
+    if (!found) {
+        if (name.includes("Seed") || name.includes("Lootbox")) {
             inv.push({
                 name: name,
                 amount: 1,
                 image: item.image,
-            })
+            });
         } else {
             inv.push({
                 name: name,
                 amount: undefined,
                 image: item.image,
-            })
+            });
         }
     }
 
-    data.set('inventory', inv);
+    data.set("inventory", inv);
     updateInventory();
     itemDiv.remove();
 }
