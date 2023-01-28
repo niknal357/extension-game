@@ -1955,6 +1955,7 @@ function updateInventory(skipAnimation = false) {
     let inventoryDiv = document.getElementById("inventory");
     inventoryDiv.innerHTML = "";
     for (let i = 0; i < inven.length; i++) {
+        let item_obj = inven[i];
         let item = document.createElement("div");
         item.classList.add("inventory-item");
         item.style.backgroundImage = "url('./gnomes/" + inven[i].image + "')";
@@ -1967,6 +1968,23 @@ function updateInventory(skipAnimation = false) {
             amountTxt.classList.add("inventory-item-amount");
             amountTxt.innerHTML = inven[i].amount;
             item.appendChild(amountTxt);
+        }
+        if(inven[i].name.includes('Lootbox') && inven[i].amount > 0){
+
+            item.onclick = function(){
+                event.stopPropagation();
+                openLootbox(inven[i].name.match(/\d+/)[0]);
+                let inventory = data.get('inventory');
+                for(let item = 0; item < inventory.length; item++){
+                    if(inventory[item].name == inven[i].name){
+                        inventory[item].amount--;
+                    }
+                }
+                data.set('inventory', inventory);
+                updateInventory();
+                toggleInventory();
+            }
+
         }
 
         inventoryDiv.appendChild(item);
