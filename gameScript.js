@@ -1674,8 +1674,7 @@ function updateTrader(){
             priceText.innerHTML = tInv[j][i].price;
             item.onclick = function(){
                 event.stopPropagation();
-                attemptPurchase(tInv[j][i]);
-                this.remove();
+                attemptPurchase(tInv[j][i], this);
             }
             priceTag.appendChild(coinImg);
             priceTag.appendChild(priceText);
@@ -1697,6 +1696,7 @@ function updateInventory(){
         if(inven[i].amount <= 0){
             item.classList.add('inventory-item-disabled');
         } else {
+            item.classList.remove('inventory-item-disabled');   
             let amountTxt = document.createElement('div');
             amountTxt.classList.add('inventory-item-amount');
             amountTxt.innerHTML = inven[i].amount;
@@ -1707,10 +1707,13 @@ function updateInventory(){
     }
 }
 
-function attemptPurchase(item){
+function attemptPurchase(item, itemDiv){
     let price = item.price;
     let name = item.name;
 
+    console.log('PRICE: +' + price);
+    console.log('COINS: ' + data.get('coinsInCurrentRun'));
+    console.log(price > data.get('coinsInCurrentRun'));
     if (price > data.get('coinsInCurrentRun')){
         return;
     }
@@ -1758,4 +1761,5 @@ function attemptPurchase(item){
 
     data.set('inventory', inv);
     updateInventory();
+    itemDiv.remove();
 }
