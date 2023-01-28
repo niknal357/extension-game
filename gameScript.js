@@ -983,7 +983,27 @@ function updateGnomes(gameTime, deltaT, advanced) {
         let level = 1;
         let x = 0;
         let y = 0;
-        spawnGnome(level, x, y);
+        let target_x = getOffset('main').x + Math.random()*canvas_width;
+        let target_y = getOffset('main').y + Math.random()*canvas_height;
+        let out_heading = (Math.random() - 0.5) * Math.PI;
+        let start_x = target_x;
+        let start_y = target_y;
+        while (
+            start_x < getOffset("main").x + canvas_width &&
+            !(start_y < getOffset("main").y - gnome_size) &&
+            !(start_y > getOffset("main").y + canvas_height + gnome_size)
+        ) {
+            start_x += Math.cos(out_heading) * 5;
+            start_y += Math.sin(out_heading) * 5;
+        }
+        let heading = out_heading + Math.PI;
+        spawnGnome(
+            1,
+            start_x,
+            start_y,
+            "wandering",
+            heading
+        );
         let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
         let gnomeSpawnInterval =
