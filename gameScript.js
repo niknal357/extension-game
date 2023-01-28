@@ -35,7 +35,7 @@ inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 traderRefreshTimer = 14400000;
 traderRefreshTimer = 4000;
-flowerSpawnTimer = 1000;
+flowerSpawnTimer = 60000;
 
 ghostHoles = [];
 debugMessages = [];
