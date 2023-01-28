@@ -349,10 +349,8 @@ function generateGnomeDex(gnomeDescData) {
 }
 
 const checker = setInterval(() => {
-    // console.log(document.getElementById("mainCanvas"));
     if (document.getElementById("mainCanvas") != null) {
         setTimeout(ready, 50);
-        // ready();
         console.log("starting");
 
         clearInterval(checker);
@@ -557,7 +555,6 @@ setTimeout(() => {
             start_chase = 0;
             p_bar.classList.add("hidden");
         }
-        // console.log(Date.now() - data.get("logoffTime"));
         let iterations = 0;
         if (Date.now() - data.get("logoffTime") > 60 * 60) {
             tickrate = 1000;
@@ -839,7 +836,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
         let level = 1;
         let x = 0;
         let y = 0;
-        spawnGnome(level, gameTime, x, y);
+        spawnGnome(level, x, y);
         let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
         let gnomeSpawnInterval =
@@ -907,11 +904,10 @@ function updateCoins(gameTime, deltaT, advanced) {
 
 function spawnGnome(
     level,
-    gameTime,
     xPos,
     yPos,
+    ai_mode = "wander",
     spawnHeading,
-    ai_mode = "wander"
 ) {
     let gnomes = data.get("gnomes");
 
@@ -933,7 +929,7 @@ function spawnGnome(
         }
     }
 
-    if (xPos == undefined || yPos == undefined || spawnHeading == undefined) {
+    if (xPos == undefined || yPos == undefined) {
         let minXPos = getOffset("main").x - gnome_size;
         let maxXPos = getOffset("main").x + canvas_width + gnome_size;
         let minYPos = getOffset("main").y - gnome_size;
@@ -950,6 +946,8 @@ function spawnGnome(
         // make x pos random between min and max
         xPos = Math.random() * (maxXPos - minXPos) + minXPos;
 
+    }
+    if (spawnHeading == undefined){
         // make the heading towards the center of the screen with some randomness in radians
         spawnHeading =
             Math.atan2(
@@ -1703,6 +1701,24 @@ function updateInventory(){
             item.appendChild(amountTxt);
         }
 
+        if(inven[i].name.includes('Lootbox') && inven[i].amount > 0){
+
+            item.onclick = function(){
+                event.stopPropagation();
+                openLootbox(inven[i].name.match(/\d+/)[0]);
+                let inventory = data.get('inventory');
+                for(let item = 0; item < inventory.length; item++){
+                    if(inventory[item].name == inven[i].name){
+                        inventory[item].amount--;
+                    }
+                }
+                data.set('inventory', inventory);
+                updateInventory();
+                toggleInventory();
+            }
+
+        }
+
         inventoryDiv.appendChild(item);
     }
 }
@@ -1729,7 +1745,6 @@ function attemptPurchase(item, itemDiv){
     }
     console.log(ti);
     data.set('traderInventory', ti);
-
 
     data.set('coinsInCurrentRun', data.get('coinsInCurrentRun') - price);
     let inv = data.get('inventory');
@@ -1762,4 +1777,69 @@ function attemptPurchase(item, itemDiv){
     data.set('inventory', inv);
     updateInventory();
     itemDiv.remove();
+}
+
+function openLootbox(level = 1){
+    var levelOneRange = [1, 9];
+    var levelTwoRange = [9, 13];
+    var levelThreeRange = [14, 16];
+
+    if(level == 1){
+        let randomLevel = [];
+        let rarityIncreaseFactor = 1.8;
+
+        for (let i = levelOneRange[1]; i >= levelOneRange[0]; i--){
+            for (let j = 0; j < Math.pow(rarityIncreaseFactor, levelOneRange[1]-i); j++){
+                randomLevel.push(i);
+            }
+        }
+
+        let levelOfGnome = randomLevel[Math.floor(Math.random() * randomLevel.length)];
+
+        spawnGnome(
+            levelOfGnome,
+            camera_x + canvas_width/2,
+            camera_y + canvas_height/2,
+            "idle",
+        );
+        console.log("LOOTBOX GNOME: " + levelOfGnome);
+    } else if (level == 2){
+        let randomLevel = [];
+        let rarityIncreaseFactor = 2;
+
+        for (let i = levelTwoRange[1]; i >= levelTwoRange[0]; i--){
+            for (let j = 0; j < Math.pow(rarityIncreaseFactor, levelTwoRange[1]-i); j++){
+                randomLevel.push(i);
+            }
+        }
+
+        let levelOfGnome = randomLevel[Math.floor(Math.random() * randomLevel.length)];
+
+        spawnGnome(
+            levelOfGnome,
+            camera_x + canvas_width/2,
+            camera_y + canvas_height/2,
+            "idle",
+        );
+        console.log("LOOTBOX GNOME: " + levelOfGnome);
+    } else if (level == 3){
+        let randomLevel = [];
+        let rarityIncreaseFactor = 10;
+
+        for (let i = levelThreeRange[1]; i >= levelThreeRange[0]; i--){
+            for (let j = 0; j < Math.pow(rarityIncreaseFactor, levelThreeRange[1]-i); j++){
+                randomLevel.push(i);
+            }
+        }
+
+        let levelOfGnome = randomLevel[Math.floor(Math.random() * randomLevel.length)];
+
+        spawnGnome(
+            levelOfGnome,
+            camera_x + canvas_width/2,
+            camera_y + canvas_height/2,
+            "idle",
+        );
+        console.log("LOOTBOX GNOME: " + levelOfGnome);
+    }
 }
