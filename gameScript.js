@@ -22,6 +22,8 @@ gnome_size = 100;
 coin_size = 40;
 flower_size = 120;
 coin_collection_size = 60;
+coinCollectorRange = 200;
+coin_collector_size = 120;
 wind = 0;
 gravitationalConstant = 0.4;
 
@@ -490,6 +492,8 @@ for (i = 1; i <= 5; i++) {
     flowerImgs.push(document.createElement("img"));
     flowerImgs[i - 1].src = "gnomes/Flower Level " + i + ".png";
 }
+coinCollectorImg = document.createElement("img");
+coinCollectorImg.src = "gnomes/magnet.png";
 
 console.log(gnome_imgs);
 
@@ -515,6 +519,7 @@ class DataStorage {
             "timeOfNextTraderRefresh",
             "traderInventory",
             "flowers",
+            "coinCollectors",
         ];
         let restartOffset = 0;
         this.defaults = [
@@ -538,6 +543,7 @@ class DataStorage {
             Date.now() - restartOffset * 1000,
             Date.now() + traderRefreshTimer,
             null,
+            [],
             [],
         ];
         this.loaded = false;
@@ -612,6 +618,7 @@ function run_tick(gameTime, deltaT, advanced) {
     updateGnomes(gameTime, deltaT, advanced);
     updateCoins(gameTime, deltaT, advanced);
     updateFlowers(gameTime, deltaT, advanced);
+    updateCoinCollectors(gameTime, deltaT, advanced);
 
     if (data.get("timeOfNextTraderRefresh") < Date.now()) {
         updateTraderItems();
@@ -622,6 +629,37 @@ function run_tick(gameTime, deltaT, advanced) {
 }
 
 var start_chase = 0;
+
+function updateCoinCollectors(gameTime, deltaT, advanced) {
+    let coinCollectors = data.get("coinCollectors");
+    let coins = data.get("coinEntities");
+    let coinsInCurrentRun = data.get("coinsInCurrentRun");
+    for (let i = 0; i < coinCollectors.length; i++) {
+        let coinCollector = coinCollectors[i];
+        for (let j = 0; j < coins.length; j++) {
+            let coin = coins[j];
+            let dist = Math.sqrt(
+                (coin.x + coin_size / 2 - coinCollector.x) ** 2 +
+                    (coin.y + coin_size / 2 - coinCollector.y) ** 2
+            );
+            if (dist < coinCollectorRange) {
+                moving_coins.push({
+                    scr_x: coin.x - camera_x,
+                    scr_y: coin.y - camera_y,
+                    amount: coin.amount,
+                    t_x: coinCollector.x - camera_x,
+                    t_y: coinCollector.y - camera_y - coin_collector_size / 2,
+                });
+                coinsInCurrentRun += coin.amount;
+                let coinIndex = coins.indexOf(coin);
+                coins.splice(coinIndex, 1);
+                j--;
+            }
+        }
+    }
+    data.set("coinEntities", coins);
+    data.set("coinsInCurrentRun", coinsInCurrentRun);
+}
 
 function updateFlowers(gameTime, deltaT, advanced) {
     let flowers = data.get("flowers");
@@ -1347,15 +1385,12 @@ function draw() {
     for (let i = 0; i < moving_coins.length; i++) {
         let coin = moving_coins[i];
         //move coin towards coin icon in the top left
-        let coin_icon_x = 10;
-        let coin_icon_y = 10;
-        let coin_icon_size = 50;
-        let coin_icon_center_x = coin_icon_x + coin_icon_size / 2;
-        let coin_icon_center_y = coin_icon_y + coin_icon_size / 2;
+        let target_x = coin.t_x;
+        let target_y = coin.t_y;
         let coin_center_x = coin.scr_x + coin_size / 2;
         let coin_center_y = coin.scr_y + coin_size / 2;
-        let coin_to_icon_x = coin_icon_center_x - coin_center_x;
-        let coin_to_icon_y = coin_icon_center_y - coin_center_y;
+        let coin_to_icon_x = target_x - coin_center_x;
+        let coin_to_icon_y = target_y - coin_center_y;
         let coin_to_icon_distance = Math.sqrt(
             coin_to_icon_x * coin_to_icon_x + coin_to_icon_y * coin_to_icon_y
         );
@@ -1419,6 +1454,19 @@ function draw() {
     render_gnomes(gnomes);
 
     render_flowers();
+    let coinCollectors = data.get("coinCollectors");
+    for (let i = 0; i < coinCollectors.length; i++) {
+        let collector = coinCollectors[i];
+        let v_offset =
+            Math.sin(Date.now() / 1000 + collector.x + collector.y) * 20 + 20;
+        ctx.drawImage(
+            coinCollectorImg,
+            collector.x - coin_collector_size / 2 - camera_x,
+            collector.y - coin_collector_size - camera_y - v_offset,
+            coin_collector_size,
+            coin_collector_size
+        );
+    }
 
     trader_img = document.createElement("img");
     trader_img.src = "gnomes/trading market.png";
@@ -1509,6 +1557,17 @@ function draw() {
             mouse_y - flower_size - camera_y,
             flower_size,
             flower_size
+        );
+        ctx.globalAlpha = 1;
+    }
+    if (holdingTool && toolHeld == "Coin Collector") {
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(
+            coinCollectorImg,
+            mouse_x - coin_collector_size / 2 - camera_x,
+            mouse_y - coin_collector_size - camera_y,
+            coin_collector_size,
+            coin_collector_size
         );
         ctx.globalAlpha = 1;
     }
@@ -1655,6 +1714,53 @@ function handleClick(e) {
             holdingTool = false;
             toolHeld = null;
         }
+        if (toolHeld == "Coin Collector") {
+            let mouse_x = e.clientX + camera_x;
+            let mouse_y = e.clientY + camera_y;
+            let coinCollectors = data.get("coinCollectors");
+            coinCollectors.push({
+                x: mouse_x,
+                y: mouse_y,
+            });
+            data.set("coinCollectors", coinCollectors);
+            holdingTool = false;
+            toolHeld = null;
+        }
+    } else {
+        let coinCollectors = data.get("coinCollectors");
+        for (let i = 0; i < coinCollectors.length; i++) {
+            let v_offset =
+                Math.sin(
+                    Date.now() / 1000 +
+                        coinCollectors[i].x +
+                        coinCollectors[i].y
+                ) *
+                    20 +
+                20;
+            let dist = Math.sqrt(
+                Math.pow(coinCollectors[i].x - posX, 2) +
+                    Math.pow(
+                        coinCollectors[i].y -
+                            v_offset -
+                            coin_collector_size / 2 -
+                            posY,
+                        2
+                    )
+            );
+            if (dist < coin_collector_size / 2) {
+                coinCollectors.splice(i, 1);
+                data.set("coinCollectors", coinCollectors);
+                let inventory = data.get("inventory");
+                for (let j = 0; j < inventory.length; j++) {
+                    if (inventory[j].name == "Coin Collector") {
+                        inventory[j].amount++;
+                        break;
+                    }
+                    updateInventory(true);
+                }
+                break;
+            }
+        }
     }
     // if clicked on trader
     if (current_room == "trader") {
@@ -1800,6 +1906,8 @@ function handleMouseMove(e) {
                 scr_x: coin_screen_x,
                 scr_y: coin_screen_y,
                 amount: coin.amount,
+                t_x: 35,
+                t_y: 35,
             });
         }
     }
@@ -1970,7 +2078,7 @@ var itemOptions = {
     },
     "Coin Collector": {
         price: [100000, 500000],
-        image: "Coin Collector.png",
+        image: "magnet.png",
         rarity: 10,
     },
     "Lootbox 1": {
@@ -2121,8 +2229,28 @@ function updateInventory(skipAnimation = false) {
                 toggleInventory();
             };
         }
+        if (inven[i].name == "Coin Collector" && inven[i].amount > 0) {
+            item.onclick = function () {
+                event.stopPropagation();
+                setupCoinCollector();
+                let inventory = data.get("inventory");
+                for (let item = 0; item < inventory.length; item++) {
+                    if (inventory[item].name == "Coin Collector") {
+                        inventory[item].amount--;
+                    }
+                }
+                data.set("inventory", inventory);
+                updateInventory();
+                toggleInventory();
+            };
+        }
         inventoryDiv.appendChild(item);
     }
+}
+
+function setupCoinCollector() {
+    toolHeld = "Coin Collector";
+    holdingTool = true;
 }
 
 function plantSeed(seed) {
@@ -2166,7 +2294,11 @@ function attemptPurchase(item, itemDiv) {
         }
     }
     if (!found) {
-        if (name.includes("Seed") || name.includes("Lootbox")) {
+        if (
+            name.includes("Seed") ||
+            name.includes("Lootbox") ||
+            name == "Coin Collector"
+        ) {
             inv.push({
                 name: name,
                 amount: 1,
