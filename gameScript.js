@@ -415,9 +415,9 @@ function generateGnomeDex(gnomeDescData) {
     let highestGnomeDiscovered = data.get("highestGnomeDiscovered");
     console.log("asdhad872788  " + highestGnomeDiscovered);
     if (highestGnomeDiscovered >= 5) {
-        document.getElementById('traderSign').style.display = 'block';
+        document.getElementById("traderSign").style.display = "block";
     } else {
-        document.getElementById('traderSign').style.display = 'none';
+        document.getElementById("traderSign").style.display = "none";
     }
 
     for (let i = 0; i < numGnomes; i++) {
@@ -988,8 +988,8 @@ function updateGnomes(gameTime, deltaT, advanced) {
         let level = 1;
         let x = 0;
         let y = 0;
-        let target_x = getOffset('main').x + Math.random()*canvas_width;
-        let target_y = getOffset('main').y + Math.random()*canvas_height;
+        let target_x = getOffset("main").x + Math.random() * canvas_width;
+        let target_y = getOffset("main").y + Math.random() * canvas_height;
         let out_heading = (Math.random() - 0.5) * Math.PI;
         let start_x = target_x;
         let start_y = target_y;
@@ -1002,13 +1002,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
             start_y += Math.sin(out_heading) * 5;
         }
         let heading = out_heading + Math.PI;
-        spawnGnome(
-            1,
-            start_x,
-            start_y,
-            "wandering",
-            heading
-        );
+        spawnGnome(1, start_x, start_y, "wandering", heading);
         let msUntillForGnomeSpawnMax = data.get("msUntillForGnomeSpawnMax");
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
         let gnomeSpawnInterval =
@@ -1462,7 +1456,7 @@ function draw() {
             coin_size
         );
     }
-    if (holdingTool && toolHeld == "Seed 1"){
+    if (holdingTool && toolHeld == "Seed 1") {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(
             flowerImgs[0],
@@ -1473,7 +1467,7 @@ function draw() {
         );
         ctx.globalAlpha = 1;
     }
-    if (holdingTool && toolHeld == "Seed 2"){
+    if (holdingTool && toolHeld == "Seed 2") {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(
             flowerImgs[1],
@@ -1484,7 +1478,7 @@ function draw() {
         );
         ctx.globalAlpha = 1;
     }
-    if (holdingTool && toolHeld == "Seed 3"){
+    if (holdingTool && toolHeld == "Seed 3") {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(
             flowerImgs[2],
@@ -1495,7 +1489,7 @@ function draw() {
         );
         ctx.globalAlpha = 1;
     }
-    if (holdingTool && toolHeld == "Seed 4"){
+    if (holdingTool && toolHeld == "Seed 4") {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(
             flowerImgs[3],
@@ -1506,7 +1500,7 @@ function draw() {
         );
         ctx.globalAlpha = 1;
     }
-    if (holdingTool && toolHeld == "Seed 5"){
+    if (holdingTool && toolHeld == "Seed 5") {
         ctx.globalAlpha = 0.5;
         ctx.drawImage(
             flowerImgs[4],
@@ -1517,7 +1511,6 @@ function draw() {
         );
         ctx.globalAlpha = 1;
     }
-
 
     // for (let i = 0; i < gnome_colliders.length; i++) {
     //     // console.log(gnome_colliders[i])
@@ -1581,7 +1574,7 @@ function handleClick(e) {
                 }
             }
         }
-        if (toolHeld == "Seed 1"){
+        if (toolHeld == "Seed 1") {
             let mouse_x = e.clientX + camera_x;
             let mouse_y = e.clientY + camera_y;
             let flowers = data.get("flowers");
@@ -1591,13 +1584,13 @@ function handleClick(e) {
                 num: 1,
                 decompose: Date.now() + 60000,
                 nextSpawn: Date.now(),
-                touchdown: Date.now()+500,
+                touchdown: Date.now() + 500,
             });
             data.set("flowers", flowers);
             holdingTool = false;
             toolHeld = null;
         }
-        if (toolHeld == "Seed 2"){
+        if (toolHeld == "Seed 2") {
             let mouse_x = e.clientX + camera_x;
             let mouse_y = e.clientY + camera_y;
             let flowers = data.get("flowers");
@@ -1607,13 +1600,13 @@ function handleClick(e) {
                 num: 2,
                 decompose: Date.now() + 60000,
                 nextSpawn: Date.now(),
-                touchdown: Date.now()+500,
+                touchdown: Date.now() + 500,
             });
             data.set("flowers", flowers);
             holdingTool = false;
             toolHeld = null;
         }
-        if (toolHeld == "Seed 3"){
+        if (toolHeld == "Seed 3") {
             let mouse_x = e.clientX + camera_x;
             let mouse_y = e.clientY + camera_y;
             let flowers = data.get("flowers");
@@ -1623,13 +1616,13 @@ function handleClick(e) {
                 num: 3,
                 decompose: Date.now() + 60000,
                 nextSpawn: Date.now(),
-                touchdown: Date.now()+500,
+                touchdown: Date.now() + 500,
             });
             data.set("flowers", flowers);
             holdingTool = false;
             toolHeld = null;
         }
-        if (toolHeld == "Seed 4"){
+        if (toolHeld == "Seed 4") {
             let mouse_x = e.clientX + camera_x;
             let mouse_y = e.clientY + camera_y;
             let flowers = data.get("flowers");
@@ -1639,13 +1632,13 @@ function handleClick(e) {
                 num: 4,
                 decompose: Date.now() + 60000,
                 nextSpawn: Date.now(),
-                touchdown: Date.now()+500,
+                touchdown: Date.now() + 500,
             });
             data.set("flowers", flowers);
             holdingTool = false;
             toolHeld = null;
         }
-        if (toolHeld == "Seed 5"){
+        if (toolHeld == "Seed 5") {
             let mouse_x = e.clientX + camera_x;
             let mouse_y = e.clientY + camera_y;
             let flowers = data.get("flowers");
@@ -1655,7 +1648,7 @@ function handleClick(e) {
                 num: 5,
                 decompose: Date.now() + 60000,
                 nextSpawn: Date.now(),
-                touchdown: Date.now()+500,
+                touchdown: Date.now() + 500,
             });
             data.set("flowers", flowers);
             holdingTool = false;
@@ -1984,12 +1977,12 @@ var itemOptions = {
         rarity: 2,
     },
     "Lootbox 2": {
-        price: [4000, 20000],
+        price: [30000, 62000],
         image: "Lootbox 2.png",
         rarity: 3,
     },
     "Lootbox 3": {
-        price: [40000, 200000],
+        price: [1000000, 10000000],
         image: "Lootbox 3.png",
         rarity: 4,
     },
@@ -2096,22 +2089,20 @@ function updateInventory(skipAnimation = false) {
             amountTxt.innerHTML = inven[i].amount;
             item.appendChild(amountTxt);
         }
-        if(inven[i].name.includes('Lootbox') && inven[i].amount > 0){
-
-            item.onclick = function(){
+        if (inven[i].name.includes("Lootbox") && inven[i].amount > 0) {
+            item.onclick = function () {
                 event.stopPropagation();
                 openLootbox(inven[i].name.match(/\d+/)[0]);
-                let inventory = data.get('inventory');
-                for(let item = 0; item < inventory.length; item++){
-                    if(inventory[item].name == inven[i].name){
+                let inventory = data.get("inventory");
+                for (let item = 0; item < inventory.length; item++) {
+                    if (inventory[item].name == inven[i].name) {
                         inventory[item].amount--;
                     }
                 }
-                data.set('inventory', inventory);
+                data.set("inventory", inventory);
                 updateInventory();
                 toggleInventory();
-            }
-
+            };
         }
         if (inven[i].name.includes("Seed") && inven[i].amount > 0) {
             item.onclick = function () {
@@ -2127,7 +2118,7 @@ function updateInventory(skipAnimation = false) {
                 updateInventory();
                 toggleInventory();
             };
-        };
+        }
         inventoryDiv.appendChild(item);
     }
 }
