@@ -2014,6 +2014,9 @@ function toggleInventory() {
 }
 
 function debugMessage(message) {
+    console.log(message);
+    return;
+    
     messageDiv = document.createElement("div");
     messageDiv.innerHTML = message;
     messageDiv.classList.add("debugMessage");
