@@ -212,12 +212,8 @@ function ready() {
         }
     }, 10);
 
-    debugMessage("Version 0.0.3 loaded.");
+    debugMessage("Version 1.0 loaded.");
     debugMessage(Date.now());
-    debugMessage("traderRefreshTimer is too small change it");
-    debugMessage("traderRefreshTimer is too small change it");
-    debugMessage("traderRefreshTimer is too small change it");
-    debugMessage("traderRefreshTimer is too small change it");
 
     //detect click and drag on the canvas if the mouse if over a gnome
     document.addEventListener("mousedown", function (e) {
