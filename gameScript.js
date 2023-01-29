@@ -36,7 +36,6 @@ coinDropInterval = 60000;
 inHoleCoinBoost = 3;
 enchantedCoinBoost = 3;
 traderRefreshTimer = 14400000;
-traderRefreshTimer = 4000;
 flowerSpawnTimer = 20000;
 
 ghostHoles = [];
@@ -624,8 +623,14 @@ function run_tick(gameTime, deltaT, advanced) {
         updateTraderItems();
         data.set("timeOfNextTraderRefresh", Date.now() + traderRefreshTimer);
     }
+    
+    let msUntilNextRefresh = data.get("timeOfNextTraderRefresh") - Date.now();
+    let hrUntilNextRefresh = Math.floor(msUntilNextRefresh / (1000 * 60 * 60));
+    let minUntilNextRefresh = Math.floor(msUntilNextRefresh / (1000 * 60)) - hrUntilNextRefresh * 60;
+    let secUntilNextRefresh = Math.floor(msUntilNextRefresh / (1000)) - hrUntilNextRefresh * 60 * 60 - minUntilNextRefresh * 60;
+
     document.getElementById("trader-timer").innerHTML =
-        data.get("timeOfNextTraderRefresh") - Date.now();
+        "Trader refreshes in " + hrUntilNextRefresh + "h " + minUntilNextRefresh + "m " + secUntilNextRefresh + "s";
 }
 
 var start_chase = 0;
@@ -1924,7 +1929,7 @@ function handleKeyPress(e) {
         }
     } else if (e.key == "1") {
         toggleHoldingShovel();
-    } else if (e.key == "5") {
+    } else if (e.key == "2") {
         toggleInventory();
     }
 }
