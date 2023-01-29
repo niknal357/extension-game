@@ -1310,6 +1310,7 @@ function draw() {
         }
     }
     if (toolHeld == "Shovel") {
+        console.log("entered shovel");
         let gholes = ghostHoles;
         let found = false;
         for (let i = 0; i < gholes.length; i++) {
@@ -1856,6 +1857,7 @@ function toggleHoldingShovel() {
                     holes[j].y == ghostHolePositions[i].y
                 ) {
                     ghostHolePositions.splice(i, 1);
+                    break;
                 }
             }
         }
