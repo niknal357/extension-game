@@ -21,7 +21,7 @@ hole_size = 100;
 gnome_size = 100;
 coin_size = 40;
 flower_size = 120;
-coin_collection_size = 60;
+coin_collection_size = 30;
 coinCollectorRange = 200;
 coin_collector_size = 120;
 wind = 0;
@@ -51,11 +51,11 @@ function resetProgress() {
 function flower_prob_1(x) {
     return Math.round(
         -41.9296 * x * x * x * x * x +
-            95.6499 * x * x * x * x -
-            54.6928 * x * x * x +
-            1.35786 * x * x +
-            6.53499 * x +
-            0.905404
+        95.6499 * x * x * x * x -
+        54.6928 * x * x * x +
+        1.35786 * x * x +
+        6.53499 * x +
+        0.905404
     );
 }
 //round(-41.9296xxxxx + 95.6499xxxx - 54.6928xxx + 1.35786xx + 6.53499x + 0.905404)
@@ -63,11 +63,11 @@ function flower_prob_1(x) {
 function flower_prob_2(x) {
     return Math.round(
         -257.358 * x * x * x * x * x +
-            620.305 * x * x * x * x -
-            487.694 * x * x * x +
-            130.806 * x * x +
-            0.371213 * x +
-            2.69662
+        620.305 * x * x * x * x -
+        487.694 * x * x * x +
+        130.806 * x * x +
+        0.371213 * x +
+        2.69662
     );
 }
 //round(-257.358xxxxx + 620.305xxxx - 487.694xxx + 130.806xx + 0.371213x + 2.69662)
@@ -75,11 +75,11 @@ function flower_prob_2(x) {
 function flower_prob_3(x) {
     return Math.round(
         -371.755 * x * x * x * x * x +
-            1008.58 * x * x * x * x -
-            946.173 * x * x * x +
-            356.661 * x * x -
-            42.2152 * x +
-            5.59973
+        1008.58 * x * x * x * x -
+        946.173 * x * x * x +
+        356.661 * x * x -
+        42.2152 * x +
+        5.59973
     );
 }
 //round(-371.755xxxxx + 1008.58xxxx - 946.173xxx + 356.661xx - 42.2152x + 5.59973)
@@ -87,11 +87,11 @@ function flower_prob_3(x) {
 function flower_prob_4(x) {
     return Math.round(
         75.3325 * x * x * x * x * x -
-            206.142 * x * x * x * x +
-            254.2 * x * x * x -
-            163.257 * x * x +
-            49.3637 * x +
-            4.38775
+        206.142 * x * x * x * x +
+        254.2 * x * x * x -
+        163.257 * x * x +
+        49.3637 * x +
+        4.38775
     );
 }
 //round(75.3325xxxxx - 206.142xxxx + 254.2xxx - 163.257xx + 49.3637x + 4.38775)
@@ -99,11 +99,11 @@ function flower_prob_4(x) {
 function flower_prob_5(x) {
     return Math.round(
         48.2798 * x * x * x * x * x -
-            124.572 * x * x * x * x +
-            113.094 * x * x * x -
-            40.7922 * x * x +
-            7.28838 * x +
-            10.8208
+        124.572 * x * x * x * x +
+        113.094 * x * x * x -
+        40.7922 * x * x +
+        7.28838 * x +
+        10.8208
     );
 }
 //round(48.2798xxxxx -124.572xxxx + 113.094xxx - 40.7922xx + 7.28838x + 10.8208)
@@ -619,7 +619,7 @@ function run_tick(gameTime, deltaT, advanced) {
         updateTraderItems();
         data.set("timeOfNextTraderRefresh", Date.now() + traderRefreshTimer);
     }
-    
+
     let msUntilNextRefresh = data.get("timeOfNextTraderRefresh") - Date.now();
     let hrUntilNextRefresh = Math.floor(msUntilNextRefresh / (1000 * 60 * 60));
     let minUntilNextRefresh = Math.floor(msUntilNextRefresh / (1000 * 60)) - hrUntilNextRefresh * 60;
@@ -641,7 +641,7 @@ function updateCoinCollectors(gameTime, deltaT, advanced) {
             let coin = coins[j];
             let dist = Math.sqrt(
                 (coin.x + coin_size / 2 - coinCollector.x) ** 2 +
-                    (coin.y + coin_size / 2 - coinCollector.y) ** 2
+                (coin.y + coin_size / 2 - coinCollector.y) ** 2
             );
             if (dist < coinCollectorRange) {
                 moving_coins.push({
@@ -776,10 +776,10 @@ function updateHoles(gameTime, deltaT, advanced) {
             }
             let dist = Math.sqrt(
                 Math.pow(gnome.x - gnome_size / 2 - scr_x + hole_size / 2, 2) +
-                    Math.pow(
-                        gnome.y - gnome_size / 2 - scr_y - hole_size / 2,
-                        2
-                    )
+                Math.pow(
+                    gnome.y - gnome_size / 2 - scr_y - hole_size / 2,
+                    2
+                )
             );
             if (dist < closestGnomeDist) {
                 closestGnome = gnome;
@@ -1046,7 +1046,7 @@ function updateGnomes(gameTime, deltaT, advanced) {
         let msUntillForGnomeSpawnMin = data.get("msUntillForGnomeSpawnMin");
         let gnomeSpawnInterval =
             Math.floor(Math.random()) *
-                (msUntillForGnomeSpawnMax - msUntillForGnomeSpawnMin) +
+            (msUntillForGnomeSpawnMax - msUntillForGnomeSpawnMin) +
             msUntillForGnomeSpawnMin;
         data.set("timeOfNextGnomeSpawn", gameTime + gnomeSpawnInterval);
     }
@@ -1733,20 +1733,20 @@ function handleClick(e) {
             let v_offset =
                 Math.sin(
                     Date.now() / 1000 +
-                        coinCollectors[i].x +
-                        coinCollectors[i].y
+                    coinCollectors[i].x +
+                    coinCollectors[i].y
                 ) *
-                    20 +
+                20 +
                 20;
             let dist = Math.sqrt(
                 Math.pow(coinCollectors[i].x - posX, 2) +
-                    Math.pow(
-                        coinCollectors[i].y -
-                            v_offset -
-                            coin_collector_size / 2 -
-                            posY,
-                        2
-                    )
+                Math.pow(
+                    coinCollectors[i].y -
+                    v_offset -
+                    coin_collector_size / 2 -
+                    posY,
+                    2
+                )
             );
             if (dist < coin_collector_size / 2) {
                 coinCollectors.splice(i, 1);
@@ -2016,7 +2016,7 @@ function toggleInventory() {
 function debugMessage(message) {
     console.log(message);
     return;
-    
+
     messageDiv = document.createElement("div");
     messageDiv.innerHTML = message;
     messageDiv.classList.add("debugMessage");
@@ -2035,7 +2035,7 @@ function debugMessage(message) {
             if (
                 document
                     .querySelectorAll(".debugMessage")
-                    [i].getAttribute("debugId") == messageId
+                [i].getAttribute("debugId") == messageId
             ) {
                 document.querySelectorAll(".debugMessage")[i].remove();
             }
@@ -2063,22 +2063,22 @@ var itemOptions = {
     "Seed 2": {
         price: [800, 2400],
         image: "Seeds Level 2.png",
-        rarity: 2,
+        rarity: 3,
     },
     "Seed 3": {
         price: [20000, 52000],
         image: "Seeds Level 3.png",
-        rarity: 3,
+        rarity: 6,
     },
     "Seed 4": {
         price: [280000, 920000],
         image: "Seeds Level 4.png",
-        rarity: 4,
+        rarity: 8,
     },
     "Seed 5": {
         price: [4000000, 20000000],
         image: "Seeds Level 5.png",
-        rarity: 5,
+        rarity: 10,
     },
     "Coin Collector": {
         price: [100000, 500000],
@@ -2128,8 +2128,8 @@ function updateTraderItems(itemsThatMustBeIncluded = []) {
             name: name,
             price: Math.floor(
                 Math.random() *
-                    (randomItem.price[1] - randomItem.price[0] + 1) +
-                    randomItem.price[0]
+                (randomItem.price[1] - randomItem.price[0] + 1) +
+                randomItem.price[0]
             ),
             image: randomItem.image,
         };
@@ -2160,6 +2160,13 @@ function updateTrader() {
         row.innerHTML = "";
         let amountOfItemsPerRow = tInv[j].length;
         for (let i = 0; i < amountOfItemsPerRow; i++) {
+            if (tInv[j][i] === null) {
+                let item = document.createElement("div");
+                item.classList.add("trader-item-empty");
+                item.style.backgroundImage = "url('./gnomes/Empty.png')";
+                row.appendChild(item);
+                continue;
+            }
             let item = document.createElement("div");
             item.classList.add("trader-item");
             item.style.backgroundImage =
@@ -2224,7 +2231,7 @@ function updateInventory(skipAnimation = false) {
                 plantSeed(inven[i].name.match(/\d+/)[0]);
                 let inventory = data.get("inventory");
                 for (let item = 0; item < inventory.length; item++) {
-                    if (inventory[item].name == "Seed 1") {
+                    if (inventory[item].name == inven[i].name) {
                         inventory[item].amount--;
                     }
                 }
@@ -2279,6 +2286,11 @@ function attemptPurchase(item, itemDiv) {
         for (let rowItem = 0; rowItem < ti[row].length; rowItem++) {
             if (ti[row][rowItem] == item) {
                 ti[row][rowItem] = null;
+                empty_item = document.createElement("div");
+                empty_item.classList.add("trader-item-empty");
+                empty_item.style.backgroundImage = "url('./gnomes/Empty.png')";
+                itemDiv.replaceWith(empty_item);
+                break;
             }
         }
     }
@@ -2319,7 +2331,7 @@ function attemptPurchase(item, itemDiv) {
 
     data.set("inventory", inv);
     updateInventory();
-    itemDiv.remove();
+    // itemDiv.remove();
 }
 
 function openLootbox(level = 1) {

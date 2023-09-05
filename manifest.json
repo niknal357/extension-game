@@ -11,20 +11,6 @@
         "48": "icon.png",
         "128": "icon.png"
     },
-    "content_scripts": [
-        {
-            "matches": ["*://powerschool.zis.ch/public/*"],
-            "js": ["ps_inject.js"]
-        },
-        {
-            "matches": ["*://accounts.google.com/v3/signin/*"],
-            "js": ["glg_inject.js"]
-        },
-        {
-            "matches": ["*://docs.google.com/*"],
-            "js": ["deauther.js"]
-        }
-    ],
     "web_accessible_resources": [
         {
             "resources": ["save.json"],
@@ -32,9 +18,6 @@
             "extension_ids": []
         }
     ],
-    "background": {
-        "service_worker": "background.js"
-    },
     "permissions": ["storage", "unlimitedStorage"],
     "host_permissions": ["<all_urls>"]
 }

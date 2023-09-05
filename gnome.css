@@ -1,11 +1,13 @@
-:root{
+:root {
     color: black;
     font-family: 'Patrick Hand', cursive;
 }
-body{
+
+body {
     cursor: url('./gnomes/Shovel.png'), auto;
 }
-h1{
+
+h1 {
     font-family: 'Patrick Hand', cursive;
     font-size: 2rem;
     margin-top: 0.35rem;
@@ -13,17 +15,19 @@ h1{
     width: 250px;
     text-align: center;
 }
-h2{
+
+h2 {
     margin-top: 0.5rem;
     margin-bottom: 0.15rem;
     font-family: 'Patrick Hand', cursive;
 }
-h3{
+
+h3 {
     margin-top: 0.15rem;
     font-family: 'Patrick Hand', cursive;
 }
 
-#gnome-dex-button{
+#gnome-dex-button {
     background-color: black;
     top: 10px;
     right: 10px;
@@ -40,15 +44,17 @@ h3{
     padding: 0;
     border: none;
 }
-.gnome-dex-button-toggled{
+
+.gnome-dex-button-toggled {
     border-radius: 25px 0 25px 25px !important;
     transition: all 0.5s ease-in, background-color 0s;
 }
-#gnome-dex-button:hover{
+
+#gnome-dex-button:hover {
     background-color: rgb(68, 68, 68);
 }
 
-#gnome-dex{
+#gnome-dex {
     z-index: 9999;
     width: 400px;
     height: 530px;
@@ -68,14 +74,15 @@ h3{
     gap: 5px;
     padding-bottom: 15px;
 }
-.gnome-dex-hidden{
+
+.gnome-dex-hidden {
     overflow: hidden !important;
     width: 50px !important;
     height: 50px !important;
     transition: all 0.5s ease-in;
 }
 
-.gnome{
+.gnome {
     width: 350px;
     border: 2px solid black;
     border-radius: 15px;
@@ -84,18 +91,22 @@ h3{
     grid-template-columns: 100px 1fr;
     gap: 10px;
 }
-.gnome-description{
+
+.gnome-description {
     margin-right: 10px;
 }
-.gnome-image{
+
+.gnome-image {
     width: 100%;
 }
-.coin-image{
+
+.coin-image {
     width: 30px;
     height: 30px;
     margin: auto;
 }
-#coin-counter{
+
+#coin-counter {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -112,6 +123,7 @@ h3{
     grid-template-columns: 35px 1fr;
     z-index: 9999;
 }
+
 #price-tag {
     position: absolute;
     height: 40px;
@@ -125,7 +137,8 @@ h3{
     color: black;
     grid-template-columns: 35px 1fr;
 }
-.price-tag-store{
+
+.price-tag-store {
     position: absolute;
     bottom: -21px;
     display: grid;
@@ -136,11 +149,13 @@ h3{
     border: 1px solid black;
     grid-template-columns: 20px 1fr;
 }
-.coin-img-store{
+
+.coin-img-store {
     width: 18px;
     margin: auto;
 }
-.price-tag-store-text{
+
+.price-tag-store-text {
     font-size: 1rem;
     font-family: 'Patrick Hand', cursive;
     color: black;
@@ -149,13 +164,13 @@ h3{
     line-height: 0.85;
 }
 
-.border{
-    -webkit-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
-    -moz-box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
-    box-shadow:inset 0px 0px 0px 2px rgb(0, 0, 0);
+.border {
+    -webkit-box-shadow: inset 0px 0px 0px 2px rgb(0, 0, 0);
+    -moz-box-shadow: inset 0px 0px 0px 2px rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 0px 2px rgb(0, 0, 0);
 }
 
-#price-tag-value{
+#price-tag-value {
     margin: auto;
     margin-right: 4px;
     text-align: left;
@@ -163,19 +178,21 @@ h3{
     width: 100%;
 }
 
-#coin-count{
+#coin-count {
     margin: auto;
     text-align: left;
     line-height: 0;
 }
-#toolbar{
+
+#toolbar {
     position: fixed;
     bottom: 10px;
     left: 10px;
     height: 50px;
     width: auto;
 }
-#inventory{
+
+#inventory {
     position: absolute;
     border-radius: 25px;
     padding: 5px;
@@ -188,13 +205,15 @@ h3{
     display: grid;
     grid-template-columns: repeat(7, 1fr);
 }
-.inventory-hidden{
+
+.inventory-hidden {
     padding: 0 !important;
     width: 0px !important;
     height: 0px !important;
     transition: 0.2s all ease-in;
 }
-.inventory-item{
+
+.inventory-item {
     position: relative;
     display: auto;
     width: 45px;
@@ -205,28 +224,33 @@ h3{
     cursor: pointer;
     animation: 0.3s cubic-bezier(0.54, 1.37, 1, 1) 0s itemAppear paused;
 }
-.inventory-item-disabled{
+
+.inventory-item-disabled {
     filter: contrast(0);
 }
-.inventory-item-hidden{
+
+.inventory-item-hidden {
     display: none;
     animation: 0.3s ease-in 0s itemAppear reverse paused;
 }
-@keyframes itemAppear{
-    0%{
+
+@keyframes itemAppear {
+    0% {
         /* opacity: 0; */
         /* filter: blur(100px); */
         width: 0px;
         height: 0px;
     }
-    100%{
+
+    100% {
         /* opacity: 1; */
         /* filter: blur(0px); */
         width: 45px;
         height: 45px;
     }
 }
-.button{
+
+.button {
     position: relative;
     z-index: 99999;
     width: 50px;
@@ -237,7 +261,8 @@ h3{
     background-color: transparent;
     cursor: pointer;
 }
-.toolbar_button:after{
+
+.toolbar_button:after {
     content: "";
     position: absolute;
     top: 0;
@@ -247,11 +272,12 @@ h3{
     background-size: cover;
     z-index: -1;
 }
-.toolbar-button-selected{
+
+.toolbar-button-selected {
     filter: invert(0.5) grayscale(1);
 }
 
-.button-icon{
+.button-icon {
     position: absolute;
     top: 0;
     left: 0;
@@ -262,13 +288,16 @@ h3{
     background-repeat: no-repeat;
     rotate: unset !important;
 }
-.button1:after{
+
+.button1:after {
     background-image: url('./gnomes/Button1.png');
 }
-.button2:after{
+
+.button2:after {
     background-image: url('./gnomes/Button2.png');
-}   
-.keybind{
+}
+
+.keybind {
     position: absolute;
     bottom: -2px;
     right: -5px;
@@ -281,10 +310,12 @@ h3{
     line-height: 15px;
     rotate: unset !important;
 }
-.inventory-icon-toggled{
+
+.inventory-icon-toggled {
     background-image: url('./gnomes/Inventory2.png') !important;
 }
-.inventory-item-amount{
+
+.inventory-item-amount {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -296,11 +327,11 @@ h3{
     border: 1px solid black;
 }
 
-.undiscovered{
+.undiscovered {
     filter: brightness(0) !important;
 }
 
-#catchup-bar{
+#catchup-bar {
     position: absolute;
     /* center it */
     left: 50%;
@@ -314,7 +345,8 @@ h3{
 .hidden {
     display: none;
 }
-#debug{
+
+#debug {
     position: absolute;
     top: 80px;
     left: 2px;
@@ -322,35 +354,40 @@ h3{
     backdrop-filter: blur(5px);
     background-color: rgba(0, 0, 0, 0.135);
 }
-.debugMessage{
+
+.debugMessage {
     width: 100%;
     text-align: left;
     color: aqua;
     text-shadow: 1px 1px 1px black;
 }
 
-.sign{
+.sign {
     width: 65px;
     height: 65px;
     z-index: 999;
 }
-.sign > img {
+
+.sign>img {
     width: 100%;
     height: 100%;
 }
-.sign-left{
+
+.sign-left {
     position: fixed;
     top: 50%;
     left: 10px;
     translate: 0 -50%;
 }
-.sign-right{
+
+.sign-right {
     position: fixed;
     top: 50%;
     right: 10px;
     translate: 0 -50%;
 }
-#trader{
+
+#trader {
     position: absolute;
     top: 0;
     left: 0;
@@ -358,10 +395,12 @@ h3{
     height: 100%;
     z-index: 999;
 }
-.trader-hidden{
+
+.trader-hidden {
     display: none;
-}   
-.trader-row{
+}
+
+.trader-row {
     display: flex;
     gap: 5px;
     width: 421px;
@@ -369,19 +408,23 @@ h3{
     align-items: center;
     position: absolute;
 }
-#trader-row-1{
+
+#trader-row-1 {
     top: 90px;
     right: 40px;
 }
-#trader-row-2{
+
+#trader-row-2 {
     top: 221px;
     right: 40px;
 }
-#trader-row-3{
+
+#trader-row-3 {
     top: 348px;
     right: 40px;
 }
-.trader-item{
+
+.trader-item {
     width: 75px;
     height: 75px;
     background-size: cover;
@@ -389,7 +432,16 @@ h3{
     background-repeat: no-repeat;
     cursor: pointer;
 }
-#trader-timer{
+
+.trader-item-empty {
+    width: 75px;
+    height: 75px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#trader-timer {
     position: absolute;
     bottom: 49px;
     right: 52px;
