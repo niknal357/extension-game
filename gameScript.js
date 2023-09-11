@@ -1966,6 +1966,7 @@ function toggleHoldingShovel() {
                     holes[j].y == ghostHolePositions[i].y
                 ) {
                     ghostHolePositions.splice(i, 1);
+                    i--;
                     break;
                 }
             }
